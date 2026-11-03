@@ -7,9 +7,10 @@
  *   /play/<slug>/<anything else>  -> proxied from games.gamewhame.com (proxy mode only)
  *
  * Ad units are resolved in this order:
- *   1. games.gamewhame.com/<slug>/sites/<siteKey>/ads.json   (written by your GAM automator)
- *   2. site.json ads.mode === "test"                         -> Google's public sample units
- *   3. site.json ads.gameUnitPattern                         -> e.g. /123/example.com_water_sort_rewarded
+ *   1. site.json ads.mode === "test" or no domain             -> Google's public sample units
+ *   2. site.json ads.games[<slug>]                            (set per site via the Launch API)
+ *   3. games.gamewhame.com/<slug>/sites/<siteKey>/ads.json   (written by your GAM automator)
+ *   4. site.json ads.gameUnitPattern                         -> e.g. /123/example.com_water_sort_rewarded
  */
 import SITE from "../_generated/site.js";
 
@@ -43,6 +44,9 @@ export async function onRequestGet(ctx) {
 }
 
 async function siteUnits(slug) {
+  if (SITE.ads.mode === "test" || !SITE.domain) return TEST_UNITS;
+  const own = SITE.ads.games && SITE.ads.games[slug];
+  if (own && own.rewarded && own.interstitial && own.native) return own;
   try {
     const r = await fetch(`${CDN}/${slug}/sites/${SITE.key}/ads.json`, { cf: { cacheTtl: 300, cacheEverything: true } });
     if (r.ok) {
@@ -50,7 +54,6 @@ async function siteUnits(slug) {
       if (j && j.rewarded && j.interstitial && j.native) return j;
     }
   } catch (_) { /* fall through */ }
-  if (SITE.ads.mode === "test" || !SITE.domain) return TEST_UNITS;
   const game = slug.replace(/-/g, "_");
   const make = (kind) =>
     SITE.ads.gameUnitPattern

@@ -164,10 +164,13 @@ but every unit is a string matching:
 
 When serving `/play/<slug>/` and `/play/<slug>/gam-config.js`, the Function replaces each match by kind:
 
-1. `games.gamewhame.com/<slug>/sites/<siteKey>/ads.json` if present
-2. `ads.mode === "test"` or no `domain` → Google's sample units
+1. `ads.mode === "test"` or no `domain` → Google's sample units
    (`/22639388115/rewarded_web_example`, `/6355419/Travel/Europe/France/Paris`)
-3. `gameUnitPattern` (e.g. `/23360556473/example.com_water_sort_rewarded`)
+2. `ads.games[<slug>]` in `site.json` (set per site with the Launch API)
+3. `games.gamewhame.com/<slug>/sites/<siteKey>/ads.json` if present
+4. `gameUnitPattern` (e.g. `/23360556473/example.com_water_sort_rewarded`)
+
+Portal page slots use `ads.siteUnits[<slot>]` if set, else `siteUnitPattern`.
 
 It also rewrites `<script src="gam-config.js">` to the site's copy and adds `noindex`.
 
@@ -185,7 +188,15 @@ loading and collapsed empty divs. Test mode uses `/6355419/Travel/Europe/France/
 
 ---
 
-## 7. Creating a site via your API
+## 7. Creating a site via the Launch API
+
+This is built: the Launch API (`sitebuilder.thebesads.com/api`, repo `adeshsarwan/site-builder`) creates and manages portals with
+`POST /v1/games/sites` and edits the shared catalogue with `PATCH /v1/games/<slug>`. See its `docs/GAMES_API.md`.
+`catalog/games.json` is the source of truth for game text (`scripts/sync-catalog.mjs` only adds new games unless `--refresh`),
+and `"disabled": true` on a game hides it on every site. Each `site.json` records its Pages project in `pagesProject`.
+The manual steps below are what the API does.
+
+### Manual steps (for reference)
 
 Your job-site API can create H5 game sites with the same five steps. Store per site:
 `siteKey`, `domain`, `name`, `theme`, `featured`, `adsMode`, `networkCode`, Pages project name.

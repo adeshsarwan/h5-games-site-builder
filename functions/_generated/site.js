@@ -6,7 +6,8 @@ export default {
  "ads": {
   "mode": "test",
   "networkCode": "23360556473",
-  "gameUnitPattern": "/{network}/{domain}_{game}_{kind}"
+  "gameUnitPattern": "/{network}/{domain}_{game}_{kind}",
+  "games": {}
  },
  "games": [
   "water-sort",
@@ -31,7 +32,6 @@ export default {
   "one-line-path",
   "pair-match-3d",
   "roulette",
-  "unblock-puzzle",
   "word-pic",
   "word-quest-cross-word-puzzle",
   "wrench-master-mind-twist"
