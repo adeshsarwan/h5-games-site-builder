@@ -1,0 +1,139 @@
+/* ---- Base ------------------------------------------------------------- */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:"Nunito",ui-rounded,"SF Pro Rounded",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color:var(--text);background:var(--bg);background-image:radial-gradient(circle at 20% 0,var(--bg2) 0,transparent 40%),radial-gradient(circle at 90% 30%,var(--bg2) 0,transparent 35%);
+  background-attachment:fixed;min-height:100vh;line-height:1.45}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---- Grid: fixed 94px cells on desktop (Poki-style), fluid on mobile ---- */
+:root{--cell:94px;--gap:16px;--pad:16px;--r:16px;--shadow:0 6px 12px rgba(0,30,60,.12)}
+.wrap{padding:var(--pad);max-width:1600px;margin:0 auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,var(--cell));grid-auto-rows:var(--cell);grid-auto-flow:dense;
+  gap:var(--gap);justify-content:center}
+@media (max-width:869px){
+  :root{--gap:10px;--pad:10px;--r:12px;--cols:3;--cell:calc((100vw - 2*var(--pad) - (var(--cols) - 1)*var(--gap))/var(--cols))}
+  .grid{grid-template-columns:repeat(var(--cols),var(--cell))}
+}
+@media (min-width:500px) and (max-width:869px){:root{--cols:5}}
+@media (min-width:700px) and (max-width:869px){:root{--cols:6}}
+
+/* ---- Tiles ------------------------------------------------------------ */
+.tile{position:relative;border-radius:var(--r);overflow:hidden;background:var(--tile);box-shadow:var(--shadow);
+  transition:transform .18s cubic-bezier(.2,.8,.3,1.4),box-shadow .18s;isolation:isolate}
+.tile img{width:100%;height:100%;object-fit:cover;background:var(--bg2)}
+.tile:hover,.tile:focus-visible{transform:scale(1.04) translateY(-2px);box-shadow:0 12px 24px rgba(0,30,60,.22);z-index:2;outline:0}
+.tile .t{position:absolute;inset:auto 0 0 0;padding:22px 8px 7px;font-weight:800;font-size:13px;line-height:1.15;color:#fff;
+  background:linear-gradient(transparent,rgba(0,0,0,.65));opacity:0;transform:translateY(6px);transition:.18s}
+.tile:hover .t,.tile:focus-visible .t{opacity:1;transform:none}
+@media (hover:none){.tile .t{display:none}}
+.s2{grid-column:span 2;grid-row:span 2}
+.s3{grid-column:span 3;grid-row:span 3}
+.s3 .t,.s2 .t{font-size:16px;padding:30px 12px 10px}
+@media (max-width:869px){.s3{grid-column:span 2;grid-row:span 2}}
+.badge{position:absolute;top:8px;left:8px;background:var(--accent);color:var(--accentText);font-size:11px;font-weight:900;
+  padding:2px 8px;border-radius:999px;letter-spacing:.02em;z-index:1}
+
+/* ---- Logo / nav box (first grid item, like Poki) ---------------------- */
+.brand{grid-column:span 2;background:var(--tile);border-radius:var(--r);box-shadow:var(--shadow);display:flex;flex-direction:column;
+  justify-content:center;align-items:center;gap:6px;padding:6px}
+.brand .logo{display:flex;align-items:center;gap:8px;font-weight:900;font-size:22px;letter-spacing:-.02em;color:var(--text)}
+.brand .mark{width:30px;height:30px;border-radius:9px;background:var(--accent);color:var(--accentText);display:grid;place-items:center;font-size:18px;transform:rotate(-8deg)}
+.brand nav{display:flex;gap:6px}
+.brand nav a,.brand nav button{width:38px;height:30px;border-radius:999px;display:grid;place-items:center;background:var(--bg2)}
+.brand nav a:hover,.brand nav button:hover{background:var(--bg)}
+.brand svg{width:18px;height:18px}
+@media (max-width:869px){.brand{grid-column:1/-1;grid-row:span 1;flex-direction:row;justify-content:space-between;padding:0 18px}.brand .logo{font-size:26px}.brand .mark{width:38px;height:38px;font-size:22px}.brand nav a,.brand nav button{width:48px;height:40px}}
+
+/* ---- Category tiles --------------------------------------------------- */
+.cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:var(--gap);margin:var(--gap) auto;max-width:1600px}
+.grid:empty{display:none}
+.cat{height:72px;background:var(--tile);border-radius:var(--r);box-shadow:var(--shadow);display:flex;align-items:center;gap:10px;
+  padding:0 14px;font-weight:900;font-size:17px;transition:transform .18s}
+.cat:hover{transform:scale(1.04)}
+.cat i{font-style:normal;font-size:28px}
+@media (max-width:869px){.cats{grid-template-columns:1fr 1fr}.cat{height:60px;font-size:15px}.cat i{font-size:22px}}
+
+/* ---- Ads as grid items ------------------------------------------------ */
+.ad{grid-column:span 3;grid-row:span 3;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.45);border-radius:var(--r)}
+.ad::before{content:"Advertisement";font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.55;margin-bottom:4px}
+.ad.tall{grid-row:span 7}
+.ad.wide{grid-column:1/-1;grid-row:span 1;min-height:var(--cell)}
+@media (max-width:869px){.ad{grid-column:1/-1}.ad.tall{display:none}}
+
+/* ---- Game page: player ------------------------------------------------ */
+.player{grid-column:span 8;grid-row:span 6;background:#000;border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.player.portrait{grid-column:span 5;grid-row:span 8}
+@media (min-width:870px) and (max-width:1099px){.player{grid-column:span 6;grid-row:span 5}.player.portrait{grid-column:span 4;grid-row:span 7}}
+.stage{position:relative;flex:1;min-height:0;background:#0b1b2e}
+.stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.cover{position:absolute;inset:0;display:grid;place-items:center;overflow:hidden}
+.cover img.bg{position:absolute;inset:-20px;width:calc(100% + 40px);height:calc(100% + 40px);object-fit:cover;filter:blur(22px) brightness(.7);transform:scale(1.05)}
+.cover .card{position:relative;display:flex;flex-direction:column;align-items:center;gap:14px;color:#fff;text-align:center;padding:16px}
+.cover .card img{width:132px;height:132px;border-radius:28px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.cover h1{margin:0;font-size:24px;font-weight:900;text-shadow:0 2px 8px rgba(0,0,0,.4)}
+.play{background:var(--accent);color:var(--accentText);font-weight:900;font-size:20px;padding:12px 40px;border-radius:999px;
+  box-shadow:0 6px 0 rgba(0,0,0,.25);transition:transform .12s}
+.play:hover{transform:scale(1.06)}
+.play:active{transform:translateY(3px);box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.bar{height:56px;flex:none;display:flex;align-items:center;gap:12px;padding:0 14px;background:var(--tile);color:var(--text)}
+.bar img{width:36px;height:36px;border-radius:9px}
+.bar strong{font-size:16px;font-weight:900;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar button{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--bg2)}
+.bar button:hover{background:var(--bg)}
+.bar svg{width:20px;height:20px}
+.player:fullscreen{border-radius:0}
+.player:fullscreen .bar{display:none}
+@media (max-width:869px){
+  .player,.player.portrait{grid-column:1/-1;grid-row:span 3}
+  .player .bar{display:none}
+}
+/* Immersive mobile play: game takes the whole viewport */
+body.immersive{overflow:hidden}
+body.immersive .player{position:fixed;inset:0;z-index:50;border-radius:0;aspect-ratio:auto;width:100vw;height:100dvh}
+body.immersive .player .bar{display:flex;height:44px}
+.exit{display:none}
+body.immersive .exit{display:grid}
+
+/* ---- Info card -------------------------------------------------------- */
+.info{margin:var(--gap) auto;background:var(--tile);border-radius:var(--r);box-shadow:var(--shadow);padding:28px clamp(16px,4vw,40px);
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:28px;max-width:1200px;width:100%}
+.info h2{font-size:26px;font-weight:900;margin:0 0 4px;letter-spacing:-.01em}
+.info h3{font-size:17px;font-weight:900;margin:22px 0 8px}
+.info p{margin:0 0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px}
+.chip{background:var(--bg2);padding:5px 14px;border-radius:999px;font-weight:800;font-size:14px}
+.chip:hover{background:var(--bg)}
+.how{counter-reset:s;list-style:none;padding:0;margin:0}
+.how li{counter-increment:s;position:relative;padding:6px 0 6px 40px}
+.how li::before{content:counter(s);position:absolute;left:0;top:4px;width:28px;height:28px;border-radius:50%;background:var(--accent);
+  color:var(--accentText);display:grid;place-items:center;font-weight:900;font-size:14px}
+.shots{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px}
+.shots img{height:220px;width:auto;border-radius:12px;scroll-snap-align:start;flex:none;background:var(--bg2)}
+.desc{white-space:pre-line}
+details summary{cursor:pointer;font-weight:900;color:var(--accent);margin:4px 0 10px;list-style:none}
+details summary::-webkit-details-marker{display:none}
+.ch{font-size:26px}
+.wrap>.grid+.grid{margin-top:var(--gap)}
+@media (max-width:869px){.info{grid-template-columns:1fr;gap:6px}}
+
+/* ---- Section headings & text blocks ----------------------------------- */
+.h{grid-column:1/-1;grid-row:span 1;display:flex;align-items:flex-end;font-size:22px;font-weight:900;margin:0;padding:0 4px 6px;height:var(--cell)}
+.text{margin:var(--gap) auto 0;background:var(--tile);border-radius:var(--r);box-shadow:var(--shadow);padding:22px 28px;max-width:1200px;width:100%}
+.text h1{margin:0 0 8px;font-size:26px;font-weight:900}
+footer{max-width:1200px;margin:24px auto 40px;padding:0 16px;display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:center;font-weight:800;font-size:14px;opacity:.75}
+footer a:hover{text-decoration:underline}
+
+/* ---- Search overlay --------------------------------------------------- */
+.search{position:fixed;inset:0;z-index:60;background:rgba(10,30,60,.35);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding:6vh 12px}
+.search.open{display:flex}
+.search .box{width:min(720px,100%);background:var(--tile);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:14px}
+.search input{width:100%;font:inherit;font-size:20px;font-weight:800;border:0;outline:0;padding:12px 14px;border-radius:12px;background:var(--bg2);color:var(--text)}
+.search .res{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:10px;margin-top:12px;max-height:60vh;overflow:auto}
+.search .res a{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:800;text-align:center}
+.search .res img{border-radius:14px;aspect-ratio:1;width:100%}
+.search .empty{padding:14px;opacity:.7;font-weight:700}

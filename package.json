@@ -1,0 +1,10 @@
+{
+  "name": "h5-games-site-builder",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node build.mjs && npx wrangler@3 pages dev dist --port 8788",
+    "sync-catalog": "node scripts/sync-catalog.mjs"
+  }
+}
