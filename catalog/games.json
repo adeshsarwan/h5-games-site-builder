@@ -265,7 +265,8 @@
   "description": "Start your puzzling journey today with Jigsaw Ultimate Puzzles, Unwind and Unravel Stunning Pictures, Piece by Piece!\nSharpen your memory, concentration, and problem-solving skills with every piece you place with Jigsaw Ultimate Puzzles!\n\nChallenge your mind by Choosing from a variety of difficulty levels, from soothing landscapes to intricate works of art.\nNo pressure, pure joy: Relax and enjoy the process with no timers or scores, just pure puzzle satisfaction.\n\nImmerse Yourself in Stunning Visuals with A feast for the eyes: Explore a vast library of high-quality puzzles featuring breathtaking landscapes, charming animals, inspiring art, and more!\n\nBrain-boosting fun to Uncover hidden details and captivating stories within each image.\n\nDownload Jigsaw Ultimate Puzzles today and Unleash your inner artist.\nExperience the magic of puzzles anytime, anywhere: Play offline or online, on your phone or tablet.\n\nJigsaw Ultimate Puzzles: Your key to relaxation, creativity, and brain-boosting fun!",
   "how_to_play": "Pick a picture and a difficulty level.\nDrag the pieces into place to rebuild the image.\nComplete the picture. There's no timer, so take it easy.",
   "orientation": "portrait",
-  "how_to_play_source": "written"
+  "how_to_play_source": "written",
+  "disabled": true
  },
  {
   "slug": "roulette",
