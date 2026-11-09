@@ -102,7 +102,7 @@ Files in `content/<dir>/` (all optional):
 
 | File | Builds |
 |---|---|
-| `apps.json` | `/mobile-games/` and `/mobile-games/<slug>/` (info, facts, official store links, screenshots, guide text) |
+| `apps.json` | `/topgames/` and `/topgames/<Name>` (same URLs as the source site; info, facts, official store links, screenshots, guide text). `/download/<Name>` redirects to the game page |
 | `posts.json` | `/blog/` and `/blog/<slug>/` |
 | `pages.json` | `about`, `privacy`, `terms`, `contact` HTML that replaces the built-in legal pages |
 | `home.json` | home-page intro / "mobile games" text and the popular list |

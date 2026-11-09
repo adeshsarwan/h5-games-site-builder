@@ -120,7 +120,7 @@ function tile(g, size = "", lazy = true, badge = "") {
   const px = size === "s3" ? 314 : size === "s2" ? 204 : 94;
   return `<a class="tile ${size}" href="/game/${g.slug}/">${badge ? `<span class="badge">${badge}</span>` : ""}<img src="/media/${g.slug}/${px > 94 ? "thumb-1x1" : "icon-192"}.webp" srcset="/media/${g.slug}/icon-192.webp 192w, /media/${g.slug}/thumb-1x1.webp 400w, /media/${g.slug}/icon-512.webp 512w" sizes="${px}px" width="${px}" height="${px}" alt="${esc(g.title)}"${lazy ? ' loading="lazy" decoding="async"' : ' fetchpriority="high"'}><span class="t">${esc(g.title)}</span></a>`;
 }
-const brand = () => `<div class="brand"><a class="logo" href="/" aria-label="${esc(site.name)} home"><span class="mark">${esc(site.logo.mark)}</span>${esc(site.logo.text)}</a><nav><a href="/" aria-label="Home">${ICON.home}</a>${C?.apps.length ? `<a href="/mobile-games/" aria-label="Mobile games">${ICON.phone}</a>` : ""}${C?.posts.length ? `<a href="/blog/" aria-label="Blog">${ICON.blog}</a>` : ""}<button data-search aria-label="Search games">${ICON.search}</button></nav></div>`;
+const brand = () => `<div class="brand"><a class="logo" href="/" aria-label="${esc(site.name)} home"><span class="mark">${esc(site.logo.mark)}</span>${esc(site.logo.text)}</a><nav><a href="/" aria-label="Home">${ICON.home}</a>${C?.apps.length ? `<a href="/topgames/" aria-label="Mobile games">${ICON.phone}</a>` : ""}${C?.posts.length ? `<a href="/blog/" aria-label="Blog">${ICON.blog}</a>` : ""}<button data-search aria-label="Search games">${ICON.search}</button></nav></div>`;
 const catTiles = () => `</div><nav class="cats" aria-label="Categories">${cats.map((c) => `<a class="cat" href="/category/${catSlug(c)}/"><i>${CAT_ICON[c] || "🎮"}</i>${esc(c)} games</a>`).join("")}</nav><div class="grid">`;
 
 function page({ title, desc, canonical, body, head = "", ogImage = "", jsonld = null, robots = "" }) {
@@ -134,7 +134,7 @@ ${ADS_OFF ? "" : '<link rel="preconnect" href="https://securepubads.g.doubleclic
 <style>${themeCss}${CSS}</style>${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script>` : ""}
 <script>window.__SITE__=${JSON.stringify(siteJs)}</script><script defer src="${JS_FILE}"></script>${site.analytics?.ga4 ? `<script async src="https://www.googletagmanager.com/gtag/js?id=${site.analytics.ga4}"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${site.analytics.ga4}')</script>` : ""}
 </head><body><main class="wrap">${body}</main>
-<footer><a href="/">All games</a>${cats.map((c) => `<a href="/category/${catSlug(c)}/">${esc(c)}</a>`).join("")}${C?.apps.length ? '<a href="/mobile-games/">Mobile games</a>' : ""}${C?.posts.length ? '<a href="/blog/">Blog</a>' : ""}<a href="/about/">About</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a>${C?.pages.contact ? '<a href="/contact/">Contact</a>' : site.contactEmail ? `<a href="mailto:${esc(site.contactEmail)}">Contact</a>` : ""}<span>© ${new Date().getFullYear()} ${esc(site.name)}</span></footer>
+<footer><a href="/">All games</a>${cats.map((c) => `<a href="/category/${catSlug(c)}/">${esc(c)}</a>`).join("")}${C?.apps.length ? '<a href="/topgames/">Mobile games</a>' : ""}${C?.posts.length ? '<a href="/blog/">Blog</a>' : ""}<a href="/about/">About</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a>${C?.pages.contact ? '<a href="/contact/">Contact</a>' : site.contactEmail ? `<a href="mailto:${esc(site.contactEmail)}">Contact</a>` : ""}<span>© ${new Date().getFullYear()} ${esc(site.name)}</span></footer>
 <div class="search" role="dialog" aria-label="Search"><div class="box"><input type="search" placeholder="Search ${games.length} games…" aria-label="Search games"><div class="res"></div></div></div>
 </body></html>`;
 }
@@ -221,8 +221,11 @@ const LEGAL = {
   terms: ["Terms of use", `<p>The games on ${esc(site.name)} are provided free of charge for personal entertainment, as is and without warranty. Game names, artwork and trademarks belong to their respective owners. By using the site you agree not to copy, frame or redistribute its content without permission.</p>`],
 };
 
-// ---------- content pages: /mobile-games/, /blog/ ----------
+// ---------- content pages: /topgames/, /blog/ ----------
 const appBy = Object.fromEntries((C?.apps || []).map((a) => [a.slug, a]));
+const appByPath = Object.fromEntries((C?.apps || []).map((a) => [(a.path || a.slug).toLowerCase(), a]));
+// Mobile game pages keep the source site's URLs (/topgames/<Name>) so existing campaign links work unchanged.
+const appUrl = (a) => `/topgames/${a.path || a.slug}`;
 const postBy = Object.fromEntries((C?.posts || []).map((p) => [p.slug, p]));
 const slugify = (x) => { try { x = decodeURIComponent(x); } catch {} return x.toLowerCase().replace(/™|®/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); };
 const LEGAL_PATH = { "about-us": "/about/", "privacy-policy": "/privacy/", "terms-of-use": "/terms/", "contact-us": "/contact/" };
@@ -233,11 +236,11 @@ function fixLinks(html = "") {
   return html.replace(/href="([^"]*)"/g, (m, h) => {
     const u = h.replace(/^https?:\/\/[^/]+/, "");
     let x;
-    if ((x = u.match(/^\/topgames\/([^/?#]+)/))) return `href="${appBy[slugify(x[1])] ? `/mobile-games/${slugify(x[1])}/` : "/mobile-games/"}"`;
-    if (/^\/topgames\/?$/.test(u)) return 'href="/mobile-games/"';
+    if ((x = u.match(/^\/topgames\/([^/?#]+)/))) { let n = x[1]; try { n = decodeURIComponent(n); } catch {} const a = appByPath[n.replace(/ /g, "-").toLowerCase()] || appBy[slugify(n)]; return `href="${a ? appUrl(a) : "/topgames/"}"`; }
+    if (/^\/topgames\/?$/.test(u)) return 'href="/topgames/"';
     if ((x = u.match(/^\/blogs\/([^/?#]+)/))) return `href="${postBy[slugify(x[1])] ? `/blog/${slugify(x[1])}/` : "/blog/"}"`;
     if (/^\/blogs\/?$/.test(u)) return 'href="/blog/"';
-    if ((x = u.match(/^\/download\/([^/?#]+)/))) { const a = appBy[slugify(x[1])]; return a?.googlePlay ? `href="${esc(a.googlePlay)}" rel="nofollow noopener" target="_blank"` : `href="/mobile-games/"`; }
+    if ((x = u.match(/^\/download\/([^/?#]+)/))) { const a = appBy[slugify(x[1])]; return a?.googlePlay ? `href="${esc(a.googlePlay)}" rel="nofollow noopener" target="_blank"` : `href="/topgames/"`; }
     if ((x = u.match(/^\/page\/([^/?#]+)/))) return `href="${LEGAL_PATH[x[1].toLowerCase()] || "/"}"`;
     if (/^\/(playgames\.html|index\.html|game-template\.html.*)?$/.test(u) && h !== u) return 'href="/"';
     return m;
@@ -246,7 +249,7 @@ function fixLinks(html = "") {
 const appImg = (a) => a._icon || a.icon;
 function appTile(a, size = "", lazy = true) {
   const px = size === "s2" ? 204 : 94;
-  return `<a class="tile ${size}" href="/mobile-games/${a.slug}/"><img src="${esc(appImg(a))}" width="${px}" height="${px}" alt="${esc(a.title)}"${lazy ? ' loading="lazy" decoding="async"' : ""}><span class="t">${esc(a.title)}</span></a>`;
+  return `<a class="tile ${size}" href="${appUrl(a)}"><img src="${esc(appImg(a))}" width="${px}" height="${px}" alt="${esc(a.title)}"${lazy ? ' loading="lazy" decoding="async"' : ""}><span class="t">${esc(a.title)}</span></a>`;
 }
 function postCard(p) {
   return `<a class="card" href="/blog/${p.slug}/"><img src="${esc(p._image || p.image)}" alt="${esc(p.title)}" loading="lazy" decoding="async" width="400" height="225"><span>${p.label ? `<em>${esc(p.label)}</em>` : ""}<strong>${esc(p.title)}</strong>${p.blurb ? `<small>${esc(p.blurb)}</small>` : ""}</span></a>`;
@@ -254,33 +257,34 @@ function postCard(p) {
 function homeExtras() {
   const pop = (C.home.popular || []).map((s) => appBy[s]).filter(Boolean);
   const list = [...pop, ...C.apps.filter((a) => !pop.includes(a))];
-  return `${C.apps.length ? `<div class="grid"><h2 class="h"><a href="/mobile-games/">Popular mobile games →</a></h2>${list.slice(0, 24).map((a, i) => appTile(a, i < 2 ? "s2" : "")).join("")}</div>` : ""}
+  return `${C.apps.length ? `<div class="grid"><h2 class="h"><a href="/topgames/">Popular mobile games →</a></h2>${list.slice(0, 24).map((a, i) => appTile(a, i < 2 ? "s2" : "")).join("")}</div>` : ""}
 ${C.posts.length ? `<h2 class="h2"><a href="/blog/">Articles →</a></h2><div class="cards">${C.posts.slice(0, 6).map(postCard).join("")}</div>` : ""}`;
 }
 function appsIndex() {
-  const body = `<div class="grid">${brand()}<h1 class="h ch">📱 Mobile games</h1>${C.apps.map((a, i) => appTile(a, i < 3 ? "s2" : "", i > 7)).join("")}<h2 class="h">Play online now</h2>${games.slice(0, 12).map((g) => tile(g)).join("")}</div>
+  const body = `<div class="grid">${brand()}<h1 class="h ch">🔥 Top mobile games</h1>${C.apps.map((a, i) => appTile(a, i < 3 ? "s2" : "", i > 7)).join("")}<h2 class="h">Play online now</h2>${games.slice(0, 12).map((g) => tile(g)).join("")}</div>
 ${C.home.intro ? `<section class="text prose">${fixLinks(C.home.intro)}</section>` : ""}`;
-  return page({ title: `Mobile games: guides, tips and official download links | ${site.name}`, desc: `Gameplay guides, tips and official store links for ${C.apps.slice(0, 4).map((a) => a.title).join(", ")} and more popular mobile games.`, canonical: "/mobile-games/", body });
+  return page({ title: `Top mobile games: guides, tips and official download links | ${site.name}`, desc: `Gameplay guides, tips and official store links for ${C.apps.slice(0, 4).map((a) => a.title).join(", ")} and more popular mobile games.`, canonical: "/topgames/", body });
 }
 function appPage(a) {
   const facts = [["Developer", a.developer], ["Score", a.score], ["Downloads", a.downloads], ["Age", a.age], ["Version", a.version], ["Price", a.price]].filter(([, v]) => v);
   const stores = [a.googlePlay && `<a class="store" href="${esc(a.googlePlay)}" rel="nofollow noopener" target="_blank">Get it on Google Play</a>`, a.appStore && `<a class="store" href="${esc(a.appStore)}" rel="nofollow noopener" target="_blank">Download on the App Store</a>`].filter(Boolean).join("");
   const shots = (a._shots || a.screenshots || []).slice(0, 6);
-  const others = C.apps.filter((x) => x.slug !== a.slug);
+  const rest = C.apps.filter((x) => x.slug !== a.slug);
+  const others = [...rest.filter((x) => x.genre && x.genre === a.genre), ...rest.filter((x) => !x.genre || x.genre !== a.genre)];
   const body = `<div class="grid">${brand()}</div>
 <article class="info app"><div>
 <div class="apphead"><img src="${esc(appImg(a))}" width="112" height="112" alt="${esc(a.title)}" fetchpriority="high"><div><h1>${esc(a.title)}</h1>${a.genre ? `<p class="genre">${esc(a.genre)}</p>` : ""}${stores ? `<div class="stores">${stores}</div>` : ""}</div></div>
 ${facts.length ? `<dl class="facts">${facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>` : ""}
 <div class="prose">${fixLinks(a.html)}</div></div>
 <div>${shots.length ? `<h3>Screenshots</h3><div class="shots">${shots.map((u, i) => `<img src="${esc(u)}" alt="${esc(a.title)} screenshot ${i + 1}" loading="lazy" decoding="async" height="220">`).join("")}</div>` : ""}
-<h3>Similar games</h3><div class="mini">${others.slice(0, 8).map((x) => `<a href="/mobile-games/${x.slug}/"><img src="${esc(appImg(x))}" width="48" height="48" alt="" loading="lazy">${esc(x.title)}</a>`).join("")}</div></div></article>
+<h3>Similar games</h3><div class="mini">${others.slice(0, 8).map((x) => `<a href="${appUrl(x)}"><img src="${esc(appImg(x))}" width="48" height="48" alt="" loading="lazy">${esc(x.title)}</a>`).join("")}</div></div></article>
 <div class="grid"><h2 class="h">H5 online games: play instantly</h2>${games.slice(0, 18).map((g) => tile(g)).join("")}</div>`;
   return page({
     title: `${a.title}: gameplay, tips and download | ${site.name}`,
     desc: short(a.metaDesc || `${a.title} guide: gameplay, strategies and tips, features, and the official download link.`),
-    canonical: `/mobile-games/${a.slug}/`,
+    canonical: appUrl(a),
     ogImage: a._icon || "",
-    jsonld: { "@context": "https://schema.org", "@type": "MobileApplication", name: a.title, applicationCategory: "GameApplication", operatingSystem: "Android, iOS", author: a.developer ? { "@type": "Organization", name: a.developer } : undefined, url: origin ? `${origin}/mobile-games/${a.slug}/` : undefined },
+    jsonld: { "@context": "https://schema.org", "@type": "MobileApplication", name: a.title, applicationCategory: "GameApplication", operatingSystem: "Android, iOS", author: a.developer ? { "@type": "Organization", name: a.developer } : undefined, url: origin ? origin + appUrl(a) : undefined },
     body,
   });
 }
@@ -337,12 +341,15 @@ if (C) {
   await pool(C.apps, async (a) => {
     a._icon = await localImg(a.icon, `apps/${a.slug}/icon`);
     a._shots = [];
-    for (const [i, u] of (a.screenshots || []).slice(0, 6).entries()) a._shots.push(await localImg(u, `apps/${a.slug}/${String(i + 1).padStart(2, "0")}`));
+    for (const [i, u] of (a.screenshots || []).slice(0, 4).entries()) a._shots.push(await localImg(u, `apps/${a.slug}/${String(i + 1).padStart(2, "0")}`));
   });
   await pool(C.posts, async (p) => { p._image = await localImg(p.image, `blog/${p.slug}`); });
   // rebuild home now that images are local
   await w("index.html", homePage());
-  if (C.apps.length) { await w("mobile-games/index.html", appsIndex()); for (const a of C.apps) await w(`mobile-games/${a.slug}/index.html`, appPage(a)); }
+  if (C.apps.length) {
+    await w("topgames/index.html", appsIndex());
+    for (const a of C.apps) await w(`topgames/${a.path || a.slug}.html`, appPage(a)); // served at /topgames/<Name>
+  }
   if (C.posts.length) { await w("blog/index.html", blogIndex()); for (const p of C.posts) await w(`blog/${p.slug}/index.html`, postPage(p)); }
   console.log(`  + content: ${C.apps.length} mobile game pages, ${C.posts.length} blog posts, pages: ${Object.keys(C.pages).join(", ") || "none"}`);
 }
@@ -353,10 +360,11 @@ await w("manifest.webmanifest", JSON.stringify({ name: site.name, short_name: si
 await w("robots.txt", `User-agent: *\nDisallow: /play/\n${origin ? `Sitemap: ${origin}/sitemap.xml\n` : ""}`);
 if (origin) {
   const urls = ["/", ...games.map((g) => `/game/${g.slug}/`), ...cats.map((c) => `/category/${catSlug(c)}/`), "/about/", "/privacy/", "/terms/",
-    ...(C?.pages.contact ? ["/contact/"] : []), ...(C?.apps.length ? ["/mobile-games/", ...C.apps.map((a) => `/mobile-games/${a.slug}/`)] : []), ...(C?.posts.length ? ["/blog/", ...C.posts.map((p) => `/blog/${p.slug}/`)] : [])];
+    ...(C?.pages.contact ? ["/contact/"] : []), ...(C?.apps.length ? ["/topgames/", ...C.apps.map(appUrl)] : []), ...(C?.posts.length ? ["/blog/", ...C.posts.map((p) => `/blog/${p.slug}/`)] : [])];
   await w("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map((u) => `<url><loc>${origin}${u}</loc></url>`).join("")}</urlset>`);
 }
 if (site.adsTxt?.length) await w("ads.txt", site.adsTxt.join("\n") + "\n");
+if (C?.apps.length) await w("_redirects", `/download/:name /topgames/:name 302\n/mobile-games/* /topgames/ 301\n`);
 await w("_headers", `/assets/*
   Cache-Control: public, max-age=31536000, immutable
 /media/*
