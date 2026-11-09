@@ -111,7 +111,8 @@ const { doc: blogIdx } = await get("/blogs/");
 const posts = [];
 for (const a of blogIdx.querySelectorAll("a.blog-card")) {
   const href = a.getAttribute("href");
-  const { doc, url } = await get(href);
+  let doc, url;
+  try { ({ doc, url } = await get(href)); } catch (e) { console.warn("skip (broken link on source site):", href, e.message); continue; }
   const main = doc.querySelector(".blog-main");
   if (!main) { console.warn("skip (not an article):", href); continue; }
   const title = text(a.querySelector("h3"));
