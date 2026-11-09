@@ -22,7 +22,9 @@ const prev = existsSync(outFile) ? JSON.parse(await readFile(outFile, "utf8")) :
 const out = { ...prev };
 
 const pkgOf = (url = "") => (url.match(/[?&]id=([^&#]+)/) || [])[1] || "";
-const pkgs = [...new Set(apps.map((a) => pkgOf(a.googlePlay)).filter(Boolean))];
+const extraFile = path.join(dir, "extra-apps.json"); // games added by us (not from the imported site)
+const extra = existsSync(extraFile) ? JSON.parse(await readFile(extraFile, "utf8")) : [];
+const pkgs = [...new Set([...apps.map((a) => pkgOf(a.googlePlay)), ...extra.map((e) => e.pkg)].filter(Boolean))];
 let ok = 0, failed = [];
 
 async function one(appId) {

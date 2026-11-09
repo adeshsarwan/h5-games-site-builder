@@ -1,0 +1,186 @@
+[
+ {
+  "pkg": "com.vitastudio.mahjong",
+  "path": "Vita-Mahjong"
+ },
+ {
+  "pkg": "com.kristanix.android.mahjongsolitairetitan",
+  "path": "Mahjong-Titan"
+ },
+ {
+  "pkg": "com.match.meditation",
+  "path": "Mahjong-Scapes"
+ },
+ {
+  "pkg": "com.g5e.mahjong.android",
+  "path": "Mahjong-Journey"
+ },
+ {
+  "pkg": "com.YoStarEN.MahjongSoul",
+  "path": "Mahjong-Soul"
+ },
+ {
+  "pkg": "com.peoplefun.wordcross",
+  "path": "Wordscapes"
+ },
+ {
+  "pkg": "com.fugo.wow",
+  "path": "Words-of-Wonders"
+ },
+ {
+  "pkg": "com.nytimes.crossword",
+  "path": "NYT-Games"
+ },
+ {
+  "pkg": "com.pieyel.scrabble",
+  "path": "Scrabble-GO"
+ },
+ {
+  "pkg": "com.fanatee.cody",
+  "path": "CodyCross"
+ },
+ {
+  "pkg": "in.playsimple.wordsearch",
+  "path": "Word-Search-Explorer"
+ },
+ {
+  "pkg": "kidultlovin.word.zen",
+  "path": "Zen-Word"
+ },
+ {
+  "pkg": "com.JindoBlu.TwoPlayerGamesChallenge",
+  "path": "2-Player-Games-The-Challenge"
+ },
+ {
+  "pkg": "com.JindoBlu.FourPlayers",
+  "path": "1-2-3-4-Player-Games"
+ },
+ {
+  "pkg": "net.froemling.bombsquad",
+  "path": "BombSquad"
+ },
+ {
+  "pkg": "com.matteljv.uno",
+  "path": "UNO"
+ },
+ {
+  "pkg": "com.dodreams.driveahead",
+  "path": "Drive-Ahead"
+ },
+ {
+  "pkg": "com.unicostudio.braintest",
+  "path": "Brain-Test"
+ },
+ {
+  "pkg": "com.tellmewow.senior.brain.training",
+  "path": "Train-your-Brain"
+ },
+ {
+  "pkg": "com.vitastudio.solitaire",
+  "path": "Vita-Solitaire"
+ },
+ {
+  "pkg": "com.chess",
+  "path": "Chess-com"
+ },
+ {
+  "pkg": "name.boyle.chris.sgtpuzzles",
+  "path": "Simon-Tathams-Puzzles"
+ },
+ {
+  "pkg": "com.balysv.loop",
+  "path": "Infinity-Loop"
+ },
+ {
+  "pkg": "com.hidea.cat",
+  "path": "Cats-and-Soup"
+ },
+ {
+  "pkg": "com.block.juggle",
+  "path": "Block-Blast"
+ },
+ {
+  "pkg": "com.dreamgames.royalmatch",
+  "path": "Royal-Match"
+ },
+ {
+  "pkg": "net.peakgames.toonblast",
+  "path": "Toon-Blast"
+ },
+ {
+  "pkg": "com.oakever.tiletrip",
+  "path": "Tile-Explorer"
+ },
+ {
+  "pkg": "com.king.candycrushsodasaga",
+  "path": "Candy-Crush-Soda-Saga"
+ },
+ {
+  "pkg": "com.weplaydots.twodotsandroid",
+  "path": "Two-Dots"
+ },
+ {
+  "pkg": "com.je.supersus",
+  "path": "Super-Sus"
+ },
+ {
+  "pkg": "com.werewolfapps.online",
+  "path": "Wolvesville"
+ },
+ {
+  "pkg": "com.wildlifestudios.free.online.games.suspects",
+  "path": "Suspects-Mystery-Mansion"
+ },
+ {
+  "pkg": "net.partycat.spygame",
+  "path": "Spy-Imposter-Game"
+ },
+ {
+  "pkg": "com.fungames.blockcraft",
+  "path": "Block-Craft-3D"
+ },
+ {
+  "pkg": "com.mkarpenko.worldbox",
+  "path": "WorldBox"
+ },
+ {
+  "pkg": "info.flowersoft.theotown.theotown",
+  "path": "TheoTown"
+ },
+ {
+  "pkg": "moonbear.PocketBuild",
+  "path": "Pocket-Build"
+ },
+ {
+  "pkg": "com.playmini.miniworld",
+  "path": "Mini-World-CREATA"
+ },
+ {
+  "pkg": "com.tripledot.solitaire",
+  "path": "Solitaire-com"
+ },
+ {
+  "pkg": "nz.co.codepoint.minimetro",
+  "path": "Mini-Metro"
+ },
+ {
+  "pkg": "com.kiragames.unblockme",
+  "path": "Unblock-Me-Premium"
+ },
+ {
+  "pkg": "com.noodlecake.altosodyssey",
+  "path": "Altos-Odyssey"
+ },
+ {
+  "pkg": "com.potatojam.classic.solitaire.klondike",
+  "path": "Classic-Solitaire-Klondike"
+ },
+ {
+  "pkg": "com.SecretModeLimited.ALittletotheLeft",
+  "path": "A-Little-to-the-Left"
+ },
+ {
+  "pkg": "com.playgendary.tom",
+  "path": "Tomb-of-the-Mask"
+ }
+]

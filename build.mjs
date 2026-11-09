@@ -50,6 +50,15 @@ const C = await (async () => {
   const out = swap({ apps: await load("apps.json", []), posts: await load("posts.json", []), pages: await load("pages.json", {}), home: await load("home.json", {}) });
   out.play = await load("play.json", {});          // live Google Play data (scripts/sync-play.mjs, daily)
   out.ed = await load("editorial.json", { reviews: {}, lists: [] }); // our own reviews and best-of lists
+  // Games we added ourselves (content/<dir>/extra-apps.json: [{ pkg, path? }]); facts and images come from play.json.
+  const have = new Set(out.apps.map((a) => (a.googlePlay?.match(/[?&]id=([^&#]+)/) || [])[1]));
+  for (const e of await load("extra-apps.json", [])) {
+    const p = out.play[e.pkg];
+    if (!p || have.has(e.pkg)) continue;
+    const pth = e.path || p.title.replace(/[™®:'’]/g, "").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    out.apps.push({ slug: pth.toLowerCase(), path: pth, title: e.title || p.title, genre: `Game ${p.genre}`, developer: p.developer, googlePlay: `https://play.google.com/store/apps/details?id=${e.pkg}`, html: "", screenshots: [], icon: "", extra: true });
+    have.add(e.pkg);
+  }
   const ex = site.content.excludeApps || [];
   out.apps = out.apps.filter((a) => !ex.includes(a.slug));
   return out;
@@ -355,8 +364,17 @@ ${kids.length ? `<h2 class="h2">For kids</h2><div class="cards">${kids.map(listC
 <h2 class="h2">Editor's Choice</h2><div class="grid">${C.apps.filter((a) => reviewOf(a)?.editorsChoice).map((a) => appTile(a)).join("")}</div>`;
   return page({ title: `Best mobile games to download in ${new Date().getFullYear()} | ${site.name}`, desc: `Editor-picked lists of the best Android games: ${main.slice(0, 4).map((l) => l.title.replace(/^Best /, "").toLowerCase()).join(", ")} and more.`, canonical: "/best/", body });
 }
+// A list can require facts that must stay true ("filter": "noAds" | "noIAP" | "noAdsNoIAP"); picks that no longer
+// match the live Google Play data are dropped at build time, so the page never claims something stale.
+const LIST_FILTER = { noAds: (p) => p && !p.adSupported, noIAP: (p) => p && !p.offersIAP, noAdsNoIAP: (p) => p && !p.adSupported && !p.offersIAP };
+const picksOf = (l) => l.picks.map((p) => ({ ...p, a: appByPath[p.path.toLowerCase()] })).filter((p) => {
+  if (!p.a) { console.warn(`  ! list ${l.slug}: unknown game ${p.path}`); return false; }
+  const f = LIST_FILTER[l.filter];
+  if (f && !f(playOf(p.a))) { console.warn(`  ! list ${l.slug}: dropped ${p.path} (no longer matches ${l.filter})`); return false; }
+  return true;
+});
 function listPage(l) {
-  const picks = l.picks.map((p) => ({ ...p, a: appByPath[p.path.toLowerCase()] })).filter((p) => p.a);
+  const picks = picksOf(l);
   const row = (p, i) => { const pl = playOf(p.a), r = reviewOf(p.a); return `<tr><td>${i + 1}</td><td><a href="#pick-${i + 1}"><img src="${esc(appImgOf(p.a, 64))}" width="32" height="32" alt="" loading="lazy">${esc(p.a.title)}</a></td><td>${esc(p.award || "")}</td><td>${r ? `${r.score.toFixed(1)}/5` : "–"}</td><td>${pl?.score ? `${pl.score} ★` : "–"}</td><td>${esc(installsShort(pl) || "–")}</td><td>${pl ? [pl.free ? "Free" : pl.price || "Paid", pl.adSupported ? "ads" : "", pl.offersIAP ? "IAP" : ""].filter(Boolean).join(" · ") : "–"}</td></tr>`; };
   const section = (p, i) => { const r = reviewOf(p.a), pl = playOf(p.a); return `<section class="pick" id="pick-${i + 1}"><div class="apphead"><img src="${esc(appImgOf(p.a, 192))}" width="88" height="88" alt="${esc(p.a.title)}" loading="lazy"><div><p class="rank">${i + 1}.${p.award ? ` <em>${esc(p.award)}</em>` : ""}</p><h2>${esc(p.a.title)}</h2><p class="genre">${r ? `Our score ${r.score.toFixed(1)}/5` : ""}${r && pl?.score ? " · " : ""}${pl?.score ? `Google Play ${pl.score} ★` : ""}${pl?.installs ? ` · ${esc(pl.installs)} installs` : ""}</p></div></div>
 <p>${esc(p.why)}</p><div class="stores">${storeBtn(p.a)}${r ? `<a class="store ghost" href="${appUrl(p.a)}">Read our review</a>` : ""}</div></section>`; };
