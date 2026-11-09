@@ -72,11 +72,13 @@ const homeOut = {
   popular: [...new Set(popular)],
 };
 
+
 // ---------- mobile game pages ----------
 const apps = [];
 for (const h of appHrefs) {
   const name = decodeURIComponent(h.split("/topgames/")[1]);
-  const { doc, url } = await get(h);
+  let doc, url;
+  try { ({ doc, url } = await get(h)); } catch (e) { console.warn("skip (broken link on source site):", h, e.message); continue; }
   let dl;
   try { dl = (await get(`/download/${name.replace(/ /g, "-")}`)).doc; } catch { dl = null; }
   const info = {};
