@@ -1179,6 +1179,596 @@
    "updated": "2026-11-09",
    "author": "editors",
    "kids": true
+  },
+  {
+   "slug": "best-games-without-ads",
+   "title": "Best Android games without ads",
+   "intro": [
+    "Tired of a 30-second video after every level? Every game on this list shows no ads at all, according to its Google Play listing.",
+    "Some are paid once, some are free and make money from optional purchases instead. We note which is which."
+   ],
+   "picks": [
+    {
+     "path": "Monument-Valley-2",
+     "award": "Best overall",
+     "why": "A beautiful, complete puzzle game. Pay once and there's nothing else to buy or watch."
+    },
+    {
+     "path": "Simon-Tathams-Puzzles",
+     "award": "Best free pick",
+     "why": "Around 40 classic logic puzzles, completely free, with no ads and no purchases."
+    },
+    {
+     "path": "Terraria",
+     "award": "Best adventure",
+     "why": "Hundreds of hours of crafting and boss fights for one small price."
+    },
+    {
+     "path": "Mini-Metro",
+     "award": "Best strategy",
+     "why": "Design a subway map for a growing city: calm, clever and ad-free."
+    },
+    {
+     "path": "Royal-Match",
+     "award": "Best match-3",
+     "why": "A free match-3 game that skips ads entirely and earns from optional purchases instead."
+    },
+    {
+     "path": "A-Little-to-the-Left",
+     "award": "Most relaxing",
+     "why": "Tidy-up puzzles that feel like sorting a messy drawer, with no ads."
+    },
+    {
+     "path": "Classic-Solitaire-Klondike",
+     "award": "Best card game",
+     "why": "Plain, free Klondike solitaire with no ads."
+    },
+    {
+     "path": "Geometry-Dash",
+     "award": "Best challenge",
+     "why": "A hard rhythm platformer, paid once, with no ads."
+    },
+    {
+     "path": "Brawl-Stars",
+     "award": "Best multiplayer",
+     "why": "Free team battles with no ads; it sells skins and passes instead."
+    }
+   ],
+   "howWeChose": "We only included games whose Google Play listing says they contain no ads, and we re-check that every day. If a game starts showing ads, it drops off this page automatically.",
+   "updated": "2026-11-09",
+   "author": "editors",
+   "kids": false,
+   "filter": "noAds"
+  },
+  {
+   "slug": "best-games-without-in-app-purchases",
+   "title": "Best games with no in-app purchases",
+   "intro": [
+    "No coins, no gems, no 'special offer' pop-ups. These games have no in-app purchases at all, according to Google Play, so what you see is what you get."
+   ],
+   "picks": [
+    {
+     "path": "Terraria",
+     "award": "Best overall",
+     "why": "A huge adventure, paid once, with nothing more to buy."
+    },
+    {
+     "path": "Monument-Valley-2",
+     "award": "Best puzzle game",
+     "why": "A short, lovely game that's complete out of the box."
+    },
+    {
+     "path": "Simon-Tathams-Puzzles",
+     "award": "Best free pick",
+     "why": "Free, with no ads and nothing to buy: rare on Google Play."
+    },
+    {
+     "path": "Mini-Metro",
+     "award": "Best strategy",
+     "why": "A small price for a game you can replay for years."
+    },
+    {
+     "path": "Geometry-Dash",
+     "award": "Best for skill",
+     "why": "Every level unlocked by playing, not paying."
+    },
+    {
+     "path": "Poly-Bridge-3",
+     "award": "Best sandbox",
+     "why": "Creative bridge-building with nothing extra to buy."
+    },
+    {
+     "path": "Earn-to-Die",
+     "award": "Best budget pick",
+     "why": "A cheap, complete upgrade-and-drive game."
+    },
+    {
+     "path": "Classic-Solitaire-Klondike",
+     "award": "Best card game",
+     "why": "Free solitaire with no purchases."
+    },
+    {
+     "path": "Sudoku-Ultimate-Offline-puzzle",
+     "award": "Best number puzzle",
+     "why": "Pay once for clean, offline sudoku."
+    }
+   ],
+   "howWeChose": "Every pick has no in-app purchases on its Google Play listing, checked daily. Games that add purchases are removed from this list automatically.",
+   "updated": "2026-11-09",
+   "author": "editors",
+   "kids": false,
+   "filter": "noIAP"
+  },
+  {
+   "slug": "best-games-for-low-end-phones",
+   "title": "Best games for low-end and older Android phones",
+   "intro": [
+    "You don't need a flagship phone to have fun. These are light, mostly 2D games that tend to run smoothly on budget and older devices.",
+    "Phones vary a lot, so check the download size on Google Play before installing if storage is tight."
+   ],
+   "picks": [
+    {
+     "path": "Hill-Climb-Racing",
+     "award": "Best overall",
+     "why": "Simple graphics and smooth physics that run on almost anything."
+    },
+    {
+     "path": "Simon-Tathams-Puzzles",
+     "award": "Smallest download",
+     "why": "A tiny app packed with puzzles."
+    },
+    {
+     "path": "Tomb-of-the-Mask",
+     "award": "Best arcade game",
+     "why": "Retro-style maze action with simple graphics."
+    },
+    {
+     "path": "Solitaire-com",
+     "award": "Best card game",
+     "why": "Light, fast solitaire."
+    },
+    {
+     "path": "Block-Blast",
+     "award": "Best puzzle",
+     "why": "A simple block puzzle that loads instantly."
+    },
+    {
+     "path": "Infinity-Loop",
+     "award": "Most relaxing",
+     "why": "Minimal graphics and calm puzzles."
+    },
+    {
+     "path": "Geometry-Dash",
+     "award": "Best challenge",
+     "why": "Simple shapes, smooth gameplay."
+    },
+    {
+     "path": "Unblock-Me-Premium",
+     "award": "Best brain teaser",
+     "why": "Classic sliding-block puzzles."
+    }
+   ],
+   "howWeChose": "We chose games with simple 2D graphics and small downloads that generally run well on budget phones. We can't test every device, so performance on yours may differ.",
+   "updated": "2026-11-09",
+   "author": "editors",
+   "kids": false
+  },
+  {
+   "slug": "best-two-player-games",
+   "title": "Best two-player games: same phone or with a friend",
+   "intro": [
+    "Hand your phone to a friend or play together in the same room. These games are built for two (or more) players."
+   ],
+   "picks": [
+    {
+     "path": "2-Player-Games-The-Challenge",
+     "award": "Best same-phone pick",
+     "why": "Dozens of quick mini-games for two people sharing one screen."
+    },
+    {
+     "path": "1-2-3-4-Player-Games",
+     "award": "Best for groups",
+     "why": "Mini-games for up to four players on one phone or tablet."
+    },
+    {
+     "path": "Drive-Ahead",
+     "award": "Most fun",
+     "why": "Silly car battles where each player controls one side of the screen."
+    },
+    {
+     "path": "BombSquad",
+     "award": "Best party game",
+     "why": "Chaotic party games for a room full of friends."
+    },
+    {
+     "path": "UNO",
+     "award": "Best card game",
+     "why": "The classic card game, online with friends."
+    },
+    {
+     "path": "8-Ball-Pool",
+     "award": "Best online 1v1",
+     "why": "Quick pool matches against a friend online."
+    }
+   ],
+   "howWeChose": "We favored games that are easy to explain to someone else in seconds, and noted which work on a single device.",
+   "updated": "2026-11-09",
+   "author": "editors",
+   "kids": false
+  },
+  {
+   "slug": "best-games-for-seniors",
+   "title": "Best games for seniors",
+   "intro": [
+    "Games that keep the mind active, with clear visuals and no rush. Several of these were designed with larger text and simple controls."
+   ],
+   "picks": [
+    {
+     "path": "Vita-Solitaire",
+     "award": "Best overall",
+     "why": "Solitaire with large cards and clear layouts, designed for older players."
+    },
+    {
+     "path": "Vita-Mahjong",
+     "award": "Best tile game",
+     "why": "Mahjong with large tiles and a calm pace."
+    },
+    {
+     "path": "Wordscapes",
+     "award": "Best word game",
+     "why": "Relaxing word puzzles that grow with you."
+    },
+    {
+     "path": "Train-your-Brain",
+     "award": "Best brain training",
+     "why": "Short memory and attention exercises."
+    },
+    {
+     "path": "Sudoku-Ultimate-Offline-puzzle",
+     "award": "Best number puzzle",
+     "why": "Ad-free sudoku with difficulty levels."
+    },
+    {
+     "path": "Solitaire-com",
+     "award": "Best classic",
+     "why": "Simple, familiar solitaire."
+    },
+    {
+     "path": "Infinity-Loop",
+     "award": "Most relaxing",
+     "why": "Calm puzzles with no time limits."
+    }
+   ],
+   "howWeChose": "We looked for readable visuals, simple controls, no time pressure, and games that are easy to learn.",
+   "updated": "2026-11-09",
+   "author": "editors",
+   "kids": false
+  },
+  {
+   "slug": "best-relaxing-games-before-sleep",
+   "title": "Best relaxing games to play before sleep",
+   "intro": [
+    "Wind down with games that are calm, quiet and don't keep you up with cliffhangers or timers."
+   ],
+   "picks": [
+    {
+     "path": "Infinity-Loop",
+     "award": "Best overall",
+     "why": "Connect shapes into loops with no timer and soft visuals."
+    },
+    {
+     "path": "Cats-and-Soup",
+     "award": "Coziest",
+     "why": "Watch cats cook soup in a forest. That's it, and it's lovely."
+    },
+    {
+     "path": "Zen-Word",
+     "award": "Best word game",
+     "why": "Relaxing word puzzles with calm backgrounds."
+    },
+    {
+     "path": "Monument-Valley",
+     "award": "Most beautiful",
+     "why": "A peaceful, short puzzle story."
+    },
+    {
+     "path": "A-Little-to-the-Left",
+     "award": "Most satisfying",
+     "why": "Tidy-up puzzles that feel calming."
+    },
+    {
+     "path": "Water-Sort-Puz---Color-Game",
+     "award": "Simplest",
+     "why": "Pour colors into tubes, at your own pace."
+    },
+    {
+     "path": "Two-Dots",
+     "award": "Best puzzle",
+     "why": "Gentle dot-connecting puzzles."
+    }
+   ],
+   "howWeChose": "We chose games with no timers, gentle visuals and short sessions. Tip: turn on your phone's night mode too.",
+   "updated": "2026-11-09",
+   "author": "editors",
+   "kids": false
+  },
+  {
+   "slug": "best-games-for-a-long-flight",
+   "title": "Best games for a long flight",
+   "intro": [
+    "Flights are perfect for longer games, as long as they work offline. Download these before you board."
+   ],
+   "picks": [
+    {
+     "path": "Terraria",
+     "award": "Best overall",
+     "why": "Hours of exploring and building, fully offline."
+    },
+    {
+     "path": "Minecraft",
+     "award": "Best for creative types",
+     "why": "Build a whole world before you land."
+    },
+    {
+     "path": "Monument-Valley-2",
+     "award": "Best for a short flight",
+     "why": "A complete story in a few hours."
+    },
+    {
+     "path": "Mini-Metro",
+     "award": "Best strategy",
+     "why": "Calm, absorbing and offline."
+    },
+    {
+     "path": "Bloons-TD-6",
+     "award": "Best tower defense",
+     "why": "Deep strategy that works without Wi-Fi."
+    },
+    {
+     "path": "Altos-Odyssey",
+     "award": "Most beautiful",
+     "why": "A gorgeous snowboarding game, playable offline."
+    },
+    {
+     "path": "Simon-Tathams-Puzzles",
+     "award": "Best brain games",
+     "why": "Endless logic puzzles in a tiny download."
+    },
+    {
+     "path": "Geometry-Dash",
+     "award": "Best challenge",
+     "why": "Hard, addictive levels."
+    }
+   ],
+   "howWeChose": "We picked games that work offline and can fill hours, with a mix of long and short ones.",
+   "updated": "2026-11-09",
+   "author": "editors",
+   "kids": false
+  },
+  {
+   "slug": "best-games-like-candy-crush",
+   "title": "Best games like Candy Crush",
+   "intro": [
+    "Love matching candies? These match-3 and tile games offer the same satisfying puzzles with their own twists."
+   ],
+   "picks": [
+    {
+     "path": "Royal-Match",
+     "award": "Best overall",
+     "why": "Polished match-3 with no ads."
+    },
+    {
+     "path": "Candy-Crush-Soda-Saga",
+     "award": "Closest to the original",
+     "why": "More of the same, with soda and new candies."
+    },
+    {
+     "path": "Toon-Blast",
+     "award": "Best for quick play",
+     "why": "Tap groups of cubes instead of swapping."
+    },
+    {
+     "path": "Gardenscapes",
+     "award": "Best with a story",
+     "why": "Match-3 plus a garden to restore."
+    },
+    {
+     "path": "Homescapes",
+     "award": "Best for decorating",
+     "why": "Match-3 plus a house to redesign."
+    },
+    {
+     "path": "Two-Dots",
+     "award": "Most stylish",
+     "why": "Connect dots instead of swapping."
+    },
+    {
+     "path": "Tile-Explorer",
+     "award": "Best tile match",
+     "why": "Match three tiles to clear the board."
+    }
+   ],
+   "howWeChose": "We chose games with the same quick, satisfying matching as Candy Crush, and noted ads and purchases for each.",
+   "updated": "2026-11-09",
+   "author": "editors",
+   "kids": false
+  },
+  {
+   "slug": "best-games-like-among-us",
+   "title": "Best games like Among Us",
+   "intro": [
+    "Love catching the impostor? These social deduction games have the same mix of teamwork, lies and accusations."
+   ],
+   "picks": [
+    {
+     "path": "Super-Sus",
+     "award": "Closest to Among Us",
+     "why": "Space crew, hidden impostors and more roles."
+    },
+    {
+     "path": "Wolvesville",
+     "award": "Best werewolf game",
+     "why": "Online werewolf with many roles and big lobbies."
+    },
+    {
+     "path": "Suspects-Mystery-Mansion",
+     "award": "Best action twist",
+     "why": "Quick mystery matches in a mansion."
+    },
+    {
+     "path": "Spy-Imposter-Game",
+     "award": "Best party game",
+     "why": "Pass the phone and find the spy in person."
+    }
+   ],
+   "howWeChose": "We looked for games where bluffing and discussion matter, and that are active enough to find players.",
+   "updated": "2026-11-09",
+   "author": "editors",
+   "kids": false
+  },
+  {
+   "slug": "best-games-like-minecraft",
+   "title": "Best games like Minecraft",
+   "intro": [
+    "Want to build, craft and explore? These sandbox games offer the same freedom, and several are free."
+   ],
+   "picks": [
+    {
+     "path": "Terraria",
+     "award": "Best overall",
+     "why": "2D crafting and adventure with tons of content."
+    },
+    {
+     "path": "Block-Craft-3D",
+     "award": "Best free alternative",
+     "why": "Free block building in 3D."
+    },
+    {
+     "path": "Mini-World-CREATA",
+     "award": "Best for multiplayer",
+     "why": "Free sandbox with online worlds."
+    },
+    {
+     "path": "Roblox",
+     "award": "Most variety",
+     "why": "Millions of player-made games."
+    },
+    {
+     "path": "Pocket-Build",
+     "award": "Best for building",
+     "why": "Build anything without survival pressure."
+    },
+    {
+     "path": "WorldBox",
+     "award": "Best god game",
+     "why": "Create and watch whole civilizations."
+    },
+    {
+     "path": "TheoTown",
+     "award": "Best city builder",
+     "why": "Retro-style city building."
+    }
+   ],
+   "howWeChose": "We chose sandbox games that give you the same freedom to build and explore, with a mix of free and paid options.",
+   "updated": "2026-11-09",
+   "author": "editors",
+   "kids": false
+  },
+  {
+   "slug": "best-mahjong-games",
+   "title": "Best mahjong games for Android",
+   "intro": [
+    "Classic tile matching, daily puzzles and real four-player mahjong: our pick of the best."
+   ],
+   "picks": [
+    {
+     "path": "Vita-Mahjong",
+     "award": "Best overall",
+     "why": "Large tiles and clear design."
+    },
+    {
+     "path": "Mahjong-Titan",
+     "award": "Best classic",
+     "why": "Lots of traditional layouts."
+    },
+    {
+     "path": "Mahjong-Scapes",
+     "award": "Most relaxing",
+     "why": "Calm tile matching with travel scenes."
+    },
+    {
+     "path": "Mahjong-Journey",
+     "award": "Best with a story",
+     "why": "Tile puzzles plus an adventure."
+    },
+    {
+     "path": "Zen-Tiles---Mahjong-Match",
+     "award": "Best triple match",
+     "why": "Match three tiles at a time."
+    },
+    {
+     "path": "Mahjong-Soul",
+     "award": "Best real mahjong",
+     "why": "Proper four-player riichi mahjong online."
+    }
+   ],
+   "howWeChose": "We included both mahjong solitaire (tile matching) and real mahjong, and ranked by design, readability and fairness.",
+   "updated": "2026-11-09",
+   "author": "editors",
+   "kids": false
+  },
+  {
+   "slug": "best-word-games",
+   "title": "Best word games for Android",
+   "intro": [
+    "Crosswords, word searches and anagram puzzles for every level."
+   ],
+   "picks": [
+    {
+     "path": "Wordscapes",
+     "award": "Best overall",
+     "why": "Relaxing anagram crosswords."
+    },
+    {
+     "path": "NYT-Games",
+     "award": "Best daily puzzles",
+     "why": "Wordle, crosswords and more, with no ads."
+    },
+    {
+     "path": "Words-of-Wonders",
+     "award": "Best for travel lovers",
+     "why": "Word puzzles set around world landmarks."
+    },
+    {
+     "path": "CodyCross",
+     "award": "Best crossword",
+     "why": "Themed crossword puzzles."
+    },
+    {
+     "path": "Scrabble-GO",
+     "award": "Best multiplayer",
+     "why": "Play Scrabble against friends."
+    },
+    {
+     "path": "Word-Search-Explorer",
+     "award": "Best word search",
+     "why": "Classic word search puzzles."
+    },
+    {
+     "path": "Zen-Word",
+     "award": "Most relaxing",
+     "why": "Calm word puzzles."
+    },
+    {
+     "path": "Word-Pizza---Word-Games",
+     "award": "Most fun",
+     "why": "Make words from a pizza of letters."
+    }
+   ],
+   "howWeChose": "We chose a mix of word game styles and favored puzzles that stay fun without paying.",
+   "updated": "2026-11-09",
+   "author": "editors",
+   "kids": false
   }
  ],
  "method": [
