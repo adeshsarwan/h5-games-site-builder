@@ -68,9 +68,12 @@ const meta = (doc) => ({
 
 // ---------- home ----------
 const { doc: home } = await get("/");
-const appHrefs = [...new Set([...home.querySelectorAll('a[href*="/topgames/"]')]
+// The /topgames/ index is the full list (and its order); home-page links are added if missing.
+const { doc: tgIdx } = await get("/topgames/");
+const hrefsOf = (doc) => [...doc.querySelectorAll('a[href*="/topgames/"]')]
   .map((a) => a.getAttribute("href").replace(BASE, "").replace(/\/$/, ""))
-  .filter((h) => !/\/topgames$/.test(h)))];
+  .filter((h) => !/\/topgames$/.test(h));
+const appHrefs = [...new Set([...hrefsOf(tgIdx), ...hrefsOf(home)])];
 const popular = [...home.querySelectorAll(".game-tags a")].map((a) => slugify(a.getAttribute("href").split("/topgames/")[1].replace(/\/$/, "")));
 const blogBlurbs = {};
 home.querySelectorAll(".blog-section a").forEach((a) => {
@@ -99,6 +102,7 @@ for (const h of appHrefs) {
   const store = (re) => links.find((l) => re.test(l.href))?.href || "";
   apps.push({
     slug: slugify(name),
+    path: name.replace(/ /g, "-"), // original URL name: /topgames/<path> is kept on the new site
     source: url,
     title: text(doc.querySelector(".app-title .title")) || name.replace(/-/g, " "),
     genre: text(doc.querySelector(".app-title .developer")),
@@ -115,7 +119,7 @@ for (const h of appHrefs) {
     ...meta(doc),
     html: tidy(doc.querySelector(".review .entry")),
   });
-  console.log("app ", apps.at(-1).slug);
+  console.log("app ", apps.at(-1).path);
 }
 
 // ---------- blog ----------
