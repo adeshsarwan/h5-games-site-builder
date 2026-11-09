@@ -1,0 +1,100 @@
+{
+  "key": "torunex-site",
+  "name": "Torunex",
+  "domain": "torunex.site",
+  "pagesProject": "games-torunex-site",
+  "tagline": "Free online games, mobile game guides and gaming tips.",
+  "description": "Torunex has free online puzzle, word, arcade and casual games you can play instantly in your browser, plus guides, tips and official download links for popular mobile games.",
+  "language": "en",
+  "theme": {
+    "background": "#ffe8c7",
+    "backgroundAlt": "#fff3e0",
+    "accent": "#6b3df5",
+    "accentText": "#ffffff",
+    "text": "#2a1846",
+    "tile": "#ffffff"
+  },
+  "logo": {
+    "text": "Torunex",
+    "mark": "T"
+  },
+  "games": "all",
+  "exclude": [],
+  "featured": [
+    "block-puzzle-blast",
+    "water-sort",
+    "dice-merge-mania",
+    "word-quest-cross-word-puzzle",
+    "pair-match-3d"
+  ],
+  "categories": [
+    "Puzzle",
+    "Casual",
+    "Word",
+    "Arcade",
+    "Brain",
+    "Cards",
+    "Casino",
+    "Sports",
+    "Action"
+  ],
+  "ads": {
+    "mode": "off",
+    "networkCode": "23360556473",
+    "gameUnitPattern": "/{network}/{domain}_{game}_{kind}",
+    "siteUnitPattern": "/{network}/{domain}_{slot}",
+    "siteSlots": {
+      "game_side": [
+        [
+          300,
+          250
+        ],
+        [
+          300,
+          600
+        ],
+        [
+          160,
+          600
+        ]
+      ],
+      "home_rect": [
+        [
+          300,
+          250
+        ]
+      ],
+      "game_below": [
+        [
+          728,
+          90
+        ],
+        [
+          320,
+          100
+        ],
+        [
+          320,
+          50
+        ]
+      ]
+    },
+    "games": {},
+    "siteUnits": {}
+  },
+  "assets": "proxy",
+  "adsTxt": [],
+  "contactEmail": "bhaviksonani6633442@gmail.com",
+  "analytics": {
+    "ga4": ""
+  },
+  "content": {
+    "dir": "torunex-site",
+    "replaceNames": {
+      "gamezadda.store": "torunex.site",
+      "GamezAdda": "Torunex",
+      "Gamez Adda": "Torunex",
+      "GAMEZ ADDA": "TORUNEX"
+    }
+  }
+}

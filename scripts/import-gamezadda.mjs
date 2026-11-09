@@ -28,7 +28,7 @@ async function get(p) {
   const url = p.startsWith("http") ? p : BASE + encodeURI(decodeURI(p));
   for (let i = 0; i < 3; i++) {
     try {
-      const r = await fetch(url, { headers: { "user-agent": "Mozilla/5.0 (content import)" } });
+      const r = await fetch(url, { headers: { "user-agent": "Mozilla/5.0 (content import)" }, signal: AbortSignal.timeout(20000) });
       if (!r.ok) throw new Error(`${r.status} ${url}`);
       const html = await r.text();
       return { url: r.url, doc: parseHTML(html).document };
@@ -39,8 +39,20 @@ async function get(p) {
   }
 }
 
+// Cloudflare email obfuscation -> plain mailto links.
+function decodeCfEmail(hex) {
+  const k = parseInt(hex.slice(0, 2), 16);
+  let o = "";
+  for (let i = 2; i < hex.length; i += 2) o += String.fromCharCode(parseInt(hex.slice(i, i + 2), 16) ^ k);
+  return o;
+}
 function tidy(el) {
   if (!el) return "";
+  el.querySelectorAll("[data-cfemail]").forEach((e) => {
+    const mail = decodeCfEmail(e.getAttribute("data-cfemail"));
+    const a = e.closest('a[href*="email-protection"]') || e;
+    a.outerHTML = `<a href="mailto:${mail}">${mail}</a>`;
+  });
   el.querySelectorAll("script,style,noscript,.gam-ad-wrapper,.gam-ad-label").forEach((e) => e.remove());
   el.querySelectorAll("*").forEach((e) => {
     for (const a of [...e.attributes]) if (!["href", "src", "alt"].includes(a.name)) e.removeAttribute(a.name);

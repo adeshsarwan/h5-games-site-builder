@@ -7,7 +7,8 @@
  *   /play/<slug>/<anything else>  -> proxied from games.gamewhame.com (proxy mode only)
  *
  * Ad units are resolved in this order:
- *   1. site.json ads.mode === "test" or no domain             -> Google's public sample units
+ *   1. site.json ads.mode "test" / "off", or no domain        -> Google's public sample units
+ *      ("off" = no portal ads yet; games keep sample units so rewarded/continue flows still work)
  *   2. site.json ads.games[<slug>]                            (set per site via the Launch API)
  *   3. games.gamewhame.com/<slug>/sites/<siteKey>/ads.json   (written by your GAM automator)
  *   4. site.json ads.gameUnitPattern                         -> e.g. /123/example.com_water_sort_rewarded
@@ -44,7 +45,7 @@ export async function onRequestGet(ctx) {
 }
 
 async function siteUnits(slug) {
-  if (SITE.ads.mode === "test" || !SITE.domain) return TEST_UNITS;
+  if (SITE.ads.mode === "test" || SITE.ads.mode === "off" || !SITE.domain) return TEST_UNITS;
   const own = SITE.ads.games && SITE.ads.games[slug];
   if (own && own.rewarded && own.interstitial && own.native) return own;
   try {

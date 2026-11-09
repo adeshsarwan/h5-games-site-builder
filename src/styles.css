@@ -137,3 +137,39 @@ footer a:hover{text-decoration:underline}
 .search .res a{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:800;text-align:center}
 .search .res img{border-radius:14px;aspect-ratio:1;width:100%}
 .search .empty{padding:14px;opacity:.7;font-weight:700}
+
+/* ---- Content pages: mobile game guides, blog, legal ------------------ */
+.h a:hover,.h2 a:hover{text-decoration:underline}
+.h2{max-width:1200px;margin:28px auto 10px;padding:0 4px;font-size:22px;font-weight:900}
+.prose h2{font-size:21px;font-weight:900;margin:22px 0 8px}
+.prose h3{font-size:17px;font-weight:900;margin:18px 0 6px}
+.prose p,.prose li{margin:0 0 10px}
+.prose ul,.prose ol{padding-left:22px;margin:0 0 12px}
+.prose a{color:var(--accent);font-weight:800}
+.prose img{border-radius:12px;margin:10px 0}
+.app h1{margin:0;font-size:28px;font-weight:900;letter-spacing:-.01em}
+.apphead{display:flex;gap:18px;align-items:center;margin-bottom:16px}
+.apphead>img{width:112px;height:112px;border-radius:26px;box-shadow:var(--shadow);flex:none;background:var(--bg2)}
+.genre{margin:2px 0 10px;opacity:.75;font-weight:800}
+.stores{display:flex;flex-wrap:wrap;gap:8px}
+.store{background:var(--accent);color:var(--accentText);font-weight:900;padding:10px 18px;border-radius:999px;box-shadow:0 4px 0 rgba(0,0,0,.2)}
+.store:hover{transform:translateY(-1px)}
+.facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin:0 0 18px}
+.facts div{background:var(--bg2);border-radius:12px;padding:8px 12px}
+.facts dt{font-size:12px;font-weight:800;opacity:.7}
+.facts dd{margin:0;font-weight:900}
+.mini{display:grid;gap:8px}
+.mini a{display:flex;align-items:center;gap:10px;font-weight:800;font-size:14px;padding:4px;border-radius:12px}
+.mini a:hover{background:var(--bg2)}
+.mini img{width:48px;height:48px;border-radius:12px;flex:none}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:var(--gap);max-width:1200px;margin:0 auto var(--gap)}
+.card{background:var(--tile);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;transition:transform .18s}
+.card:hover{transform:translateY(-3px)}
+.card img{width:100%;aspect-ratio:16/9;height:auto;object-fit:cover;background:var(--bg2)}
+.card span{display:flex;flex-direction:column;gap:4px;padding:12px 14px 16px}
+.card em{font-style:normal;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
+.card strong{font-size:17px;font-weight:900;line-height:1.25}
+.card small{font-size:14px;opacity:.8}
+.post .banner{width:100%;height:auto;max-height:420px;object-fit:cover;border-radius:12px;margin-bottom:16px}
+.post .meta{opacity:.7;font-weight:800;margin:0 0 14px}
+@media (max-width:869px){.apphead>img{width:84px;height:84px;border-radius:20px}.app h1{font-size:22px}.h2{font-size:19px}}

@@ -89,3 +89,28 @@ npx wrangler@3 pages dev dist      # serves pages + the /play/ Function on http:
 - `"cdn"`: only `index.html` and `gam-config.js` go through the Function; the rest load straight from
   `games.gamewhame.com` with a shared cache. This needs the R2 bucket's CORS policy to allow the site's origin
   (or `*`) for `GET`/`HEAD`.
+
+## Extra content (mobile game guides, blog, own legal pages)
+
+A site can add content beyond the H5 games with `"content"` in `site.json`:
+
+```json
+"content": { "dir": "torunex-site", "replaceNames": { "Gamez Adda": "Torunex" }, "excludeApps": [] }
+```
+
+Files in `content/<dir>/` (all optional):
+
+| File | Builds |
+|---|---|
+| `apps.json` | `/mobile-games/` and `/mobile-games/<slug>/` (info, facts, official store links, screenshots, guide text) |
+| `posts.json` | `/blog/` and `/blog/<slug>/` |
+| `pages.json` | `about`, `privacy`, `terms`, `contact` HTML that replaces the built-in legal pages |
+| `home.json` | home-page intro / "mobile games" text and the popular list |
+
+Import them from a Gamez Adda-style site with the **Import site content** GitHub Action (inputs: site key, source URL),
+or locally: `npm i --no-save linkedom && node scripts/import-gamezadda.mjs <siteKey> <sourceUrl>`.
+Images are copied to the site's own `/media/` at build time; brand names are swapped at build time with `replaceNames`.
+
+**`"ads": { "mode": "off" }`** builds with no ad slots and no GPT on portal pages (for sites whose ads come later,
+e.g. from the Price Optimiser script). Inside the games, Google's sample units stay so rewarded flows keep working.
+`site.json → headHtml` (array of strings) is injected into every page's `<head>` for that later script.
