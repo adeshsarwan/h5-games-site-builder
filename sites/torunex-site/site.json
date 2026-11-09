@@ -84,13 +84,16 @@
   },
   "assets": "proxy",
   "adsTxt": [],
-  "contactEmail": "bhaviksonani6633442@gmail.com",
+  "contactEmail": "adesh@thebesads.com",
   "analytics": {
     "ga4": ""
   },
   "content": {
     "dir": "torunex-site",
     "replaceNames": {
+      "BHAVIK SONANI. shall": "Thebes Ads PTE LTD shall",
+      "BHAVIK SONANI": "Thebes Ads PTE LTD",
+      "bhaviksonani6633442@gmail.com": "adesh@thebesads.com",
       "gamezadda.store": "torunex.site",
       "GamezAdda": "Torunex",
       "Gamez Adda": "Torunex",
