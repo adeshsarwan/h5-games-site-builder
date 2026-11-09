@@ -1,0 +1,25 @@
+name: Google Play research
+on:
+  workflow_dispatch:
+    inputs:
+      terms:
+        description: "Search terms separated by |"
+        required: true
+permissions:
+  contents: write
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm i --no-save google-play-scraper@10
+      - run: node scripts/play-search.mjs "${{ inputs.terms }}"
+      - name: Commit
+        run: |
+          git config user.name "play-research"
+          git config user.email "actions@users.noreply.github.com"
+          git add content/_research
+          git diff --cached --quiet || git commit -m "Google Play research results"
+          git pull --rebase && git push
