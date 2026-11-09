@@ -114,3 +114,12 @@ Images are copied to the site's own `/media/` at build time; brand names are swa
 **`"ads": { "mode": "off" }`** builds with no ad slots and no GPT on portal pages (for sites whose ads come later,
 e.g. from the Price Optimiser script). Inside the games, Google's sample units stay so rewarded flows keep working.
 `site.json → headHtml` (array of strings) is injected into every page's `<head>` for that later script.
+
+## Reviews, best-of lists and live Google Play data (torunex.site)
+
+- `content/<dir>/play.json`: live Google Play data (rating, installs, price, ads/IAP, version, updated, official icon and
+  screenshot URLs), refreshed daily by the **Sync Google Play data** Action (`scripts/sync-play.mjs`). Images are shown
+  from Google Play's CDN; facts show "Data from Google Play, checked <date>".
+- `content/<dir>/editorial.json`: our own `reviews` (keyed by the `/topgames/<Name>` path: score, Editor's Choice, verdict,
+  pros/cons, body), `lists` (`/best/<slug>/` with picks and awards, `kids: true` for the kids section) and `method`
+  (`/how-we-review/`). Pages without a review stay live for campaigns but are `noindex` and left out of the sitemap.

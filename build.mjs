@@ -48,6 +48,8 @@ const C = await (async () => {
   const swap = (v) => typeof v === "string" ? names.reduce((x, [a, b]) => x.split(a).join(b), v)
     : Array.isArray(v) ? v.map(swap) : v && typeof v === "object" ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, swap(x)])) : v;
   const out = swap({ apps: await load("apps.json", []), posts: await load("posts.json", []), pages: await load("pages.json", {}), home: await load("home.json", {}) });
+  out.play = await load("play.json", {});          // live Google Play data (scripts/sync-play.mjs, daily)
+  out.ed = await load("editorial.json", { reviews: {}, lists: [] }); // our own reviews and best-of lists
   const ex = site.content.excludeApps || [];
   out.apps = out.apps.filter((a) => !ex.includes(a.slug));
   return out;
@@ -69,6 +71,7 @@ const ICON = {
   search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
   full: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
   phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M11 18h2"/></svg>',
+  trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M9 17h6"/></svg>',
   blog: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14v16H5z"/><path d="M9 9h6M9 13h6M9 17h3"/></svg>',
   close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
 };
@@ -120,7 +123,7 @@ function tile(g, size = "", lazy = true, badge = "") {
   const px = size === "s3" ? 314 : size === "s2" ? 204 : 94;
   return `<a class="tile ${size}" href="/game/${g.slug}/">${badge ? `<span class="badge">${badge}</span>` : ""}<img src="/media/${g.slug}/${px > 94 ? "thumb-1x1" : "icon-192"}.webp" srcset="/media/${g.slug}/icon-192.webp 192w, /media/${g.slug}/thumb-1x1.webp 400w, /media/${g.slug}/icon-512.webp 512w" sizes="${px}px" width="${px}" height="${px}" alt="${esc(g.title)}"${lazy ? ' loading="lazy" decoding="async"' : ' fetchpriority="high"'}><span class="t">${esc(g.title)}</span></a>`;
 }
-const brand = () => `<div class="brand"><a class="logo" href="/" aria-label="${esc(site.name)} home"><span class="mark">${esc(site.logo.mark)}</span>${esc(site.logo.text)}</a><nav><a href="/" aria-label="Home">${ICON.home}</a>${C?.apps.length ? `<a href="/topgames/" aria-label="Mobile games">${ICON.phone}</a>` : ""}${C?.posts.length ? `<a href="/blog/" aria-label="Blog">${ICON.blog}</a>` : ""}<button data-search aria-label="Search games">${ICON.search}</button></nav></div>`;
+const brand = () => `<div class="brand"><a class="logo" href="/" aria-label="${esc(site.name)} home"><span class="mark">${esc(site.logo.mark)}</span>${esc(site.logo.text)}</a><nav><a href="/" aria-label="Home">${ICON.home}</a>${LISTS().length ? `<a href="/best/" aria-label="Best games">${ICON.trophy}</a>` : ""}${C?.apps.length ? `<a href="/topgames/" aria-label="Mobile games">${ICON.phone}</a>` : ""}${C?.posts.length ? `<a href="/blog/" aria-label="Blog">${ICON.blog}</a>` : ""}<button data-search aria-label="Search games">${ICON.search}</button></nav></div>`;
 const catTiles = () => `</div><nav class="cats" aria-label="Categories">${cats.map((c) => `<a class="cat" href="/category/${catSlug(c)}/"><i>${CAT_ICON[c] || "🎮"}</i>${esc(c)} games</a>`).join("")}</nav><div class="grid">`;
 
 function page({ title, desc, canonical, body, head = "", ogImage = "", jsonld = null, robots = "" }) {
@@ -134,7 +137,7 @@ ${ADS_OFF ? "" : '<link rel="preconnect" href="https://securepubads.g.doubleclic
 <style>${themeCss}${CSS}</style>${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script>` : ""}
 <script>window.__SITE__=${JSON.stringify(siteJs)}</script><script defer src="${JS_FILE}"></script>${site.analytics?.ga4 ? `<script async src="https://www.googletagmanager.com/gtag/js?id=${site.analytics.ga4}"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${site.analytics.ga4}')</script>` : ""}
 </head><body><main class="wrap">${body}</main>
-<footer><a href="/">All games</a>${cats.map((c) => `<a href="/category/${catSlug(c)}/">${esc(c)}</a>`).join("")}${C?.apps.length ? '<a href="/topgames/">Mobile games</a>' : ""}${C?.posts.length ? '<a href="/blog/">Blog</a>' : ""}<a href="/about/">About</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a>${C?.pages.contact ? '<a href="/contact/">Contact</a>' : site.contactEmail ? `<a href="mailto:${esc(site.contactEmail)}">Contact</a>` : ""}<span>© ${new Date().getFullYear()} ${esc(site.name)}</span></footer>
+<footer><a href="/">All games</a>${cats.map((c) => `<a href="/category/${catSlug(c)}/">${esc(c)}</a>`).join("")}${LISTS().length ? '<a href="/best/">Best games</a>' : ""}${C?.apps.length ? '<a href="/topgames/">Mobile games</a>' : ""}${C?.posts.length ? '<a href="/blog/">Blog</a>' : ""}<a href="/about/">About</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a>${C?.pages.contact ? '<a href="/contact/">Contact</a>' : site.contactEmail ? `<a href="mailto:${esc(site.contactEmail)}">Contact</a>` : ""}<span>© ${new Date().getFullYear()} ${esc(site.name)}</span></footer>
 <div class="search" role="dialog" aria-label="Search"><div class="box"><input type="search" placeholder="Search ${games.length} games…" aria-label="Search games"><div class="res"></div></div></div>
 </body></html>`;
 }
@@ -246,7 +249,7 @@ function fixLinks(html = "") {
     return m;
   });
 }
-const appImg = (a) => a._icon || a.icon;
+const appImg = (a) => appImgOf(a, 192);
 function appTile(a, size = "", lazy = true) {
   const px = size === "s2" ? 204 : 94;
   return `<a class="tile ${size}" href="${appUrl(a)}"><img src="${esc(appImg(a))}" width="${px}" height="${px}" alt="${esc(a.title)}"${lazy ? ' loading="lazy" decoding="async"' : ""}><span class="t">${esc(a.title)}</span></a>`;
@@ -256,37 +259,123 @@ function postCard(p) {
 }
 function homeExtras() {
   const pop = (C.home.popular || []).map((s) => appBy[s]).filter(Boolean);
-  const list = [...pop, ...C.apps.filter((a) => !pop.includes(a))];
-  return `${C.apps.length ? `<div class="grid"><h2 class="h"><a href="/topgames/">Popular mobile games →</a></h2>${list.slice(0, 24).map((a, i) => appTile(a, i < 2 ? "s2" : "")).join("")}</div>` : ""}
+  const rv = C.apps.filter((a) => reviewOf(a)).sort((x, y) => reviewOf(y).score - reviewOf(x).score);
+  const list = [...new Set([...rv, ...pop, ...C.apps])];
+  const ls = LISTS().filter((l) => !l.kids).slice(0, 6);
+  return `${ls.length ? `<h2 class="h2"><a href="/best/">Best mobile games to download →</a></h2><div class="cards">${ls.map(listCard).join("")}</div>` : ""}${C.apps.length ? `<div class="grid"><h2 class="h"><a href="/topgames/">Popular mobile games →</a></h2>${list.slice(0, 24).map((a, i) => appTile(a, i < 2 ? "s2" : "")).join("")}</div>` : ""}
 ${C.posts.length ? `<h2 class="h2"><a href="/blog/">Articles →</a></h2><div class="cards">${C.posts.slice(0, 6).map(postCard).join("")}</div>` : ""}`;
 }
 function appsIndex() {
-  const body = `<div class="grid">${brand()}<h1 class="h ch">🔥 Top mobile games</h1>${C.apps.map((a, i) => appTile(a, i < 3 ? "s2" : "", i > 7)).join("")}<h2 class="h">Play online now</h2>${games.slice(0, 12).map((g) => tile(g)).join("")}</div>
+  const body = `<div class="grid">${brand()}<h1 class="h ch">🔥 Top mobile games</h1>${[...C.apps.filter((a) => reviewOf(a)), ...C.apps.filter((a) => !reviewOf(a))].map((a, i) => appTile(a, i < 3 ? "s2" : "", i > 7)).join("")}<h2 class="h">Play online now</h2>${games.slice(0, 12).map((g) => tile(g)).join("")}</div>
 ${C.home.intro ? `<section class="text prose">${fixLinks(C.home.intro)}</section>` : ""}`;
   return page({ title: `Top mobile games: guides, tips and official download links | ${site.name}`, desc: `Gameplay guides, tips and official store links for ${C.apps.slice(0, 4).map((a) => a.title).join(", ")} and more popular mobile games.`, canonical: "/topgames/", body });
 }
+// ---------- Google Play data + editorial ----------
+const pkgOf = (a) => (a.googlePlay?.match(/[?&]id=([^&#]+)/) || [])[1] || "";
+const playOf = (a) => C?.play?.[pkgOf(a)] || null;
+const reviewOf = (a) => C?.ed?.reviews?.[a.path] || null;
+const playImg = (u, size) => (u ? u.replace(/=[swh]\d+.*$/, "") + `=${size}` : "");
+const appImgOf = (a, px = 192) => { const p = playOf(a); return p?.icon ? playImg(p.icon, `s${px}`) : a._icon || a.icon; };
+const fmtDate = (d) => { if (!d) return ""; const x = new Date(d + (d.length === 10 ? "T00:00:00Z" : "")); return isNaN(x) ? d : x.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }); };
+const fmtCount = (n) => !n ? "" : n >= 1e9 ? (n / 1e9).toFixed(1).replace(/\.0$/, "") + "B" : n >= 1e6 ? (n / 1e6).toFixed(1).replace(/\.0$/, "") + "M" : n >= 1e3 ? Math.round(n / 1e3) + "K" : String(n);
+const installsShort = (p) => p?.minInstalls ? fmtCount(p.minInstalls) + "+" : p?.installs || "";
+const stars = (x) => `<span class="stars" style="--v:${(x / 5) * 100}%" aria-label="${x} out of 5"></span>`;
+const authorName = (k) => C?.ed?.authors?.find((x) => x.slug === k)?.name || `${site.name} Editors`;
+const listsFor = (a) => (C?.ed?.lists || []).filter((l) => l.picks.some((p) => p.path === a.path));
+const storeBtn = (a) => a.googlePlay ? `<a class="store" href="${esc(a.googlePlay)}" rel="nofollow noopener" target="_blank">Get it on Google Play</a>` : "";
+function playFacts(a) {
+  const p = playOf(a);
+  if (!p) return a.developer ? `<dl class="facts"><div><dt>Developer</dt><dd>${esc(a.developer)}</dd></div></dl>` : "";
+  const f = [
+    ["Google Play rating", p.score ? `${p.score} ★${p.ratings ? ` <small>(${fmtCount(p.ratings)} ratings)</small>` : ""}` : "Not rated yet"],
+    ["Installs", esc(p.installs || "–")],
+    ["Price", p.free ? "Free" : esc(p.price || "Paid")],
+    ["Ads", p.adSupported ? "Contains ads" : "No ads"],
+    ["In-app purchases", p.offersIAP ? `Yes${p.iapRange ? ` <small>(${esc(p.iapRange)})</small>` : ""}` : "No"],
+    ["Age rating", esc(p.contentRating || "–")],
+    ["Version", esc(p.version || "Varies with device")],
+    ["Updated", esc(fmtDate(p.updated))],
+    ["Developer", esc(p.developer || a.developer || "")],
+  ].filter(([, v]) => v);
+  return `<dl class="facts">${f.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl><p class="src">Data from <a href="${esc(a.googlePlay)}" rel="nofollow noopener" target="_blank">Google Play</a>, checked ${esc(fmtDate(p.checked))}. Game names, icons and screenshots belong to their publishers.</p>`;
+}
+function reviewBox(a, r) {
+  return `<section class="review">
+<div class="score"><b>${r.score.toFixed(1)}</b><span>/5</span>${stars(r.score)}${r.editorsChoice ? `<em class="ec">Editor's Choice</em>` : ""}</div>
+<div><h2>Our verdict</h2><p class="verdict">${esc(r.verdict)}</p>${r.bestFor ? `<p><strong>Best for:</strong> ${esc(r.bestFor)}</p>` : ""}</div>
+<div class="pc"><div><h3>What we like</h3><ul class="pros">${r.pros.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div><div><h3>Watch out for</h3><ul class="cons">${r.cons.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div></div>
+</section>`;
+}
 function appPage(a) {
-  const facts = [["Developer", a.developer], ["Score", a.score], ["Downloads", a.downloads], ["Age", a.age], ["Version", a.version], ["Price", a.price]].filter(([, v]) => v);
-  const stores = [a.googlePlay && `<a class="store" href="${esc(a.googlePlay)}" rel="nofollow noopener" target="_blank">Get it on Google Play</a>`, a.appStore && `<a class="store" href="${esc(a.appStore)}" rel="nofollow noopener" target="_blank">Download on the App Store</a>`].filter(Boolean).join("");
-  const shots = (a._shots || a.screenshots || []).slice(0, 6);
+  const r = reviewOf(a);
+  const p = playOf(a);
+  const shots = p?.screenshots?.length ? p.screenshots.slice(0, 6).map((u) => playImg(u, "h440")) : (a._shots || a.screenshots || []).slice(0, 6);
   const rest = C.apps.filter((x) => x.slug !== a.slug);
-  const others = [...rest.filter((x) => x.genre && x.genre === a.genre), ...rest.filter((x) => !x.genre || x.genre !== a.genre)];
+  const reviewed = rest.filter((x) => reviewOf(x));
+  const others = [...reviewed.filter((x) => x.genre === a.genre), ...reviewed.filter((x) => x.genre !== a.genre), ...rest.filter((x) => !reviewOf(x) && x.genre === a.genre)];
+  const inLists = listsFor(a);
+  const meta = r ? `<p class="meta">Review by ${esc(authorName(r.author))} · Updated ${esc(fmtDate(r.updated))} · <a href="/how-we-review/">How we review</a></p>` : "";
+  const main = r
+    ? `${reviewBox(a, r)}<div class="prose">${r.body.map((x) => `<p>${esc(x)}</p>`).join("")}</div>`
+    : `<div class="prose">${fixLinks(a.html)}</div>`;
   const body = `<div class="grid">${brand()}</div>
 <article class="info app"><div>
-<div class="apphead"><img src="${esc(appImg(a))}" width="112" height="112" alt="${esc(a.title)}" fetchpriority="high"><div><h1>${esc(a.title)}</h1>${a.genre ? `<p class="genre">${esc(a.genre)}</p>` : ""}${stores ? `<div class="stores">${stores}</div>` : ""}</div></div>
-${facts.length ? `<dl class="facts">${facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>` : ""}
-<div class="prose">${fixLinks(a.html)}</div></div>
+<div class="apphead"><img src="${esc(appImgOf(a, 224))}" width="112" height="112" alt="${esc(a.title)}" fetchpriority="high"><div><h1>${esc(a.title)}${r ? " review" : ""}</h1>${a.genre ? `<p class="genre">${esc((p?.genre || a.genre).replace(/^Game /, ""))}</p>` : ""}<div class="stores">${storeBtn(a)}</div></div></div>
+${meta}${main}
+<h3>Google Play facts</h3>${playFacts(a)}</div>
 <div>${shots.length ? `<h3>Screenshots</h3><div class="shots">${shots.map((u, i) => `<img src="${esc(u)}" alt="${esc(a.title)} screenshot ${i + 1}" loading="lazy" decoding="async" height="220">`).join("")}</div>` : ""}
-<h3>Similar games</h3><div class="mini">${others.slice(0, 8).map((x) => `<a href="${appUrl(x)}"><img src="${esc(appImg(x))}" width="48" height="48" alt="" loading="lazy">${esc(x.title)}</a>`).join("")}</div></div></article>
+${inLists.length ? `<h3>Featured in</h3><div class="mini">${inLists.map((l) => `<a href="/best/${l.slug}/">🏆 ${esc(l.title)}</a>`).join("")}</div>` : ""}
+<h3>${reviewed.length ? "More reviewed games" : "Similar games"}</h3><div class="mini">${(others.length ? others : rest).slice(0, 8).map((x) => `<a href="${appUrl(x)}"><img src="${esc(appImgOf(x, 96))}" width="48" height="48" alt="" loading="lazy">${esc(x.title)}${reviewOf(x) ? ` <small>${reviewOf(x).score.toFixed(1)}/5</small>` : ""}</a>`).join("")}</div></div></article>
 <div class="grid"><h2 class="h">H5 online games: play instantly</h2>${games.slice(0, 18).map((g) => tile(g)).join("")}</div>`;
   return page({
-    title: `${a.title}: gameplay, tips and download | ${site.name}`,
-    desc: short(a.metaDesc || `${a.title} guide: gameplay, strategies and tips, features, and the official download link.`),
+    title: r ? `${a.title} review: is it worth downloading? | ${site.name}` : `${a.title}: gameplay, tips and download | ${site.name}`,
+    desc: short(r ? `${a.title} review: ${r.verdict}` : a.metaDesc || `${a.title} guide and official download link.`),
     canonical: appUrl(a),
-    ogImage: a._icon || "",
-    jsonld: { "@context": "https://schema.org", "@type": "MobileApplication", name: a.title, applicationCategory: "GameApplication", operatingSystem: "Android, iOS", author: a.developer ? { "@type": "Organization", name: a.developer } : undefined, url: origin ? origin + appUrl(a) : undefined },
+    ogImage: "",
+    robots: r ? "" : "noindex,follow", // unreviewed pages stay for campaigns but are kept out of search until reviewed
+    jsonld: r ? { "@context": "https://schema.org", "@type": "Review", name: `${a.title} review`, datePublished: r.updated, author: { "@type": "Organization", name: authorName(r.author) }, publisher: { "@type": "Organization", name: site.name },
+      reviewRating: { "@type": "Rating", ratingValue: r.score, bestRating: 5, worstRating: 1 },
+      itemReviewed: { "@type": "MobileApplication", name: a.title, operatingSystem: "Android", applicationCategory: "GameApplication", author: p?.developer ? { "@type": "Organization", name: p.developer } : undefined } }
+      : { "@context": "https://schema.org", "@type": "MobileApplication", name: a.title, applicationCategory: "GameApplication", operatingSystem: "Android" },
     body,
   });
+}
+// ---------- best-of lists ----------
+const LISTS = () => C?.ed?.lists || [];
+function listCard(l) {
+  const first = appByPath[(l.picks[0]?.path || "").toLowerCase()];
+  return `<a class="card list" href="/best/${l.slug}/"><span class="icons">${l.picks.slice(0, 4).map((p) => appByPath[p.path.toLowerCase()]).filter(Boolean).map((x) => `<img src="${esc(appImgOf(x, 128))}" alt="" width="64" height="64" loading="lazy">`).join("")}</span><span>${l.kids ? "<em>For kids</em>" : `<em>${l.picks.length} picks</em>`}<strong>${esc(l.title)}</strong><small>Updated ${esc(fmtDate(l.updated))}</small></span></a>`;
+}
+function bestIndex() {
+  const main = LISTS().filter((l) => !l.kids), kids = LISTS().filter((l) => l.kids);
+  const body = `<div class="grid">${brand()}<h1 class="h ch">🏆 Best mobile games</h1></div>
+<section class="text"><p>Our editors' picks of the Android games worth your time and storage space, sorted by what you want to play. Each list explains how we chose, and every pick links to the official Google Play page. <a href="/how-we-review/">How we review</a>.</p></section>
+<div class="cards">${main.map(listCard).join("")}</div>
+${kids.length ? `<h2 class="h2">For kids</h2><div class="cards">${kids.map(listCard).join("")}</div>` : ""}
+<h2 class="h2">Editor's Choice</h2><div class="grid">${C.apps.filter((a) => reviewOf(a)?.editorsChoice).map((a) => appTile(a)).join("")}</div>`;
+  return page({ title: `Best mobile games to download in ${new Date().getFullYear()} | ${site.name}`, desc: `Editor-picked lists of the best Android games: ${main.slice(0, 4).map((l) => l.title.replace(/^Best /, "").toLowerCase()).join(", ")} and more.`, canonical: "/best/", body });
+}
+function listPage(l) {
+  const picks = l.picks.map((p) => ({ ...p, a: appByPath[p.path.toLowerCase()] })).filter((p) => p.a);
+  const row = (p, i) => { const pl = playOf(p.a), r = reviewOf(p.a); return `<tr><td>${i + 1}</td><td><a href="#pick-${i + 1}"><img src="${esc(appImgOf(p.a, 64))}" width="32" height="32" alt="" loading="lazy">${esc(p.a.title)}</a></td><td>${esc(p.award || "")}</td><td>${r ? `${r.score.toFixed(1)}/5` : "–"}</td><td>${pl?.score ? `${pl.score} ★` : "–"}</td><td>${esc(installsShort(pl) || "–")}</td><td>${pl ? [pl.free ? "Free" : pl.price || "Paid", pl.adSupported ? "ads" : "", pl.offersIAP ? "IAP" : ""].filter(Boolean).join(" · ") : "–"}</td></tr>`; };
+  const section = (p, i) => { const r = reviewOf(p.a), pl = playOf(p.a); return `<section class="pick" id="pick-${i + 1}"><div class="apphead"><img src="${esc(appImgOf(p.a, 192))}" width="88" height="88" alt="${esc(p.a.title)}" loading="lazy"><div><p class="rank">${i + 1}.${p.award ? ` <em>${esc(p.award)}</em>` : ""}</p><h2>${esc(p.a.title)}</h2><p class="genre">${r ? `Our score ${r.score.toFixed(1)}/5` : ""}${r && pl?.score ? " · " : ""}${pl?.score ? `Google Play ${pl.score} ★` : ""}${pl?.installs ? ` · ${esc(pl.installs)} installs` : ""}</p></div></div>
+<p>${esc(p.why)}</p><div class="stores">${storeBtn(p.a)}${r ? `<a class="store ghost" href="${appUrl(p.a)}">Read our review</a>` : ""}</div></section>`; };
+  const body = `<div class="grid">${brand()}</div>
+<article class="text listpage"><p class="meta"><a href="/best/">Best games</a> · By ${esc(authorName(l.author))} · Updated ${esc(fmtDate(l.updated))}</p><h1>${esc(l.title)}</h1>${l.intro.map((x) => `<p>${esc(x)}</p>`).join("")}
+<div class="tablewrap"><table class="cmp"><thead><tr><th>#</th><th>Game</th><th>Award</th><th>Our score</th><th>Play rating</th><th>Installs</th><th>Price</th></tr></thead><tbody>${picks.map(row).join("")}</tbody></table></div>
+<p class="src">Google Play ratings and installs update daily. IAP = in-app purchases.</p>
+${picks.map(section).join("")}
+${l.howWeChose ? `<h2>How we chose</h2><p>${esc(l.howWeChose)}</p>` : ""}</article>
+<h2 class="h2">More lists</h2><div class="cards">${LISTS().filter((x) => x.slug !== l.slug && !!x.kids === !!l.kids).slice(0, 3).map(listCard).join("")}</div>`;
+  return page({
+    title: `${l.title} (${fmtDate(l.updated).split(" ").slice(1).join(" ")}) | ${site.name}`, desc: short(l.intro[0]), canonical: `/best/${l.slug}/`,
+    jsonld: { "@context": "https://schema.org", "@type": "ItemList", name: l.title, itemListElement: picks.map((p, i) => ({ "@type": "ListItem", position: i + 1, name: p.a.title, url: origin ? origin + appUrl(p.a) : undefined })) },
+    body,
+  });
+}
+function howWeReview() {
+  const html = (C.ed.method || []).map((x) => x.startsWith("## ") ? `<h2>${esc(x.slice(3))}</h2>` : `<p>${esc(x)}</p>`).join("");
+  return page({ title: `How we review games | ${site.name}`, desc: `How ${site.name} chooses, scores and updates its mobile game reviews and best-of lists.`, canonical: "/how-we-review/", body: `<div class="grid">${brand()}</div><section class="text prose"><h1>How we review games</h1>${html}</section>` });
 }
 function blogIndex() {
   const body = `<div class="grid">${brand()}<h1 class="h ch">📝 Gaming blog</h1></div><div class="cards">${C.posts.map(postCard).join("")}</div>`;
@@ -338,7 +427,7 @@ if (C?.pages.contact) LEGAL.contact = ["Contact us", ""];
 for (const [slug, [title, html]] of Object.entries(LEGAL)) await w(`${slug}/index.html`, textPage(slug, title, html));
 if (C) {
   const pool = async (items, fn, n = 8) => { const q = [...items]; await Promise.all(Array.from({ length: n }, async () => { while (q.length) await fn(q.shift()); })); };
-  await pool(C.apps, async (a) => {
+  await pool(C.apps.filter((a) => !playOf(a)?.icon), async (a) => {
     a._icon = await localImg(a.icon, `apps/${a.slug}/icon`);
     a._shots = [];
     for (const [i, u] of (a.screenshots || []).slice(0, 4).entries()) a._shots.push(await localImg(u, `apps/${a.slug}/${String(i + 1).padStart(2, "0")}`));
@@ -350,6 +439,8 @@ if (C) {
     await w("topgames/index.html", appsIndex());
     for (const a of C.apps) await w(`topgames/${a.path || a.slug}.html`, appPage(a)); // served at /topgames/<Name>
   }
+  if (LISTS().length) { await w("best/index.html", bestIndex()); for (const l of LISTS()) await w(`best/${l.slug}/index.html`, listPage(l)); }
+  if (C.ed.method) await w("how-we-review/index.html", howWeReview());
   if (C.posts.length) { await w("blog/index.html", blogIndex()); for (const p of C.posts) await w(`blog/${p.slug}/index.html`, postPage(p)); }
   console.log(`  + content: ${C.apps.length} mobile game pages, ${C.posts.length} blog posts, pages: ${Object.keys(C.pages).join(", ") || "none"}`);
 }
@@ -360,7 +451,7 @@ await w("manifest.webmanifest", JSON.stringify({ name: site.name, short_name: si
 await w("robots.txt", `User-agent: *\nDisallow: /play/\n${origin ? `Sitemap: ${origin}/sitemap.xml\n` : ""}`);
 if (origin) {
   const urls = ["/", ...games.map((g) => `/game/${g.slug}/`), ...cats.map((c) => `/category/${catSlug(c)}/`), "/about/", "/privacy/", "/terms/",
-    ...(C?.pages.contact ? ["/contact/"] : []), ...(C?.apps.length ? ["/topgames/", ...C.apps.map(appUrl)] : []), ...(C?.posts.length ? ["/blog/", ...C.posts.map((p) => `/blog/${p.slug}/`)] : [])];
+    ...(C?.pages.contact ? ["/contact/"] : []), ...(C?.apps.length ? ["/topgames/", ...C.apps.filter((a) => reviewOf(a)).map(appUrl)] : []), ...(LISTS().length ? ["/best/", ...LISTS().map((l) => `/best/${l.slug}/`)] : []), ...(C?.ed?.method ? ["/how-we-review/"] : []), ...(C?.posts.length ? ["/blog/", ...C.posts.map((p) => `/blog/${p.slug}/`)] : [])];
   await w("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map((u) => `<url><loc>${origin}${u}</loc></url>`).join("")}</urlset>`);
 }
 if (site.adsTxt?.length) await w("ads.txt", site.adsTxt.join("\n") + "\n");
