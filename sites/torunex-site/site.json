@@ -83,7 +83,9 @@
     "siteUnits": {}
   },
   "assets": "proxy",
-  "adsTxt": [],
+  "adsTxt": [
+    "google.com, pub-4169678248232367, DIRECT, f08c47fec0942fa0"
+  ],
   "contactEmail": "adesh@thebesads.com",
   "analytics": {
     "ga4": ""
