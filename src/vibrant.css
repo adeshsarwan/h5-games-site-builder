@@ -213,3 +213,6 @@ body.v .wrap{padding:0;max-width:none}
 .vg:hover b,.vg:focus-visible b{opacity:1;transform:none}
 @media (hover:none){.vg b{opacity:1;transform:none}}
 @media (max-width:869px){.vwall{grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:calc((100vw - 28px - 20px)/3);gap:10px}.vwall-h h1{font-size:28px}}
+.v .gam-ad-wrapper{background:#fff;border:3px solid var(--ink);border-radius:20px;padding:10px 12px 14px;max-width:none}
+.v .vad{padding-top:28px}
+.v .vlist-body .gam-ad-wrapper{margin:0}

@@ -80,7 +80,8 @@
       ]
     },
     "games": {},
-    "siteUnits": {}
+    "siteUnits": {},
+    "nativeSlots": true
   },
   "assets": "proxy",
   "adsTxt": [

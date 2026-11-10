@@ -212,3 +212,9 @@ footer a:hover{text-decoration:underline}
 .rank{margin:0;font-weight:900;font-size:14px}
 .rank em{font-style:normal;background:var(--accent);color:var(--accentText);padding:2px 9px;border-radius:999px;font-size:12px;margin-left:4px}
 @media (max-width:869px){.review{grid-template-columns:1fr}.pc{grid-template-columns:1fr}.listpage h1{font-size:24px}}
+
+/* ---- Native ad containers (filled by an external script, e.g. Price Optimiser) ---- */
+.gam-ad-wrapper{margin:20px auto;max-width:970px;text-align:center}
+.gam-ad-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.6;margin-bottom:6px}
+.gam-native-slot{min-height:0}
+.gam-ad-wrapper:has(.gam-native-slot:empty){display:none}

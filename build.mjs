@@ -91,6 +91,9 @@ function siteUnit(slot) {
   if (site.ads.siteUnits?.[slot]) return site.ads.siteUnits[slot]; // set per site via the Launch API
   return site.ads.siteUnitPattern.replace("{network}", site.ads.networkCode).replace("{domain}", site.domain).replace("{slot}", slot);
 }
+// Native banner containers filled by the Price Optimiser script (same ids as gamezadda.store): one of each per page.
+const NATIVE = !!site.ads.nativeSlots;
+const gamNative = (n) => NATIVE ? `<div id="gam-native-0${n}-wrapper" class="gam-ad-wrapper" aria-label="Advertisement" aria-busy="true"><div class="gam-ad-label">Advertisement</div><div id="gam-native-0${n}" class="gam-native-slot"></div></div>` : "";
 const ADS_OFF = site.ads.mode === "off"; // no ad slots or GPT on portal pages (ads added later, e.g. by Price Optimiser)
 function adSlot(slot, cls = "") {
   if (ADS_OFF) return "";
@@ -200,7 +203,7 @@ function gamePage(g) {
 ${g.tagline ? `<p><strong>${esc(webify(g.tagline))}</strong></p>` : ""}${descHtml(desc)}</div>
 <div>${how.length ? `<h3>How to play</h3><ol class="how">${how.map((s) => `<li>${esc(s)}</li>`).join("")}</ol>` : ""}
 ${nShots ? `<h3>Screenshots</h3><div class="shots">${Array.from({ length: nShots }, (_, i) => `<img src="/media/${g.slug}/screens/${String(i + 1).padStart(2, "0")}-540.webp" alt="${esc(g.title)} screenshot ${i + 1}" loading="lazy" decoding="async" height="220">`).join("")}</div>` : ""}</div></article>`;
-  const body = `<div class="grid">${brand()}${player}${adSlot("game_side", "tall")}${around.slice(0, 18).map((x) => tile(x)).join("")}</div>${info}<div class="grid">${adSlot("game_below", "wide")}
+  const body = `<div class="grid">${brand()}${player}${adSlot("game_side", "tall")}${around.slice(0, 18).map((x) => tile(x)).join("")}</div>${gamNative(1)}${info}${gamNative(2)}<div class="grid">${adSlot("game_below", "wide")}
 <h2 class="h">More games</h2>${around.slice(18).map((x, i) => tile(x, i % 7 === 0 ? "s2" : "")).join("")}${catTiles()}</div>`;
   return page({
     title: `${g.title}: Play online for free on ${site.name}`,
@@ -335,7 +338,7 @@ function appPage(a) {
   const body = `<div class="grid">${brand()}</div>
 <article class="info app"><div>
 <div class="apphead"><img src="${esc(appImgOf(a, 224))}" width="112" height="112" alt="${esc(a.title)}" fetchpriority="high"><div><h1>${esc(a.title)}${r ? " review" : ""}</h1>${a.genre ? `<p class="genre">${esc((p?.genre || a.genre).replace(/^Game /, ""))}</p>` : ""}<div class="stores">${storeBtn(a)}</div></div></div>
-${meta}${main}
+${gamNative(1)}${meta}${main}${gamNative(2)}
 <h3>Google Play facts</h3>${playFacts(a)}</div>
 <div>${shots.length ? `<h3>Screenshots</h3><div class="shots">${shots.map((u, i) => `<img src="${esc(u)}" alt="${esc(a.title)} screenshot ${i + 1}" loading="lazy" decoding="async" height="220">`).join("")}</div>` : ""}
 ${inLists.length ? `<h3>Featured in</h3><div class="mini">${inLists.map((l) => `<a href="/best/${l.slug}/">🏆 ${esc(l.title)}</a>`).join("")}</div>` : ""}
@@ -481,8 +484,9 @@ function vHome() {
   const rows = cats.slice(0, 3).map((c) => { const list = games.filter((g) => g.categories.includes(c)).slice(0, 9); return `<section class="vin vsec"><div class="vsec-h"><h2>${esc(c)} games</h2><a href="/category/${catSlug(c)}/">See all →</a></div>${vMosaic(list, 7)}</section>`; }).join("");
   const body = `<div class="vband">${hero}</div>
 <section class="vin vsec"><div class="vsec-h"><h2>Play instantly</h2><span class="vsticker">${games.length} free games · no download</span></div>${vMosaic(games)}</section>
+${NATIVE ? `<div class="vin vad">${gamNative(1)}</div>` : ""}
 ${homeLists.length ? `<section class="vpink"><div class="vin vsec"><div class="vsec-h"><div><h2>What should I download?</h2><p>Hand-picked Android games, checked against Google Play every day.</p></div><a class="vbtn vwhite" href="/best/">All ${LISTS().length} lists →</a></div><div class="vlists">${homeLists.map((l, i) => vListCard(l, i)).join("")}</div></div></section>` : ""}
-${rows}
+${NATIVE ? `<div class="vin vad">${gamNative(2)}</div>` : ""}${rows}
 <section class="vin vtext"><h1>${esc(site.name)}: free online games and the best mobile games to download</h1><p>${esc(site.description)}</p>${C.home.mobile ? `<div class="prose">${fixLinks(C.home.mobile)}</div>` : ""}</section>`;
   return page({ title: `${site.name}: free online games and the best mobile games`, desc: site.description, canonical: "/", ogImage: `/media/${games[0].slug}/cover-16x9.webp`,
     jsonld: { "@context": "https://schema.org", "@type": "WebSite", name: site.name, url: origin || undefined }, body });
@@ -536,7 +540,7 @@ ${shots.length ? `<div class="vshots">${shots.map((u, k) => `<img src="${esc(pla
   const h5 = games.slice(0, 6).map((g) => `<a href="/game/${g.slug}/"><img src="/media/${g.slug}/thumb-1x1.webp" alt="${esc(g.title)}" loading="lazy"></a>`).join("");
   const more = LISTS().filter((x) => x.slug !== l.slug && !!x.kids === !!l.kids).slice(0, 4);
   const body = `<div class="vband"><section class="vin vlist-hero"><div><span class="vsticker pink">${picks.length} picks · updated ${esc(fmtDate(l.updated))}</span><h1>${h1}</h1>${l.intro.map((x) => `<p>${esc(x)}</p>`).join("")}<p class="vby">By ${esc(authorName(l.author))} · <a href="/how-we-review/">How we choose</a></p></div><nav class="vquick" aria-label="Quick picks"><strong>Quick picks</strong>${quick}</nav></section></div>
-<div class="vin vlist-body"><article>${picks.map(card).join("")}${l.howWeChose ? `<section class="vhow"><h2>How we chose</h2><p>${esc(l.howWeChose)}</p><p class="src">Ratings, installs, prices and ads info come from Google Play and refresh daily. Names, icons and screenshots belong to their publishers.</p></section>` : ""}</article>
+<div class="vin vlist-body"><article>${gamNative(1)}${picks.map((p, i) => card(p, i) + (i === 1 ? gamNative(2) : "")).join("")}${l.howWeChose ? `<section class="vhow"><h2>How we chose</h2><p>${esc(l.howWeChose)}</p><p class="src">Ratings, installs, prices and ads info come from Google Play and refresh daily. Names, icons and screenshots belong to their publishers.</p></section>` : ""}</article>
 <aside><div class="vplay"><strong>Bored of waiting? Play now</strong><div>${h5}</div><span>Free in your browser, no download</span></div><div class="vmore"><strong>More lists</strong>${more.map((x) => `<a href="/best/${x.slug}/">${esc(x.title)}</a>`).join("")}</div></aside></div>`;
   return page({
     title: `${l.title} (${fmtDate(l.updated).split(" ").slice(1).join(" ")}) | ${site.name}`, desc: short(l.intro[0]), canonical: `/best/${l.slug}/`,
