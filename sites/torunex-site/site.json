@@ -103,5 +103,8 @@
       "GAMEZ ADDA": "TORUNEX"
     }
   },
-  "design": "vibrant"
+  "design": "vibrant",
+  "headHtml": [
+    "<script defer src=\"https://serve.thebesads.com/sdk/torunex.site.js\"></script>"
+  ]
 }

@@ -93,7 +93,7 @@ function siteUnit(slot) {
 }
 // Native banner containers filled by the Price Optimiser script (same ids as gamezadda.store): one of each per page.
 const NATIVE = !!site.ads.nativeSlots;
-const gamNative = (n) => NATIVE ? `<div id="gam-native-0${n}-wrapper" class="gam-ad-wrapper" aria-label="Advertisement" aria-busy="true"><div class="gam-ad-label">Advertisement</div><div id="gam-native-0${n}" class="gam-native-slot"></div></div>` : "";
+const gamNative = (n) => NATIVE ? `<div id="gam-native-0${n}-wrapper" class="gam-ad-wrapper" aria-label="Advertisement" aria-busy="true"><div class="gam-ad-label">Advertisement</div><div id="gam-native-0${n}" class="gam-native-slot" style="width:100%;min-height:250px"></div></div>` : "";
 const ADS_OFF = site.ads.mode === "off"; // no ad slots or GPT on portal pages (ads added later, e.g. by Price Optimiser)
 function adSlot(slot, cls = "") {
   if (ADS_OFF) return "";

@@ -216,5 +216,4 @@ footer a:hover{text-decoration:underline}
 /* ---- Native ad containers (filled by an external script, e.g. Price Optimiser) ---- */
 .gam-ad-wrapper{margin:20px auto;max-width:970px;text-align:center}
 .gam-ad-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.6;margin-bottom:6px}
-.gam-native-slot{min-height:0}
-.gam-ad-wrapper:has(.gam-native-slot:empty){display:none}
+.gam-native-slot{width:100%;min-height:250px}
