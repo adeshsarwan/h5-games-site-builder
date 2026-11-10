@@ -1781,5 +1781,33 @@
   "Publishers don't pay for reviews or list placements. Download links go to the official Google Play page.",
   "## Updates",
   "We revisit lists regularly and update scores when games change. If you spot something out of date, contact us."
- ]
+ ],
+ "home": {
+  "featured": "Minecraft",
+  "spotlight": [
+   {
+    "list": "best-games-like-candy-crush",
+    "path": "Royal-Match",
+    "why": "Polished match-3 with zero ads."
+   },
+   {
+    "list": "best-games-for-a-long-flight",
+    "path": "Terraria",
+    "why": "Hours of crafting and boss fights, fully offline."
+   },
+   {
+    "list": "best-multiplayer-games",
+    "path": "Brawl-Stars",
+    "why": "Three-minute team battles, easy to pick up."
+   }
+  ],
+  "lists": [
+   "best-games-without-ads",
+   "best-games-like-candy-crush",
+   "best-games-for-low-end-phones",
+   "best-two-player-games",
+   "best-games-for-a-long-flight",
+   "best-mahjong-games"
+  ]
+ }
 }
