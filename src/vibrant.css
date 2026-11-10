@@ -216,3 +216,26 @@ body.v .wrap{padding:0;max-width:none}
 .v .gam-ad-wrapper{background:#fff;border:3px solid var(--ink);border-radius:20px;padding:10px 12px 14px;max-width:none}
 .v .vad{padding-top:28px}
 .v .vlist-body .gam-ad-wrapper{margin:0}
+
+/* home "about" block, FAQ, disclaimer */
+.vabout{display:flex;flex-direction:column;gap:28px;padding-bottom:8px}
+.vfeats{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+.vfeat-c{background:var(--c);border:var(--bd);box-shadow:var(--sh);border-radius:24px;padding:22px}
+.vfeat-c strong{font-family:Fredoka,sans-serif;font-size:26px}
+.vfeat-c p{margin:8px 0 0;font-weight:700;line-height:1.5}
+.vfaq{background:#fff;border:var(--bd);box-shadow:var(--sh);border-radius:24px;padding:22px 24px}
+.vfaq h2{margin:0 0 10px;font-size:30px}
+.vfaq details{border-top:2px dashed #E4DFFF;padding:12px 0}
+.vfaq summary{cursor:pointer;font-weight:900;font-size:17px;list-style:none;display:flex;justify-content:space-between;gap:12px}
+.vfaq summary::-webkit-details-marker{display:none}
+.vfaq summary::after{content:"+";font-family:Fredoka,sans-serif;font-size:24px;line-height:1}
+.vfaq details[open] summary::after{content:"–"}
+.vfaq details p{margin:8px 0 0;line-height:1.6;font-weight:600;color:var(--muted)}
+.vdisc{background:#FFF4C2;border:var(--bd);border-radius:20px;padding:16px 20px;margin-top:28px}
+.vdisc strong{font-family:Fredoka,sans-serif;font-size:18px}
+.vdisc p{margin:4px 0 0;font-weight:700;line-height:1.55;font-size:15px}
+.vdisc a{color:#4B2FC4;text-decoration:underline}
+.vdisc.sm{margin-top:16px;padding:12px 16px}.vdisc.sm p{font-size:14px}
+.vlist-body article .vdisc{margin-top:0}
+.vabout .vdisc{margin-top:0}
+.vseo{font-size:18px!important;font-weight:700;color:var(--muted);margin:0;text-align:center}

@@ -339,7 +339,7 @@ function appPage(a) {
 <article class="info app"><div>
 <div class="apphead"><img src="${esc(appImgOf(a, 224))}" width="112" height="112" alt="${esc(a.title)}" fetchpriority="high"><div><h1>${esc(a.title)}${r ? " review" : ""}</h1>${a.genre ? `<p class="genre">${esc((p?.genre || a.genre).replace(/^Game /, ""))}</p>` : ""}<div class="stores">${storeBtn(a)}</div></div></div>
 ${gamNative(1)}${meta}${main}${gamNative(2)}
-<h3>Google Play facts</h3>${playFacts(a)}</div>
+<h3>Google Play facts</h3>${playFacts(a)}${V ? vDisclaimer(true) : ""}</div>
 <div>${shots.length ? `<h3>Screenshots</h3><div class="shots">${shots.map((u, i) => `<img src="${esc(u)}" alt="${esc(a.title)} screenshot ${i + 1}" loading="lazy" decoding="async" height="220">`).join("")}</div>` : ""}
 ${inLists.length ? `<h3>Featured in</h3><div class="mini">${inLists.map((l) => `<a href="/best/${l.slug}/">🏆 ${esc(l.title)}</a>`).join("")}</div>` : ""}
 <h3>${reviewed.length ? "More reviewed games" : "Similar games"}</h3><div class="mini">${(others.length ? others : rest).slice(0, 8).map((x) => `<a href="${appUrl(x)}"><img src="${esc(appImgOf(x, 96))}" width="48" height="48" alt="" loading="lazy">${esc(x.title)}${reviewOf(x) ? ` <small>${reviewOf(x).score.toFixed(1)}/5</small>` : ""}</a>`).join("")}</div></div></article>
@@ -455,7 +455,7 @@ ${LISTS().length ? `<a class="vbtn vhot" href="/best/">${VSVG.trophy}<span>Best 
 }
 function vFooter() {
   const links = [LISTS().length && ["/best/", "Best lists"], nApps() && ["/topgames/", "Mobile games"], C?.ed?.method && ["/how-we-review/", "How we review"], C?.posts.length && ["/blog/", "Blog"], ["/about/", "About"], ["/privacy/", "Privacy"], ["/terms/", "Terms"], C?.pages.contact && ["/contact/", "Contact"]].filter(Boolean);
-  return `<footer class="vf"><div class="vin"><span class="vlogo vsm"><span class="vmark">${esc(site.logo.mark)}</span>${esc(site.logo.text)}</span>${links.map(([h, n]) => `<a href="${h}">${n}</a>`).join("")}<span class="vcopy">Game names, icons and screenshots belong to their publishers. © ${new Date().getFullYear()} ${esc(site.name)}</span></div></footer>`;
+  return `<footer class="vf"><div class="vin"><span class="vlogo vsm"><span class="vmark">${esc(site.logo.mark)}</span>${esc(site.logo.text)}</span>${links.map(([h, n]) => `<a href="${h}">${n}</a>`).join("")}<span class="vcopy">Reviews and rankings are our opinion. Mobile games listed here are made and owned by their developers and download from Google Play; ${esc(site.name)} isn't affiliated with Google or the publishers. © ${new Date().getFullYear()} ${esc(site.name)}</span></div></footer>`;
 }
 // One H5 game tile in a mosaic; sz: "" | "w" (2x1, cover art) | "b" (2x2)
 function vTile(g, sz = "", badge = "", lazy = true) {
@@ -470,6 +470,28 @@ const shortList = (l) => l.title.replace(/^Best /, "").replace(/ for Android$/, 
 function vListCard(l, i, sz = "") {
   const picks = picksOf(l).slice(0, 3);
   return `<a class="vlist ${sz}" style="--c:${VPAL[i % VPAL.length]}" href="/best/${l.slug}/"><span class="vlist-icons">${picks.map((p) => `<span>${vIcon(p.a, sz === "b" ? 88 : 56)}<em>${esc(p.a.title.split(/[:\-–]/)[0].trim())}</em></span>`).join("")}</span><span class="vlist-t"><strong>${esc(l.title)}</strong><small>${picksOf(l).length} picks · updated ${esc(fmtDate(l.updated))}</small></span></a>`;
+}
+// Shown wherever we review or recommend Play Store games.
+function vDisclaimer(compact = false) {
+  return `<aside class="vdisc${compact ? " sm" : ""}" aria-label="Disclaimer"><strong>Please note</strong><p>Our reviews, scores and rankings are the opinion of the ${esc(site.name)} editors. The mobile games we list are not our games: they are made and owned by their own developers and are downloaded from Google Play, not from ${esc(site.name)}. We are not affiliated with Google or the game publishers. Ratings, installs and prices come from Google Play and can change. <a href="/how-we-review/">How we review</a></p></aside>`;
+}
+function vAbout() {
+  const faq = [
+    ["Do I need to install anything?", `Not for our ${games.length} browser games: open one and it starts right away. The mobile games in our lists are installed from Google Play.`],
+    ["Are the browser games free?", "Yes. Every game you can play on this site is free and needs no account."],
+    ["Are the mobile games yours?", `No. They are made by their own developers. We review and recommend them, and every download button goes to the game's official Google Play page.`],
+    ["How do you pick games for your lists?", "Our editors look at how fun and deep a game is, how fair its ads and purchases are, and how well it runs on typical phones. Facts come from Google Play and refresh daily."],
+    ["Does it work on my phone?", "Yes. The site and the browser games work on phones, tablets and desktops."],
+  ];
+  const feats = [
+    ["#B6F23A", "Play instantly", `${games.length} free puzzle, word and arcade games that run in your browser. No download, no sign-up.`],
+    ["#FFB3D1", "Honest picks", `${LISTS().length} lists and ${Object.keys(C.ed.reviews || {}).length} reviews telling you which Play Store games are worth your time, money and storage.`],
+    ["#2EE6D6", "Always up to date", "Ratings, installs, prices and ads info are checked against Google Play every day."],
+  ];
+  return `<section class="vin vsec vabout"><div class="vfeats">${feats.map(([c, h, t]) => `<div class="vfeat-c" style="--c:${c}"><strong>${h}</strong><p>${esc(t)}</p></div>`).join("")}</div>
+<div class="vfaq"><h2>Questions</h2>${faq.map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("")}</div>
+${vDisclaimer()}
+<h1 class="vseo">${esc(site.name)}: free online games and the best mobile games to download</h1></section>`;
 }
 function vHome() {
   const ed = C.ed.home || {};
@@ -487,7 +509,7 @@ function vHome() {
 ${NATIVE ? `<div class="vin vad">${gamNative(1)}</div>` : ""}
 ${homeLists.length ? `<section class="vpink"><div class="vin vsec"><div class="vsec-h"><div><h2>What should I download?</h2><p>Hand-picked Android games, checked against Google Play every day.</p></div><a class="vbtn vwhite" href="/best/">All ${LISTS().length} lists →</a></div><div class="vlists">${homeLists.map((l, i) => vListCard(l, i)).join("")}</div></div></section>` : ""}
 ${NATIVE ? `<div class="vin vad">${gamNative(2)}</div>` : ""}${rows}
-<section class="vin vtext"><h1>${esc(site.name)}: free online games and the best mobile games to download</h1><p>${esc(site.description)}</p>${C.home.mobile ? `<div class="prose">${fixLinks(C.home.mobile)}</div>` : ""}</section>`;
+${vAbout()}`;
   return page({ title: `${site.name}: free online games and the best mobile games`, desc: site.description, canonical: "/", ogImage: `/media/${games[0].slug}/cover-16x9.webp`,
     jsonld: { "@context": "https://schema.org", "@type": "WebSite", name: site.name, url: origin || undefined }, body });
 }
@@ -515,7 +537,7 @@ function vAppsIndex() {
   };
   const body = `<section class="vin vwall-h"><h1>Top mobile games</h1><p>${C.apps.length} Android games · live Google Play ratings · <a href="/best/">best-of lists</a></p></section>
 <section class="vin"><div class="vwall">${mixed.map(tile).join("")}</div></section>
-${C.home.intro ? `<section class="vin vtext prose">${fixLinks(C.home.intro)}</section>` : ""}`;
+<section class="vin">${vDisclaimer()}</section>`;
   return page({ slim: true, title: `Top mobile games: reviews, ratings and official downloads | ${site.name}`, desc: `Live Google Play ratings and our reviews of ${C.apps.length} Android games, including ${big.slice(0, 3).map((a) => a.title.split(":")[0]).join(", ")}.`, canonical: "/topgames/", body });
 }
 function vBestIndex() {
@@ -524,7 +546,8 @@ function vBestIndex() {
   const order = [...ls.filter((l) => l.filter || /like|without|low-end|two-player|seniors|sleep|flight|mahjong|word/.test(l.slug)), ...ls.filter((l) => !(l.filter || /like|without|low-end|two-player|seniors|sleep|flight|mahjong|word/.test(l.slug)))];
   const body = `<div class="vband vband-hot"><section class="vin vpage-h"><h1>What should you <span>download next?</span></h1><p>${LISTS().length} hand-picked lists for every mood, phone and budget. Every pick links to its official Google Play page. <a href="/how-we-review/">How we choose</a></p></section></div>
 <section class="vin vsec"><div class="vlists vmos">${order.map((l, i) => vListCard(l, i, SZ[i % SZ.length])).join("")}</div></section>
-${kids.length ? `<section class="vin vsec"><div class="vsec-h"><h2>For kids</h2></div><div class="vlists">${kids.map((l, i) => vListCard(l, i + 3)).join("")}</div></section>` : ""}`;
+${kids.length ? `<section class="vin vsec"><div class="vsec-h"><h2>For kids</h2></div><div class="vlists">${kids.map((l, i) => vListCard(l, i + 3)).join("")}</div></section>` : ""}
+<section class="vin">${vDisclaimer()}</section>`;
   return page({ title: `Best mobile games to download in ${new Date().getFullYear()} | ${site.name}`, desc: `${LISTS().length} editor-picked lists of the best Android games: ${ls.slice(0, 4).map((l) => shortList(l).toLowerCase()).join(", ")} and more.`, canonical: "/best/", body });
 }
 function vListPage(l) {
@@ -539,8 +562,8 @@ ${shots.length ? `<div class="vshots">${shots.map((u, k) => `<img src="${esc(pla
 <p>${esc(p.why)}</p><div class="vrow">${storeBtn(p.a).replace('class="store"', 'class="vbtn vpop vlg"')}${r ? `<a class="vbtn vwhite" href="${appUrl(p.a)}">Read our review</a>` : ""}</div></div></section>`; };
   const h5 = games.slice(0, 6).map((g) => `<a href="/game/${g.slug}/"><img src="/media/${g.slug}/thumb-1x1.webp" alt="${esc(g.title)}" loading="lazy"></a>`).join("");
   const more = LISTS().filter((x) => x.slug !== l.slug && !!x.kids === !!l.kids).slice(0, 4);
-  const body = `<div class="vband"><section class="vin vlist-hero"><div><span class="vsticker pink">${picks.length} picks · updated ${esc(fmtDate(l.updated))}</span><h1>${h1}</h1>${l.intro.map((x) => `<p>${esc(x)}</p>`).join("")}<p class="vby">By ${esc(authorName(l.author))} · <a href="/how-we-review/">How we choose</a></p></div><nav class="vquick" aria-label="Quick picks"><strong>Quick picks</strong>${quick}</nav></section></div>
-<div class="vin vlist-body"><article>${gamNative(1)}${picks.map((p, i) => card(p, i) + (i === 1 ? gamNative(2) : "")).join("")}${l.howWeChose ? `<section class="vhow"><h2>How we chose</h2><p>${esc(l.howWeChose)}</p><p class="src">Ratings, installs, prices and ads info come from Google Play and refresh daily. Names, icons and screenshots belong to their publishers.</p></section>` : ""}</article>
+  const body = `<div class="vband"><section class="vin vlist-hero"><div><span class="vsticker pink">${picks.length} picks · updated ${esc(fmtDate(l.updated))}</span><h1>${h1}</h1>${l.intro.map((x) => `<p>${esc(x)}</p>`).join("")}<p class="vby">By ${esc(authorName(l.author))} · Our picks are our opinion; these games are made by their developers and download from Google Play · <a href="/how-we-review/">How we choose</a></p></div><nav class="vquick" aria-label="Quick picks"><strong>Quick picks</strong>${quick}</nav></section></div>
+<div class="vin vlist-body"><article>${gamNative(1)}${picks.map((p, i) => card(p, i) + (i === 1 ? gamNative(2) : "")).join("")}${l.howWeChose ? `<section class="vhow"><h2>How we chose</h2><p>${esc(l.howWeChose)}</p><p class="src">Ratings, installs, prices and ads info come from Google Play and refresh daily. Names, icons and screenshots belong to their publishers.</p></section>` : ""}${vDisclaimer()}</article>
 <aside><div class="vplay"><strong>Bored of waiting? Play now</strong><div>${h5}</div><span>Free in your browser, no download</span></div><div class="vmore"><strong>More lists</strong>${more.map((x) => `<a href="/best/${x.slug}/">${esc(x.title)}</a>`).join("")}</div></aside></div>`;
   return page({
     title: `${l.title} (${fmtDate(l.updated).split(" ").slice(1).join(" ")}) | ${site.name}`, desc: short(l.intro[0]), canonical: `/best/${l.slug}/`,
