@@ -300,7 +300,7 @@ const installsShort = (p) => p?.minInstalls ? fmtCount(p.minInstalls) + "+" : p?
 const stars = (x) => `<span class="stars" style="--v:${(x / 5) * 100}%" aria-label="${x} out of 5"></span>`;
 const authorName = (k) => C?.ed?.authors?.find((x) => x.slug === k)?.name || `${site.name} Editors`;
 const listsFor = (a) => (C?.ed?.lists || []).filter((l) => l.picks.some((p) => p.path === a.path));
-const storeBtn = (a) => a.googlePlay ? `<a class="store" href="${esc(a.googlePlay)}" rel="nofollow noopener" target="_blank">Get it on Google Play</a>` : "";
+const storeBtn = (a) => a.googlePlay ? `<a class="store" data-app="${esc(a.title)}" href="${esc(a.googlePlay)}" rel="nofollow noopener" target="_blank">Get it on Google Play</a>` : "";
 function playFacts(a) {
   const p = playOf(a);
   if (!p) return a.developer ? `<dl class="facts"><div><dt>Developer</dt><dd>${esc(a.developer)}</dd></div></dl>` : "";
