@@ -575,8 +575,8 @@ ${shots.length ? `<div class="vshots">${shots.map((u, k) => `<img src="${esc(pla
 // H5 game page, vibrant design. One HTML document with two layouts:
 //  desktop (>=870px): framed player + 300px right rail (sidebar ad + trending), similar games under the player
 //  mobile  (<870px):  launch card (cover, icon, big Play button -> full-screen game), then content in one column
-// The sidebar ad container (gam-sidebar-01) is removed before any ad script runs when the rail isn't shown (<1100px),
-// so no ad is requested into a hidden slot.
+// Ads: only gam-native-01 (right rail on wide screens, main column otherwise) and gam-native-02 (full-width, above
+// "More free games"), the ids the Price Optimiser script fills.
 function vGamePage(g) {
   const desc = webify(g.description || g.tagline || "");
   const how = (g.how_to_play || "").split("\n").map((s) => s.replace(/^[•\-\d.)\s]+/, "").trim()).filter(Boolean);
@@ -591,7 +591,9 @@ function vGamePage(g) {
   const chips = `${gcats.map((c, i) => `<a class="gp-chip" style="--c:${VPAL[(cats.indexOf(c)) % VPAL.length]}" href="/category/${catSlug(c)}/">${esc(c)}</a>`).join("")}<span class="gp-chip">${portrait ? "Portrait" : "Landscape"}</span><span class="gp-chip">Free · no download</span>`;
   const shots = nShots ? `<div class="vshots gp-shots">${Array.from({ length: nShots }, (_, i) => `<img src="/media/${g.slug}/screens/${String(i + 1).padStart(2, "0")}-540.webp" alt="${esc(g.title)} screenshot ${i + 1}" loading="lazy" decoding="async">`).join("")}</div>` : "";
   const howBox = how.length ? `<section class="gp-how"><h2>How to play</h2><ol>${how.map((s) => `<li>${esc(s)}</li>`).join("")}</ol></section>` : "";
-  const sideAd = NATIVE ? `<div id="gam-sidebar-01-wrapper" class="gam-ad-wrapper gp-sidead" aria-label="Advertisement"><div class="gam-ad-label">Advertisement</div><div id="gam-sidebar-01" class="gp-sideslot"></div></div><script>matchMedia("(max-width:1099px)").matches&&document.currentScript.previousElementSibling.remove()</script>`
+  // gam-native-01 lives in the right rail on wide screens; below 1100px (no rail) the same div is moved into the main
+  // column before the ad script runs, so each id exists once. Sized for Google's 336x280 / 300x250.
+  const sideAd = NATIVE ? `<div class="gp-sidead">${gamNative(1)}</div><script>matchMedia("(max-width:1099px)").matches&&document.querySelector(".gp-n1").appendChild(document.currentScript.previousElementSibling.firstChild)</script>`
     : adSlot("game_side", "gp-sidead");
 
   // mobile only: launch card
@@ -614,8 +616,9 @@ ${g.tagline ? `<p class="gp-tag">${esc(webify(g.tagline))}</p>` : ""}${descHtml(
   const lists = LISTS().filter((l) => !l.kids).slice(0, 3);
   const body = `<nav class="vin gp-crumbs" aria-label="Breadcrumb"><a href="/">Home</a>${c0 ? `<span>›</span><a href="/category/${catSlug(c0)}/">${esc(c0)} games</a>` : ""}<span>›</span><span>${esc(g.title)}</span></nav>
 <div class="vin gp${portrait ? " gp-portrait" : ""}">
-<div class="gp-main">${launch}${player}${similar}${NATIVE ? gamNative(1) : ""}<div class="gp-info">${about}<div class="gp-side2">${howBox}${shots ? `<section class="gp-shotbox"><h2>Screenshots</h2>${shots}</section>` : ""}</div></div>${NATIVE ? gamNative(2) : adSlot("game_below", "wide")}</div>
+<div class="gp-main">${launch}${player}${similar}${NATIVE ? `<div class="gp-n1"></div>` : ""}<div class="gp-info">${about}<div class="gp-side2">${howBox}${shots ? `<section class="gp-shotbox"><h2>Screenshots</h2>${shots}</section>` : ""}</div></div>${NATIVE ? "" : adSlot("game_below", "wide")}</div>
 ${rail}</div>
+${NATIVE ? `<div class="vin gp-n2">${gamNative(2)}</div>` : ""}
 <section class="vin vsec"><div class="vsec-h"><h2>More free games</h2><span class="vsticker">${games.length} games · no download</span></div>${vMosaic(around.slice(12, 33))}</section>
 ${lists.length ? `<section class="vin vsec"><div class="vsec-h"><h2>Rather download a game?</h2><a href="/best/">All ${LISTS().length} lists →</a></div><div class="vlists">${lists.map((l, i) => vListCard(l, i)).join("")}</div></section>` : ""}
 <section class="vin vsec"><div class="vsec-h"><h2>Browse by category</h2></div><nav class="vcats2">${cats.map((c, i) => `<a class="vpill" style="--c:${VPAL[i % VPAL.length]}" href="/category/${catSlug(c)}/">${CAT_ICON[c] || "🎮"} ${esc(c)}</a>`).join("")}</nav></section>`;
