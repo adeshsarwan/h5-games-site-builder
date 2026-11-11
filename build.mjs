@@ -187,6 +187,7 @@ function descHtml(desc) {
 }
 
 function gamePage(g) {
+  if (V) return vGamePage(g);
   const desc = webify(g.description || g.tagline || "");
   const how = (g.how_to_play || "").split("\n").map((s) => s.replace(/^[•\-\d.)\s]+/, "").trim()).filter(Boolean);
   const nShots = Math.min(g.media?.screens?.length || 0, 6);
@@ -568,6 +569,68 @@ ${shots.length ? `<div class="vshots">${shots.map((u, k) => `<img src="${esc(pla
   return page({
     title: `${l.title} (${fmtDate(l.updated).split(" ").slice(1).join(" ")}) | ${site.name}`, desc: short(l.intro[0]), canonical: `/best/${l.slug}/`,
     jsonld: { "@context": "https://schema.org", "@type": "ItemList", name: l.title, itemListElement: picks.map((p, i) => ({ "@type": "ListItem", position: i + 1, name: p.a.title, url: origin ? origin + appUrl(p.a) : undefined })) },
+    body,
+  });
+}
+// H5 game page, vibrant design. One HTML document with two layouts:
+//  desktop (>=870px): framed player + 300px right rail (sidebar ad + trending), similar games under the player
+//  mobile  (<870px):  launch card (cover, icon, big Play button -> full-screen game), then content in one column
+// The sidebar ad container (gam-sidebar-01) is removed before any ad script runs when the rail isn't shown (<1100px),
+// so no ad is requested into a hidden slot.
+function vGamePage(g) {
+  const desc = webify(g.description || g.tagline || "");
+  const how = (g.how_to_play || "").split("\n").map((s) => s.replace(/^[•\-\d.)\s]+/, "").trim()).filter(Boolean);
+  const nShots = Math.min(g.media?.screens?.length || 0, 6);
+  const others = games.filter((x) => x.slug !== g.slug);
+  const related = others.filter((x) => x.categories.some((c) => g.categories.includes(c)));
+  const around = [...related, ...others.filter((x) => !related.includes(x))];
+  const portrait = g.orientation === "portrait";
+  const gcats = g.categories.filter((c) => cats.includes(c));
+  const c0 = gcats[0];
+  const trending = [...featured.map((s) => bySlug[s]), ...games].filter((x, i, a) => x && x.slug !== g.slug && a.indexOf(x) === i).slice(0, 6);
+  const chips = `${gcats.map((c, i) => `<a class="gp-chip" style="--c:${VPAL[(cats.indexOf(c)) % VPAL.length]}" href="/category/${catSlug(c)}/">${esc(c)}</a>`).join("")}<span class="gp-chip">${portrait ? "Portrait" : "Landscape"}</span><span class="gp-chip">Free · no download</span>`;
+  const shots = nShots ? `<div class="vshots gp-shots">${Array.from({ length: nShots }, (_, i) => `<img src="/media/${g.slug}/screens/${String(i + 1).padStart(2, "0")}-540.webp" alt="${esc(g.title)} screenshot ${i + 1}" loading="lazy" decoding="async">`).join("")}</div>` : "";
+  const howBox = how.length ? `<section class="gp-how"><h2>How to play</h2><ol>${how.map((s) => `<li>${esc(s)}</li>`).join("")}</ol></section>` : "";
+  const sideAd = NATIVE ? `<div id="gam-sidebar-01-wrapper" class="gam-ad-wrapper gp-sidead" aria-label="Advertisement"><div class="gam-ad-label">Advertisement</div><div id="gam-sidebar-01" class="gp-sideslot"></div></div><script>matchMedia("(max-width:1099px)").matches&&document.currentScript.previousElementSibling.remove()</script>`
+    : adSlot("game_side", "gp-sidead");
+
+  // mobile only: launch card
+  const launch = `<section class="gp-launch"><div class="gp-launch-card"><img class="gp-launch-bg" src="/media/${g.slug}/cover-16x9.webp" alt="" fetchpriority="high">
+<div class="gp-launch-b"><img class="vicon" src="/media/${g.slug}/icon-192.webp" width="88" height="88" alt=""><div><p class="gp-launch-t">${esc(g.title)}</p><div class="gp-chips">${chips}</div></div></div>
+<button class="vbtn vpop vlg gp-launch-play" data-play>${VSVG.play}<span>Play now</span></button><small>Opens full screen · tap ✕ to come back</small></div></section>`;
+
+  // desktop player (also the full-screen player on mobile)
+  const player = `<section class="player gp-player${portrait ? " portrait" : ""}" data-slug="${g.slug}" data-title="${esc(g.title)}">
+<div class="stage"><div class="cover"><img class="bg" src="/media/${g.slug}/cover-16x9.webp" alt=""><div class="gp-card"><img src="/media/${g.slug}/icon-512.webp" width="132" height="132" alt="${esc(g.title)}"><strong>${esc(g.title)}</strong><button class="play vbtn vpop vlg">${VSVG.play}<span>Play</span></button></div></div></div>
+<div class="bar"><img src="/media/${g.slug}/icon-192.webp" width="40" height="40" alt=""><strong>${esc(g.title)}</strong><span class="gp-bar-chips">${gcats.map((c) => `<a href="/category/${catSlug(c)}/">${esc(c)}</a>`).join("")}</span><button data-fullscreen aria-label="Fullscreen">${ICON.full}</button><button class="exit" data-exit aria-label="Close game">${ICON.close}</button></div></section>`;
+
+  const similar = `<section class="gp-similar"><div class="vsec-h"><h2>${c0 ? `More ${esc(c0.toLowerCase())} games` : "You may also like"}</h2>${c0 ? `<a href="/category/${catSlug(c0)}/">See all →</a>` : ""}</div><div class="gp-strip">${around.slice(0, 12).map((x) => vTile(x)).join("")}</div></section>`;
+
+  const about = `<article class="gp-about"><h1>${esc(g.title)}</h1><div class="gp-chips">${chips}</div>
+${g.tagline ? `<p class="gp-tag">${esc(webify(g.tagline))}</p>` : ""}${descHtml(desc)}</article>`;
+
+  const rail = `<aside class="gp-rail">${sideAd}<div class="gp-trend"><strong>Trending now</strong>${trending.map((x, i) => `<a href="/game/${x.slug}/"><b>${i + 1}</b><img src="/media/${x.slug}/icon-192.webp" width="48" height="48" alt="" loading="lazy"><span>${esc(x.title)}</span></a>`).join("")}</div></aside>`;
+
+  const lists = LISTS().filter((l) => !l.kids).slice(0, 3);
+  const body = `<nav class="vin gp-crumbs" aria-label="Breadcrumb"><a href="/">Home</a>${c0 ? `<span>›</span><a href="/category/${catSlug(c0)}/">${esc(c0)} games</a>` : ""}<span>›</span><span>${esc(g.title)}</span></nav>
+<div class="vin gp${portrait ? " gp-portrait" : ""}">
+<div class="gp-main">${launch}${player}${similar}${NATIVE ? gamNative(1) : ""}<div class="gp-info">${about}<div class="gp-side2">${howBox}${shots ? `<section class="gp-shotbox"><h2>Screenshots</h2>${shots}</section>` : ""}</div></div>${NATIVE ? gamNative(2) : adSlot("game_below", "wide")}</div>
+${rail}</div>
+<section class="vin vsec"><div class="vsec-h"><h2>More free games</h2><span class="vsticker">${games.length} games · no download</span></div>${vMosaic(around.slice(12, 33))}</section>
+${lists.length ? `<section class="vin vsec"><div class="vsec-h"><h2>Rather download a game?</h2><a href="/best/">All ${LISTS().length} lists →</a></div><div class="vlists">${lists.map((l, i) => vListCard(l, i)).join("")}</div></section>` : ""}
+<section class="vin vsec"><div class="vsec-h"><h2>Browse by category</h2></div><nav class="vcats2">${cats.map((c, i) => `<a class="vpill" style="--c:${VPAL[i % VPAL.length]}" href="/category/${catSlug(c)}/">${CAT_ICON[c] || "🎮"} ${esc(c)}</a>`).join("")}</nav></section>`;
+  return page({
+    title: `${g.title}: Play online for free on ${site.name}`,
+    desc: short(`Play ${g.title} free in your browser. ${g.tagline || desc}`),
+    canonical: `/game/${g.slug}/`,
+    ogImage: `/media/${g.slug}/cover-16x9.webp`,
+    head: `<link rel="preload" as="image" href="/media/${g.slug}/cover-16x9.webp" fetchpriority="high">`,
+    jsonld: {
+      "@context": "https://schema.org", "@type": "VideoGame", name: g.title, description: short(desc, 300),
+      url: origin ? `${origin}/game/${g.slug}/` : undefined, image: origin ? `${origin}/media/${g.slug}/icon-512.webp` : undefined,
+      genre: g.categories, gamePlatform: ["Web browser", "Mobile", "Desktop"], applicationCategory: "Game", operatingSystem: "Any",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    },
     body,
   });
 }

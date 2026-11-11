@@ -67,6 +67,8 @@
       store.set("recent", recent.slice(0, 12));
     };
     $(".play", player).addEventListener("click", start);
+    // Mobile launch card (vibrant game page): Play opens the game full screen.
+    document.querySelectorAll("[data-play]").forEach(function (b) { b.addEventListener("click", start); });
     var fs = $("[data-fullscreen]", player);
     fs && fs.addEventListener("click", function () {
       if (document.fullscreenElement) return document.exitFullscreen();
