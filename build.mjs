@@ -52,7 +52,10 @@ const C = await (async () => {
     : Array.isArray(v) ? v.map(tok) : v && typeof v === "object" ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, tok(x)])) : v;
   const out = tok(swap({ apps: await load("apps.json", []), posts: await load("posts.json", []), pages: await load("pages.json", {}), home: await load("home.json", {}) }));
   out.play = await load("play.json", {});          // live Google Play data (scripts/sync-play.mjs, daily)
-  out.ed = tok(await load("editorial.json", { reviews: {}, lists: [] })); // our own reviews and best-of lists
+  // Our own reviews and best-of lists. A site can have its own (content.editorialDir, written by the Launch API for
+  // every new site) while sharing the mobile game pages and Play data of content.dir.
+  const edFile = path.join(ROOT, "content", site.content.editorialDir || site.content.dir || SITE_KEY, "editorial.json");
+  out.ed = tok(existsSync(edFile) ? JSON.parse(await readFile(edFile, "utf8")) : { reviews: {}, lists: [] });
   // Games we added ourselves (content/<dir>/extra-apps.json: [{ pkg, path? }]); facts and images come from play.json.
   const have = new Set(out.apps.map((a) => (a.googlePlay?.match(/[?&]id=([^&#]+)/) || [])[1]));
   for (const e of await load("extra-apps.json", [])) {
