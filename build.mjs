@@ -47,9 +47,12 @@ const C = await (async () => {
   const names = Object.entries(site.content.replaceNames || {});
   const swap = (v) => typeof v === "string" ? names.reduce((x, [a, b]) => x.split(a).join(b), v)
     : Array.isArray(v) ? v.map(swap) : v && typeof v === "object" ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, swap(x)])) : v;
-  const out = swap({ apps: await load("apps.json", []), posts: await load("posts.json", []), pages: await load("pages.json", {}), home: await load("home.json", {}) });
+  // "{site}" in any content file becomes this site's name, so one content folder can serve several sites.
+  const tok = (v) => typeof v === "string" ? v.split("{site}").join(site.name)
+    : Array.isArray(v) ? v.map(tok) : v && typeof v === "object" ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, tok(x)])) : v;
+  const out = tok(swap({ apps: await load("apps.json", []), posts: await load("posts.json", []), pages: await load("pages.json", {}), home: await load("home.json", {}) }));
   out.play = await load("play.json", {});          // live Google Play data (scripts/sync-play.mjs, daily)
-  out.ed = await load("editorial.json", { reviews: {}, lists: [] }); // our own reviews and best-of lists
+  out.ed = tok(await load("editorial.json", { reviews: {}, lists: [] })); // our own reviews and best-of lists
   // Games we added ourselves (content/<dir>/extra-apps.json: [{ pkg, path? }]); facts and images come from play.json.
   const have = new Set(out.apps.map((a) => (a.googlePlay?.match(/[?&]id=([^&#]+)/) || [])[1]));
   for (const e of await load("extra-apps.json", [])) {

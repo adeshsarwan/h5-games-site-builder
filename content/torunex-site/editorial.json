@@ -2,7 +2,7 @@
  "authors": [
   {
    "slug": "editors",
-   "name": "Torunex Editors"
+   "name": "{site} Editors"
   }
  ],
  "reviews": {
@@ -1772,13 +1772,13 @@
   }
  ],
  "method": [
-  "Torunex recommends mobile games you can download from Google Play. Our goal is simple: help you decide what's worth your time, money and storage space.",
+  "{site} recommends mobile games you can download from Google Play. Our goal is simple: help you decide what's worth your time, money and storage space.",
   "## How we score",
   "Each review gives a score out of 5 based on gameplay and depth, how fair the ads and in-app purchases are, how well it plays on typical phones, and how long it stays fun. Editor's Choice marks the games we'd recommend to almost anyone.",
   "## Where our facts come from",
   "Ratings, installs, prices, age ratings and update dates come directly from Google Play and are refreshed daily. Game names, icons and screenshots belong to their publishers and are shown from Google Play.",
   "## Independence",
-  "Our reviews, scores and rankings are our editors' opinion. The mobile games we cover are not made by Torunex: they belong to their developers and are downloaded from Google Play. We are not affiliated with Google or the game publishers.",
+  "Our reviews, scores and rankings are our editors' opinion. The mobile games we cover are not made by {site}: they belong to their developers and are downloaded from Google Play. We are not affiliated with Google or the game publishers.",
   "Publishers don't pay for reviews or list placements. Download links go to the official Google Play page.",
   "## Updates",
   "We revisit lists regularly and update scores when games change. If you spot something out of date, contact us."

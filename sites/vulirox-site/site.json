@@ -91,5 +91,17 @@
     "ga4": "G-SFJRGT7P8Q",
     "ga4Property": "properties/564004011"
   },
+  "content": {
+    "dir": "torunex-site",
+    "replaceNames": {
+      "BHAVIK SONANI. shall": "Thebes Ads PTE LTD shall",
+      "BHAVIK SONANI": "Thebes Ads PTE LTD",
+      "bhaviksonani6633442@gmail.com": "hello@vulirox.site",
+      "gamezadda.store": "vulirox.site",
+      "GamezAdda": "China H5",
+      "Gamez Adda": "China H5",
+      "GAMEZ ADDA": "CHINA H5"
+    }
+  },
   "design": "vibrant"
 }
