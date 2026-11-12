@@ -1,0 +1,851 @@
+{
+  "authors": [
+    {
+      "slug": "editors",
+      "name": "{site} Editors"
+    }
+  ],
+  "reviews": {
+    "Monument-Valley-2": {
+      "score": 4.8,
+      "editorsChoice": true,
+      "verdict": "A short, beautiful puzzle game about impossible buildings, with no ads and no in-app purchases after the $3.99 price.",
+      "bestFor": "Players who want a calm, polished puzzle game they can finish in a few evenings.",
+      "pros": [
+        "One $3.99 payment, no ads and no in-app purchases",
+        "Clean, colorful art and soft music",
+        "Simple one-finger controls",
+        "Rated Everyone"
+      ],
+      "cons": [
+        "Fairly short, so it may be over quickly",
+        "Puzzles are gentle, so experienced puzzle fans may want more challenge"
+      ],
+      "body": [
+        "You guide a mother and her child through towers and temples built from impossible geometry. You tap to walk, drag handles and sliders, and rotate the structures until paths line up. There are no timers and no fail screens, so you can think at your own pace.",
+        "The story is small and told without much text. It follows the pair as the child grows more independent, and the levels reflect that. The look is bright and minimal, and nearly every screen would work as wallpaper.",
+        "If you like puzzles that are relaxing more than difficult, this is a good fit. It is also an easy pick for a first puzzle game or for sharing with family, since the price is clear and nothing interrupts you."
+      ],
+      "author": "editors",
+      "updated": "2026-11-12"
+    },
+    "Gardenscapes": {
+      "score": 4.1,
+      "editorsChoice": false,
+      "verdict": "A free match-3 game where each level you clear helps you restore a run-down garden.",
+      "bestFor": "Casual players who like match-3 levels with a light story and decorating on top.",
+      "pros": [
+        "Free to download and rated Everyone",
+        "Match-3 levels are easy to learn",
+        "Restoring the garden gives you a goal beyond the puzzles",
+        "Listed with no ads"
+      ],
+      "cons": [
+        "In-app purchases are available for boosters and extra lives",
+        "Progress is gated by stars and energy, so you may wait or pay",
+        "Later levels can become hard enough to push you toward spending"
+      ],
+      "body": [
+        "You swap tiles to match three or more, clearing the goals for each level. Winning gives you stars, and you spend those stars on garden tasks such as fixing fountains, planting flowers and choosing between a few design options. A butler named Austin guides you through the story.",
+        "The mix works well for short sessions. A level takes a few minutes, and a new garden task is often only a level or two away. The match-3 part stays familiar, with boosters and special tiles that you build as you play.",
+        "It suits people who enjoy slow, steady progress and don't mind the free-to-play pacing. If you dislike waiting for lives or being offered purchases, expect some of that here."
+      ],
+      "author": "editors",
+      "updated": "2026-11-12"
+    },
+    "Mini-Metro": {
+      "score": 4.5,
+      "editorsChoice": true,
+      "verdict": "A minimalist game where you draw subway lines for a growing city, for just $0.99.",
+      "bestFor": "Players who like calm, thoughtful strategy and quick runs that you can replay.",
+      "pros": [
+        "Only $0.99, with no ads and no in-app purchases",
+        "Easy to learn: you draw lines between stations",
+        "Each run plays out differently",
+        "Clean, simple look that is easy to read"
+      ],
+      "cons": [
+        "Runs always end when the network gets overloaded, which can feel harsh",
+        "Little story or long-term progress compared with bigger sim games"
+      ],
+      "body": [
+        "You start with a few stations shaped like circles, triangles and squares, and you connect them by dragging lines. Passengers appear wanting to travel to a station of a matching shape. As new stations pop up, you have to reroute lines and use the limited trains and tunnels you are given.",
+        "The challenge is in the planning. A layout that works early can jam later, so you keep redrawing as the city grows. Runs end when stations overcrowd, then you try again with a better idea.",
+        "It suits anyone who likes puzzle-like planning without a lot of menus. At $0.99 with no ads or purchases, it is a low-risk pick for short breaks."
+      ],
+      "author": "editors",
+      "updated": "2026-11-12"
+    },
+    "Toca-Life-World-Build-a-Story": {
+      "score": 4,
+      "editorsChoice": false,
+      "verdict": "A open-ended digital dollhouse where kids create their own characters, places and stories.",
+      "bestFor": "Younger children who enjoy pretend play and making up their own stories.",
+      "pros": [
+        "Free to download and rated Everyone",
+        "No goals or scores, so kids set their own pace",
+        "Lots of characters and places to mix together",
+        "Listed with no ads"
+      ],
+      "cons": [
+        "Many extra locations and items are sold through in-app purchases",
+        "No set goals, so some kids may get bored",
+        "Parents may want to set limits on purchases"
+      ],
+      "body": [
+        "Toca Boca World is a sandbox. You move characters between homes, shops, schools and other places, and you can change how they look, what they hold and what they do. You make the story yourself by tapping and dragging.",
+        "There are no levels, timers or fail states. That makes it friendly for young kids, and the free version includes enough to start playing. More locations and extras can be bought in the app.",
+        "It works best for children who like pretend play, and it can be fun for older kids who like to build scenes. Parents should be aware of the store before handing over the device."
+      ],
+      "author": "editors",
+      "updated": "2026-11-12"
+    },
+    "Homescapes": {
+      "score": 4.1,
+      "editorsChoice": false,
+      "verdict": "A free match-3 game where you renovate a family home room by room.",
+      "bestFor": "Match-3 fans who enjoy decorating and a light family storyline.",
+      "pros": [
+        "Free to download and rated Everyone",
+        "Renovating rooms gives your match-3 wins a clear purpose",
+        "Short levels fit quick breaks",
+        "Listed with no ads"
+      ],
+      "cons": [
+        "In-app purchases are available for boosters and lives",
+        "Lives and progress limits can slow you down",
+        "Gets harder over time, which may tempt you to spend"
+      ],
+      "body": [
+        "You play match-3 levels to earn stars, then use stars to renovate rooms in a big family house. The story follows butler Austin and his parents as the house is fixed up. You often choose between a couple of designs for each item.",
+        "The levels use boosters and obstacles that grow more complex as you advance. It is easy to pick up for a few minutes, and the renovation tasks give you a new goal after most levels.",
+        "It suits casual players who like an easy puzzle loop with decorating. If you do not like free-to-play limits, be ready for lives and the option to buy extras."
+      ],
+      "author": "editors",
+      "updated": "2026-11-12"
+    },
+    "Unblock-Me-Premium": {
+      "score": 4.2,
+      "editorsChoice": false,
+      "verdict": "A simple sliding-block puzzle for $0.99 where you clear a path for the red block.",
+      "bestFor": "Anyone who wants easy-to-learn brain teasers for short breaks.",
+      "pros": [
+        "Only $0.99 and listed with no ads",
+        "Rules take seconds to learn",
+        "Short puzzles suit quick play",
+        "Rated Everyone"
+      ],
+      "cons": [
+        "In-app purchases are listed, such as for hints",
+        "The idea stays the same, so it can feel repetitive",
+        "Harder puzzles may need patience or trial and error"
+      ],
+      "body": [
+        "Each puzzle is a grid of wooden blocks. You slide them up, down or sideways to make room, then guide the red block out through the exit. The controls are just dragging with your finger.",
+        "Early puzzles are quick, and they ramp up into ones that need several steps of planning. There is no story or art to speak of, so the appeal is the logic itself.",
+        "It fits people who like short puzzle sessions during a commute or waiting. You pay once up front, but check the store if you are thinking of buying hints."
+      ],
+      "author": "editors",
+      "updated": "2026-11-12"
+    },
+    "Five-Nights-at-Freddys": {
+      "score": 4.2,
+      "editorsChoice": false,
+      "verdict": "A tense horror game where you watch cameras and manage power while animatronics approach your office.",
+      "bestFor": "Teens and adults who like jump-scare horror and can handle repeated tries.",
+      "pros": [
+        "One-time $2.99 price and listed with no ads",
+        "Simple controls with tension that builds each night",
+        "Short sessions suit playing in the dark",
+        "Famous horror setup with a lot of lore to explore"
+      ],
+      "cons": [
+        "Rated Teen because of jump scares and horror",
+        "In-app purchases are listed",
+        "Repeating a night after a failure can be frustrating"
+      ],
+      "body": [
+        "You play a night security guard in a pizza restaurant. You sit in an office, check security cameras, close doors and use lights, all while your limited power drains. The animatronic characters move around between checks, and you have to guess when they are coming.",
+        "The game is about managing information and nerves. You have very few actions, so each decision matters, and the five nights get harder as they go. Failing usually means a sudden scare and starting the night again.",
+        "It suits players who like horror and learning patterns. If you scare easily or are buying for a younger child, note the Teen rating."
+      ],
+      "author": "editors",
+      "updated": "2026-11-12"
+    },
+    "Five-Nights-at-Freddys-2": {
+      "score": 4.1,
+      "editorsChoice": false,
+      "verdict": "A sequel with more animatronics and no doors, so you rely on a mask and a wind-up music box.",
+      "bestFor": "Fans of the first game who want a harder, busier version of the same idea.",
+      "pros": [
+        "One-time $2.99 price and listed with no ads",
+        "Adds new tools, including a Freddy mask and a music box",
+        "More characters to track keeps you alert",
+        "Fits short sessions"
+      ],
+      "cons": [
+        "Rated Teen because of horror and jump scares",
+        "In-app purchases are listed",
+        "More to juggle at once, so it can feel stressful or hard"
+      ],
+      "body": [
+        "Once again you are a night guard, but this time there are no doors to close. You wear a mask to fool some animatronics, use a flashlight on others, and keep winding a music box that must not stop. Several characters can threaten you at once, so you jump between tasks.",
+        "That makes it a busier game than the original. You need to remember who is coming from which direction and what each one responds to. The nights rise in difficulty and failing sends you back to the start of the night.",
+        "It is a good pick if you finished the first game and want something tougher. Newcomers can start here, but the Teen rating and the scares are worth thinking about."
+      ],
+      "author": "editors",
+      "updated": "2026-11-12"
+    },
+    "Coloring-Book---Games-for-Kids": {
+      "score": 3.7,
+      "editorsChoice": false,
+      "verdict": "A free coloring app for kids with tap-to-fill pictures and simple drawing tools.",
+      "bestFor": "Young children who like to color and are playing with a parent nearby.",
+      "pros": [
+        "Free to download and rated Everyone",
+        "Easy for small children to use",
+        "Listed with no ads",
+        "Relaxing activity with no pressure"
+      ],
+      "cons": [
+        "In-app purchases are available for extra content",
+        "Free content may feel limited after a while",
+        "Tapping to fill leaves less room for creativity than drawing by hand"
+      ],
+      "body": [
+        "Kids pick a picture and fill it with colors, using a palette and basic tools. It is quiet, simple and has no goals or timers. A child can spend a few minutes or much longer on one picture.",
+        "The controls are made for small hands, with big areas to tap. It is more about enjoying colors than learning to draw, which suits younger children best.",
+        "It makes a decent free option for car rides or quiet time. Parents should check what is locked behind purchases before handing the device to a child."
+      ],
+      "author": "editors",
+      "updated": "2026-11-12"
+    },
+    "Monument-Valley": {
+      "score": 4.7,
+      "editorsChoice": true,
+      "verdict": "A short, artful puzzle game about Ida and impossible architecture, and a good place to start the series.",
+      "bestFor": "Players who want a gentle puzzle game with striking visuals and a one-time price.",
+      "pros": [
+        "Inventive puzzles built on optical illusions",
+        "Beautiful art and relaxing music",
+        "Easy touch controls",
+        "Listed with no ads and rated Everyone"
+      ],
+      "cons": [
+        "Short, so you can finish it in a couple of sittings",
+        "In-app purchases are listed, such as for extra chapters",
+        "Puzzles are mostly easy, so there is little challenge for experts"
+      ],
+      "body": [
+        "You guide a princess named Ida through buildings that bend the rules of space. By rotating towers, sliding platforms and changing your viewpoint, you can link paths that seem unconnected. Tapping is all you do to move her.",
+        "The puzzles teach you each new trick as it appears, so it rarely gets frustrating. The story is told lightly with minimal text, and the look is clean and colorful. It lasts only a short while, which is part of its charm.",
+        "It is a good fit if you like atmosphere and clever ideas more than tough challenges. At $3.99, it is a solid choice for a quiet evening."
+      ],
+      "author": "editors",
+      "updated": "2026-11-12"
+    },
+    "Bloons-TD-6": {
+      "score": 4.7,
+      "editorsChoice": true,
+      "verdict": "A deep tower defense game where you place monkeys and upgrades to pop waves of balloons.",
+      "bestFor": "Strategy fans who want lots of content and are fine paying $6.99 up front.",
+      "pros": [
+        "Many towers, upgrade paths and heroes to mix",
+        "Plenty of maps and modes for long-term play",
+        "Easy to start, but gets challenging",
+        "Listed with no ads and rated Everyone"
+      ],
+      "cons": [
+        "Costs $6.99, higher than most mobile games",
+        "In-app purchases are listed, such as for currency and extras",
+        "Hard modes can be demanding and need trial and error"
+      ],
+      "body": [
+        "You place monkey towers along a track to pop balloons before they reach the end. Each tower has upgrade paths that change how it works, and you can add heroes who level up during a match. Money earned by popping balloons pays for more towers and upgrades.",
+        "The early rounds are easy, then the balloons become tougher with new types and speeds. Finding combinations of towers that cope with them is the heart of the game. Different maps and difficulty settings give you reasons to come back and try new setups.",
+        "It suits both newcomers to tower defense and people who like to optimize. You pay up front, but there are no ads, and the amount to explore is large."
+      ],
+      "author": "editors",
+      "updated": "2026-11-12"
+    },
+    "Bloons-TD-5": {
+      "score": 3.8,
+      "editorsChoice": false,
+      "verdict": "An earlier Bloons tower defense game that is fun and straightforward, but it has ads as well as a price.",
+      "bestFor": "Tower defense fans who want a simpler Bloons game and can put up with ads.",
+      "pros": [
+        "Clear tower defense gameplay that is easy to learn",
+        "Plenty of towers and upgrades",
+        "Cheaper at $2.99",
+        "Rated Everyone"
+      ],
+      "cons": [
+        "Has ads even though it costs $2.99",
+        "In-app purchases are listed",
+        "Older design than Bloons TD 6 with less variety"
+      ],
+      "body": [
+        "As in other Bloons games, you place monkey towers and upgrade them to stop balloons from crossing the map. Earning money from popped balloons lets you build more defenses, and special towers and powers help in tough rounds.",
+        "The core idea is easy to pick up and fits both short and long sessions. The balloons get tougher as rounds go on, so you rethink your layout often.",
+        "It is a fair pick if you like the series and want a lower price. Because it has ads and purchases, many players will find Bloons TD 6 a smoother experience if they can afford the higher price."
+      ],
+      "author": "editors",
+      "updated": "2026-11-12"
+    }
+  },
+  "lists": [
+    {
+      "slug": "best-story-driven-match-3-games-with-a-makeover-twist",
+      "title": "Best story-driven match-3 games with a makeover twist",
+      "intro": [
+        "These games pair match-3 or tile puzzles with something to fix up, so each level you clear moves a project forward.",
+        "All five are free to download, and four of them are rated Everyone with 4.5★ or higher on Google Play."
+      ],
+      "picks": [
+        {
+          "path": "Gardenscapes",
+          "award": "Best garden restoration",
+          "why": "You clear match-3 levels to earn stars and fix up a neglected garden, and it is free with no ads at 4.8★."
+        },
+        {
+          "path": "Homescapes",
+          "award": "Best house renovation",
+          "why": "Match-3 levels pay for renovating a family house room by room, and it is free with no ads at 4.7★."
+        },
+        {
+          "path": "Project-Makeover",
+          "award": "Best for style fans",
+          "why": "You play match-style levels to earn money for changing characters' looks, and it is free with ads at 4.5★."
+        },
+        {
+          "path": "Royal-Match",
+          "award": "Best for tidy level design",
+          "why": "This is a match-3 with boosters and a king character, free with no ads and rated 4.6★."
+        },
+        {
+          "path": "Makeover-Tile-ASMR-Blast",
+          "award": "Best for soothing sounds",
+          "why": "It mixes tile puzzles with a makeover theme and ASMR-style sounds, but it has ads and a lower 4.1★ rating."
+        }
+      ],
+      "howWeChose": "We picked puzzle games where progress is tied to a makeover or renovation, then put the highest-rated ones first.",
+      "updated": "2026-11-12",
+      "author": "editors",
+      "kids": false
+    },
+    {
+      "slug": "best-android-games-that-cost-under-3",
+      "title": "Best Android games that cost under $3",
+      "intro": [
+        "A small one-time price can buy a lot of play. Every game here costs $2.99 or less on Google Play.",
+        "Most of these have no ads, so you pay once and get on with the game."
+      ],
+      "picks": [
+        {
+          "path": "Mini-Metro",
+          "award": "Best at 99 cents",
+          "why": "You draw subway lines to keep passengers moving as a city grows, and it costs $0.99 with no ads and no in-app purchases."
+        },
+        {
+          "path": "Unblock-Me-Premium",
+          "award": "Best sliding puzzle",
+          "why": "You slide blocks out of the way to free the red one, and the $0.99 Premium version has no ads."
+        },
+        {
+          "path": "Earn-to-Die",
+          "award": "Best for upgrades",
+          "why": "You drive a car across a zombie-filled land and spend your earnings on upgrades, for $1.49 with no ads or in-app purchases."
+        },
+        {
+          "path": "Papas-Cheeseria-To-Go",
+          "award": "Best for order juggling",
+          "why": "You take orders and build sandwiches against the clock, for $1.99 with no ads."
+        },
+        {
+          "path": "Wheres-My-Water",
+          "award": "Best for water puzzles",
+          "why": "You dig through dirt to guide water to Swampy's shower, and it costs $1.99 with some ads."
+        },
+        {
+          "path": "Poly-Bridge-3",
+          "award": "Best bridge builder",
+          "why": "You build bridges and test whether vehicles can cross, for $2.99 with no ads and no in-app purchases."
+        },
+        {
+          "path": "Bloons-TD-5",
+          "award": "Best tower defense deal",
+          "why": "You place monkey towers to pop balloon waves, for $2.99, though it still shows ads."
+        }
+      ],
+      "howWeChose": "We kept only games priced at $2.99 or less on Google Play and favoured ones with good ratings and different kinds of play.",
+      "updated": "2026-11-12",
+      "author": "editors",
+      "kids": false
+    },
+    {
+      "slug": "best-five-nights-at-freddy-s-games-to-start-with",
+      "title": "Best Five Nights at Freddy's games to start with",
+      "intro": [
+        "The Five Nights at Freddy's series is about surviving nights against animatronics. Each game changes the rules, so they do not feel the same.",
+        "All of these are one-time purchases at $2.99 with no ads, and all are rated Teen."
+      ],
+      "picks": [
+        {
+          "path": "Five-Nights-at-Freddys",
+          "award": "Best place to begin",
+          "why": "You watch cameras and close doors from a security office to survive until morning, at 4.7★."
+        },
+        {
+          "path": "Five-Nights-at-Freddys-2",
+          "award": "Best for fast thinking",
+          "why": "There are no doors, so you rely on a mask and a music box to get through each night."
+        },
+        {
+          "path": "Five-Nights-at-Freddys-3",
+          "award": "Best for one threat",
+          "why": "You face a single main animatronic and manage cameras and ventilation, with no in-app purchases."
+        },
+        {
+          "path": "Five-Nights-at-Freddys-4",
+          "award": "Best for listening",
+          "why": "The action moves to a child's bedroom where you check doors and listen for breathing, with no in-app purchases."
+        },
+        {
+          "path": "Five-Nights-at-Freddys-SL",
+          "award": "Best for story fans",
+          "why": "It follows the Sister Location story and has no in-app purchases."
+        },
+        {
+          "path": "FNaF-6-Pizzeria-Simulator",
+          "award": "Best for a change of pace",
+          "why": "You run a pizzeria business and then handle the dangerous nights, and it is rated 4.6★."
+        },
+        {
+          "path": "Ultimate-Custom-Night",
+          "award": "Best for experts",
+          "why": "You pick which animatronics to face and set the difficulty, so it suits players who already know the series."
+        }
+      ],
+      "howWeChose": "We listed games from the series in a rough order from the first game to the spin-offs, and noted what each one changes.",
+      "filter": "noAds",
+      "updated": "2026-11-12",
+      "author": "editors",
+      "kids": false
+    },
+    {
+      "slug": "best-drawing-coloring-and-make-believe-games-for-young-children",
+      "title": "Best drawing, coloring and make-believe games for young children",
+      "intro": [
+        "These games let small children draw, color, solve simple puzzles or act out stories at their own speed. None is about fighting or winning.",
+        "All five are rated Everyone, free to download and show no ads on Google Play."
+      ],
+      "picks": [
+        {
+          "path": "Toca-Life-World-Build-a-Story",
+          "award": "Best for pretend play",
+          "why": "Children build places, move characters around and make up their own stories, and it has no ads."
+        },
+        {
+          "path": "Coloring-Book---Games-for-Kids",
+          "award": "Best for coloring",
+          "why": "Children tap to color pictures, and it is free with no ads."
+        },
+        {
+          "path": "Coloring-games-for-kids-2-5-y",
+          "award": "Best for toddlers",
+          "why": "Its coloring activities are aimed at ages 2 to 5, and it is free with no ads."
+        },
+        {
+          "path": "Kids-Puzzle-Games-2-5-years",
+          "award": "Best first puzzles",
+          "why": "It offers simple puzzles made for ages 2 to 5, with no ads."
+        },
+        {
+          "path": "LEGO-Bluey",
+          "award": "Best for Bluey fans",
+          "why": "Children play in a LEGO version of the Bluey family's world, free with no ads."
+        }
+      ],
+      "howWeChose": "We chose drawing, coloring, puzzle and pretend-play games rated Everyone, with no fighting, and kept to ones that show no ads.",
+      "filter": "noAds",
+      "updated": "2026-11-12",
+      "author": "editors",
+      "kids": true
+    },
+    {
+      "slug": "best-puzzles-about-rotating-sliding-and-arranging",
+      "title": "Best puzzles about rotating, sliding and arranging",
+      "intro": [
+        "Instead of racing a clock, these puzzles ask you to move pieces until things fit. They suit players who like to think quietly.",
+        "Prices run from free to $3.99, and every game here is rated Everyone."
+      ],
+      "picks": [
+        {
+          "path": "Monument-Valley-2",
+          "award": "Best looking puzzle",
+          "why": "You rotate impossible buildings to guide a mother and child, for $3.99 with no ads and no in-app purchases, at 4.9★."
+        },
+        {
+          "path": "Monument-Valley",
+          "award": "Best original",
+          "why": "You turn and shift architecture to lead a princess to the exit, and it is rated 4.9★."
+        },
+        {
+          "path": "Infinity-Loop",
+          "award": "Best for loops",
+          "why": "You rotate line pieces until they join into closed shapes, and it is free."
+        },
+        {
+          "path": "A-Little-to-the-Left",
+          "award": "Best for tidying",
+          "why": "You sort and arrange everyday objects into the right order, free with no ads."
+        },
+        {
+          "path": "Unblock-Me-Premium",
+          "award": "Best for sliding blocks",
+          "why": "You slide blocks until the red one can escape, for $0.99 with no ads."
+        },
+        {
+          "path": "Simon-Tathams-Puzzles",
+          "award": "Best puzzle collection",
+          "why": "It bundles many classic logic puzzles in one free app with no ads and no in-app purchases."
+        }
+      ],
+      "howWeChose": "We looked for puzzles where you move or rotate pieces rather than match colors, and put the best-rated ones first.",
+      "updated": "2026-11-12",
+      "author": "editors",
+      "kids": false
+    },
+    {
+      "slug": "best-games-for-defending-against-waves-of-enemies",
+      "title": "Best games for defending against waves of enemies",
+      "intro": [
+        "In these games you set up defenses and then watch them handle an attack. Where you place things matters more than how fast you tap.",
+        "Some are free and some cost a few dollars, so check the details under each pick."
+      ],
+      "picks": [
+        {
+          "path": "Bloons-TD-6",
+          "award": "Best tower defense",
+          "why": "You place monkey towers and upgrade them to pop balloons, for $6.99 with no ads, at 4.8★."
+        },
+        {
+          "path": "Bloons-TD-5",
+          "award": "Best cheaper option",
+          "why": "It is the earlier game in the series, at $2.99, though it shows ads."
+        },
+        {
+          "path": "Plants-vs-Zombies",
+          "award": "Best classic",
+          "why": "You plant defenders on a lawn to stop zombies, free with ads."
+        },
+        {
+          "path": "Plants-vs-Zombies-2",
+          "award": "Best for variety",
+          "why": "You defend across different time-travel worlds with new plants, free with ads."
+        },
+        {
+          "path": "Plants-vs-Zombies-Heroes",
+          "award": "Best for card fans",
+          "why": "You build a deck of plant or zombie cards and battle other players, free with ads."
+        }
+      ],
+      "howWeChose": "We chose games where you plan a defense before the enemy attacks, and ordered them by rating and price.",
+      "updated": "2026-11-12",
+      "author": "editors",
+      "kids": false
+    },
+    {
+      "slug": "best-one-more-try-games-for-beating-your-own-score",
+      "title": "Best one-more-try games for beating your own score",
+      "intro": [
+        "These games are easy to start and hard to put down because a bad run only costs you a minute or two.",
+        "Most are free with ads, and two cost a few dollars."
+      ],
+      "picks": [
+        {
+          "path": "Subway-Surfers",
+          "award": "Best runner",
+          "why": "You swipe to dodge trains while running down subway tracks, free and rated 4.6★."
+        },
+        {
+          "path": "Geometry-Dash",
+          "award": "Best for rhythm and reflexes",
+          "why": "You tap to jump through spike-filled levels set to music, for $3.99 with no ads and no in-app purchases."
+        },
+        {
+          "path": "Jetpack-Joyride",
+          "award": "Best jetpack runner",
+          "why": "You hold to fly, avoid zappers and collect coins, free with ads."
+        },
+        {
+          "path": "Altos-Odyssey",
+          "award": "Best for a calm pace",
+          "why": "You snowboard across desert dunes, doing flips and jumping gaps, free with ads."
+        },
+        {
+          "path": "Hill-Climb-Racing",
+          "award": "Best for driving fans",
+          "why": "You balance a car over bumpy hills and watch your fuel, free with ads."
+        },
+        {
+          "path": "Tomb-of-the-Mask",
+          "award": "Best maze runner",
+          "why": "You swipe a masked hero through tight mazes, free and rated 4.3★."
+        }
+      ],
+      "howWeChose": "We picked games where a run is short and the aim is a better score or distance, and put the strongest-rated ones first.",
+      "updated": "2026-11-12",
+      "author": "editors",
+      "kids": false
+    },
+    {
+      "slug": "best-management-games-for-farms-cities-and-train-lines",
+      "title": "Best management games for farms, cities and train lines",
+      "intro": [
+        "These games are about running something that keeps growing. You plan, expand and fix problems as they appear.",
+        "They range from a free farm to a paid tractor simulator."
+      ],
+      "picks": [
+        {
+          "path": "Hay-Day",
+          "award": "Best farm to run",
+          "why": "You grow crops, raise animals and sell goods to build up your farm, free with ads."
+        },
+        {
+          "path": "TheoTown",
+          "award": "Best city builder",
+          "why": "You build and grow a city, and it is free with a 4.7★ rating."
+        },
+        {
+          "path": "Mini-Metro",
+          "award": "Best transit puzzle",
+          "why": "You design subway lines to move passengers, for $0.99 with no ads and no in-app purchases."
+        },
+        {
+          "path": "Farming-Simulator-23-Mobile",
+          "award": "Best for tractor fans",
+          "why": "You work fields with farm machines, for $5.99 with ads and in-app purchases."
+        },
+        {
+          "path": "Pocket-Build",
+          "award": "Best without ads",
+          "why": "It is a free builder that shows no ads and is rated Everyone 10+."
+        }
+      ],
+      "howWeChose": "We chose games where you plan and run a growing place, and covered farms, cities and transit.",
+      "updated": "2026-11-12",
+      "author": "editors",
+      "kids": false
+    },
+    {
+      "slug": "best-dress-up-and-create-your-world-games",
+      "title": "Best dress-up and create-your-world games",
+      "intro": [
+        "These games let you design characters, outfits and places, then use them in your own scenes or stories.",
+        "Most are free and rated Everyone."
+      ],
+      "picks": [
+        {
+          "path": "Roblox",
+          "award": "Best for variety",
+          "why": "You customize an avatar and play worlds made by other users, free with no ads."
+        },
+        {
+          "path": "Toca-Life-World-Build-a-Story",
+          "award": "Best for storytelling",
+          "why": "You move characters between locations and set up your own scenes, free with no ads."
+        },
+        {
+          "path": "Gacha-Club",
+          "award": "Best for character design",
+          "why": "You dress up characters and build scenes, free with ads and no in-app purchases."
+        },
+        {
+          "path": "Gacha-Life-2",
+          "award": "Best newer Gacha",
+          "why": "It continues the dress-up and scene-making idea, free with ads and no in-app purchases."
+        },
+        {
+          "path": "Mini-World-CREATA",
+          "award": "Best for block worlds",
+          "why": "You explore and build in a block-style world, free with ads."
+        }
+      ],
+      "howWeChose": "We chose games where designing a character or place is a big part of the fun, and ordered them by how much you can create.",
+      "updated": "2026-11-12",
+      "author": "editors",
+      "kids": false
+    },
+    {
+      "slug": "best-number-card-and-word-games-for-a-morning-routine",
+      "title": "Best number, card and word games for a morning routine",
+      "intro": [
+        "These games give you a small, familiar puzzle to settle into with your first coffee. Most can be finished in a few minutes.",
+        "They are all rated Everyone, and several are free."
+      ],
+      "picks": [
+        {
+          "path": "NYT-Games",
+          "award": "Best for daily words",
+          "why": "It holds Wordle and crossword puzzles, free with no ads and rated 4.8★."
+        },
+        {
+          "path": "Daily-Number-Match",
+          "award": "Best for number matching",
+          "why": "You pair up numbers on a grid, free with ads and rated 4.8★."
+        },
+        {
+          "path": "Sudoku-Ultimate-Offline-puzzle",
+          "award": "Best sudoku",
+          "why": "You fill the grid with digits, for $3.99 with no ads and no in-app purchases."
+        },
+        {
+          "path": "Classic-Solitaire-Klondike",
+          "award": "Best plain solitaire",
+          "why": "You play Klondike with standard cards, free with no ads and no in-app purchases."
+        },
+        {
+          "path": "Solitaire-com",
+          "award": "Best for card fans",
+          "why": "It is a classic solitaire app, free with ads and no in-app purchases."
+        },
+        {
+          "path": "Word-Search-Explorer",
+          "award": "Best for word hunting",
+          "why": "You find hidden words in a letter grid, free with ads and rated 4.9★."
+        }
+      ],
+      "howWeChose": "We picked daily-style puzzles with simple rules and high ratings, and mixed numbers, cards and words.",
+      "updated": "2026-11-12",
+      "author": "editors",
+      "kids": false
+    },
+    {
+      "slug": "best-crash-flip-and-stunt-games-for-physics-fans",
+      "title": "Best crash, flip and stunt games for physics fans",
+      "intro": [
+        "In these games the fun comes from how vehicles bounce, flip and crash. You learn to read the physics and use it.",
+        "All are rated Everyone or Everyone 10+, except Earn to Die, which is rated Teen."
+      ],
+      "picks": [
+        {
+          "path": "Hill-Climb-Racing-2",
+          "award": "Best for online races",
+          "why": "You tune a car and race over hilly tracks, free with ads and rated 4.5★."
+        },
+        {
+          "path": "Earn-to-Die",
+          "award": "Best for upgrades",
+          "why": "You upgrade a car to push further across a zombie-filled land, for $1.49 with no ads."
+        },
+        {
+          "path": "Moto-X3M-Bike-Race-Game",
+          "award": "Best bike stunts",
+          "why": "You race a motorbike through obstacle courses and do flips, free and rated 4.6★."
+        },
+        {
+          "path": "Drive-Ahead",
+          "award": "Best for car duels",
+          "why": "Two cars fight to knock each other's heads off in short rounds, free with ads."
+        },
+        {
+          "path": "Hill-Climb-Racing",
+          "award": "Best original",
+          "why": "You balance a car over hills while managing fuel, free with ads."
+        }
+      ],
+      "howWeChose": "We chose vehicle games where physics and crashes drive the play, and ordered them by how much there is to unlock.",
+      "updated": "2026-11-12",
+      "author": "editors",
+      "kids": false
+    },
+    {
+      "slug": "best-games-to-try-after-clash-of-clans",
+      "title": "Best games to try after Clash of Clans",
+      "intro": [
+        "If you have finished with Clash of Clans, these strategy and battle games use similar ideas: build up, join others and fight.",
+        "All six are free and show no ads."
+      ],
+      "picks": [
+        {
+          "path": "Clash-Royale",
+          "award": "Best quick duels",
+          "why": "You play cards in short real-time battles to knock down towers, free with no ads."
+        },
+        {
+          "path": "Brawl-Stars",
+          "award": "Best for short fights",
+          "why": "You pick a brawler and play short team matches, free with no ads."
+        },
+        {
+          "path": "Kingshot",
+          "award": "Best for kingdom growth",
+          "why": "It is a free strategy game with no ads that is rated Everyone 10+."
+        },
+        {
+          "path": "Call-of-Dragons",
+          "award": "Best for alliances",
+          "why": "It is a fantasy strategy game with dragons, free with no ads and rated Teen."
+        },
+        {
+          "path": "Last-WarSurvival-Game",
+          "award": "Best survival base",
+          "why": "It is a free survival strategy game with no ads, rated 4.6★."
+        },
+        {
+          "path": "Last-Z-Survival-Shooter",
+          "award": "Best with shooter parts",
+          "why": "It mixes survival strategy with shooting, free with no ads and rated Teen."
+        }
+      ],
+      "howWeChose": "We picked free strategy and battle games from the same broad family, and kept only ones that show no ads.",
+      "filter": "noAds",
+      "updated": "2026-11-12",
+      "author": "editors",
+      "kids": false
+    }
+  ],
+  "method": [
+    "## How we review",
+    "{site} recommends Android games from Google Play. Each game gets a score out of 5, shown next to its entry in our lists.",
+    "## What Editor's Choice means",
+    "Editor's Choice is the label we give to a game we put at the top of a list as the best fit for that list's theme. A game can be an Editor's Choice in one list and not in another.",
+    "## Where the numbers come from",
+    "Ratings, install counts, prices, ads information and in-app purchase information come from Google Play. This data refreshes daily, so a game's details on {site} can change when its Google Play page changes.",
+    "## Who makes the games",
+    "The games are made by their developers, and you download them from Google Play. {site} is not affiliated with Google or with any game publisher.",
+    "## No paid placement",
+    "Publishers do not pay for placement on {site}. A game appears in a list because we judged it a good fit for that list.",
+    "## How often lists are updated",
+    "We revisit our lists regularly, adding or removing games when the details change or better fits appear."
+  ],
+  "home": {
+    "featured": "Monument-Valley-2",
+    "spotlight": [
+      {
+        "list": "best-story-driven-match-3-games-with-a-makeover-twist",
+        "path": "Gardenscapes",
+        "why": "Match-3 levels restore a garden; free, no ads."
+      },
+      {
+        "list": "best-android-games-that-cost-under-3",
+        "path": "Mini-Metro",
+        "why": "Draw subway lines for just $0.99."
+      },
+      {
+        "list": "best-drawing-coloring-and-make-believe-games-for-young-children",
+        "path": "Toca-Life-World-Build-a-Story",
+        "why": "Open-ended story play with no ads."
+      }
+    ],
+    "lists": [
+      "best-story-driven-match-3-games-with-a-makeover-twist",
+      "best-android-games-that-cost-under-3",
+      "best-five-nights-at-freddy-s-games-to-start-with",
+      "best-drawing-coloring-and-make-believe-games-for-young-children",
+      "best-puzzles-about-rotating-sliding-and-arranging",
+      "best-games-to-try-after-clash-of-clans"
+    ]
+  }
+}
