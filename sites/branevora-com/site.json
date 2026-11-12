@@ -80,7 +80,8 @@
       ]
     },
     "games": {},
-    "siteUnits": {}
+    "siteUnits": {},
+    "nativeSlots": true
   },
   "assets": "proxy",
   "adsTxt": [
@@ -103,5 +104,8 @@
       "Gamez Adda": "China H5 games",
       "GAMEZ ADDA": "CHINA H5 GAMES"
     }
-  }
+  },
+  "headHtml": [
+    "<script defer src=\"https://serve.thebesads.com/sdk/publisher-sdk.js\"></script>"
+  ]
 }
