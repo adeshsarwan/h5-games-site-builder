@@ -24,6 +24,19 @@ const site = JSON.parse(await readFile(path.join(ROOT, "sites", SITE_KEY, "site.
 const catalog = JSON.parse(await readFile(path.join(ROOT, "catalog", "games.json"), "utf8"));
 site.key = SITE_KEY;
 const origin = site.domain ? `https://${site.domain}` : "";
+// Price Optimiser Rules API SDK: data-po-site and data-po-runtime-config-url must be explicit, otherwise the SDK
+// falls back to the legacy priceoptimiser1.thebesads.com runtime (404 for Rules API sites). Older site.json files
+// carry a bare tag, so complete it here; a tag pointing at the legacy runtime fails the build.
+const PO_SDK = "https://serve.thebesads.com/sdk/publisher-sdk.js", PO_RUNTIME = "https://serve.thebesads.com/runtime/config";
+site.headHtml = (site.headHtml || []).map((h) => {
+  if (typeof h !== "string" || !h.includes(PO_SDK)) return h;
+  if (/priceoptimiser1\.thebesads\.com|\/v1\/runtime-config/i.test(h)) throw new Error(`site.json headHtml uses the legacy Price Optimiser runtime: ${h}`);
+  const poSite = h.match(/data-po-site="([^"]+)"/)?.[1] || String(site.domain || "").replace(/^www\./, "");
+  const runtime = h.match(/data-po-runtime-config-url="([^"]+)"/)?.[1] || PO_RUNTIME;
+  if (!poSite) throw new Error("Price Optimiser SDK tag needs data-po-site, and site.json has no domain");
+  return `<script defer src="${PO_SDK}" data-po-site="${poSite}" data-po-runtime-config-url="${runtime}"></script>`;
+});
+if (site.headHtml.filter((h) => typeof h === "string" && h.includes(PO_SDK)).length > 1) throw new Error("site.json headHtml loads the Price Optimiser SDK more than once");
 
 // ---------- games for this site ----------
 let games = site.games === "all" ? catalog : catalog.filter((g) => site.games.includes(g.slug));
