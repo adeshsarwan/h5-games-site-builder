@@ -876,18 +876,18 @@
     }
   ],
   "method": [
-    "## How we review",
-    "{site} recommends Android games from Google Play. Each game gets a score out of 5, which is based on the star rating shown on its Google Play page.",
-    "## What Editor's Choice means",
-    "Editor's Choice is the award given to the game we put first on a list for that theme. It means the game is our top recommendation for that list's topic.",
-    "## Where the numbers come from",
-    "Ratings, install counts, prices and the information about ads and in-app purchases all come from Google Play. This information refreshes daily, so it may change from one day to the next.",
-    "## Where the games come from",
-    "The games are made by their developers and downloaded from Google Play. {site} is not affiliated with Google or with any game publisher.",
-    "## Independence",
-    "Publishers do not pay for placement. A game cannot buy its way onto a list or into a higher position.",
-    "## How often lists change",
-    "We revisit our lists regularly, so games may be added, moved or removed as ratings, prices and other details change."
+    "## What we do",
+    "{site} picks Android games from Google Play and sorts them into lists by mood, player and play style, so you can find something worth downloading without scrolling the store for an hour.",
+    "## How scores work",
+    "The score out of 5 is our editors' judgment, not the Google Play star rating. It weighs how good and deep the game is, how fair its ads and in-app purchases are, how well it runs on an everyday phone and how long it stays fun. Editor's Choice marks the reviewed games we would suggest to almost anyone.",
+    "## Facts from Google Play",
+    "Star ratings, install counts, prices, age ratings and whether a game has ads or in-app purchases come straight from Google Play and are refreshed every day, so they can change from one visit to the next.",
+    "## Whose games these are",
+    "Every game is made by its own developer and downloads from Google Play. {site} is not affiliated with Google or with any game publisher.",
+    "## No paid placement",
+    "Publishers do not pay for reviews or for a spot on a list.",
+    "## Keeping lists fresh",
+    "We revisit the lists regularly. If a price, rating or detail looks out of date, tell us through the contact page."
   ],
   "home": {
     "featured": "Monument-Valley",
