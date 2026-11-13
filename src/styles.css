@@ -216,7 +216,9 @@ footer a:hover{text-decoration:underline}
 /* ---- Native ad containers (filled by an external script, e.g. Price Optimiser) ---- */
 .gam-ad-wrapper{margin:20px auto;max-width:970px;text-align:center}
 .gam-ad-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.6;margin-bottom:6px}
-.gam-native-slot{width:100%;min-height:250px}
+/* Reserve the largest size the slots serve (336x280; 300x250 also fits) and never collapse: the SDK hides an unfilled
+   slot (po-slot--empty -> display:none), which pulled everything below up by ~300px. Fixed height = no layout shift. */
+.gam-native-slot{width:100%;min-height:280px!important;height:280px;display:flex!important;align-items:center;justify-content:center;overflow:hidden}
 
 /* ---- Anchor ad (#gam-anchor, filled by Price Optimiser; only on sites with ads.anchor) ----
    Sticky bottom display placement. The SDK picks 320x50/320x100 below 768px and 728x90 above, so reserve

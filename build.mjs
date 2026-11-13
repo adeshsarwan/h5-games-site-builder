@@ -112,7 +112,7 @@ function siteUnit(slot) {
 }
 // Native banner containers filled by the Price Optimiser script (same ids as gamezadda.store): one of each per page.
 const NATIVE = !!site.ads.nativeSlots;
-const gamNative = (n) => NATIVE ? `<div id="gam-native-0${n}-wrapper" class="gam-ad-wrapper" aria-label="Advertisement" aria-busy="true"><div class="gam-ad-label">Advertisement</div><div id="gam-native-0${n}" class="gam-native-slot" style="width:100%;min-height:250px"></div></div>` : "";
+const gamNative = (n) => NATIVE ? `<div id="gam-native-0${n}-wrapper" class="gam-ad-wrapper" aria-label="Advertisement" aria-busy="true"><div class="gam-ad-label">Advertisement</div><div id="gam-native-0${n}" class="gam-native-slot" style="width:100%;min-height:280px"></div></div>` : "";
 // Anchor ad (Price Optimiser Rules API slot "gam-anchor": 320x50 / 320x100 below 768px, 728x90 above). A fixed
 // display placement, not a GPT out-of-page anchor: the container sits in the shared layout of every page, before
 // the deferred SDK initialises, and styles.css makes it sticky and reserves bottom space for it.
