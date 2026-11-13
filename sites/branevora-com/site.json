@@ -1,10 +1,10 @@
 {
   "key": "branevora-com",
-  "name": "China H5 Branevora",
+  "name": "Branevora",
   "domain": "branevora.com",
   "pagesProject": "games-branevora-com",
   "tagline": "Free online games. No downloads, no sign-up. Just tap and play.",
-  "description": "China H5 games has free online puzzle, word, arcade and casual games. Play instantly in your browser on mobile, tablet or desktop.",
+  "description": "Branevora has free online puzzle, word, arcade and casual games. Play instantly in your browser on mobile, tablet or desktop.",
   "language": "en",
   "theme": {
     "background": "#bfe3ff",
@@ -15,7 +15,7 @@
     "tile": "#ffffff"
   },
   "logo": {
-    "text": "China H5 games",
+    "text": "Branevora",
     "mark": "C",
     "motif": "cartridge",
     "tile": "#FFD23F"
@@ -105,9 +105,9 @@
       "BHAVIK SONANI": "Thebes Ads PTE LTD",
       "bhaviksonani6633442@gmail.com": "hello@branevora.com",
       "gamezadda.store": "branevora.com",
-      "GamezAdda": "China H5 games",
-      "Gamez Adda": "China H5 games",
-      "GAMEZ ADDA": "CHINA H5 GAMES"
+      "GamezAdda": "Branevora",
+      "Gamez Adda": "Branevora",
+      "GAMEZ ADDA": "BRANEVORA"
     }
   },
   "headHtml": [

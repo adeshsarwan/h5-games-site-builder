@@ -11,6 +11,7 @@ body.v .wrap{padding:0;max-width:none}
 .vh{background:var(--night)}
 .vtop{display:flex;flex-wrap:wrap;align-items:center;gap:18px;padding-top:16px;padding-bottom:14px}
 .vlogo{display:flex;align-items:center;gap:12px;font-family:Fredoka,sans-serif;font-weight:700;font-size:30px;color:#fff}
+.v .vlogo{color:#fff} /* beats ".v a{color:inherit}", which turned the header name dark */
 .vmark{width:46px;height:46px;border-radius:14px;background:var(--pop);border:var(--bd);box-shadow:4px 4px 0 var(--ink);color:var(--ink);display:grid;place-items:center;font-size:26px;transform:rotate(-6deg)}
 .vlogo.vsm{font-size:24px}.vlogo.vsm .vmark{width:38px;height:38px;font-size:22px}
 .vsearch{flex:1 1 240px;min-width:0;height:48px;border-radius:999px;border:var(--bd);background:#fff;color:var(--muted);display:flex;align-items:center;gap:10px;padding:0 18px;font-weight:800;font-size:16px;text-align:left}
