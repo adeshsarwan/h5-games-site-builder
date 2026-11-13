@@ -308,7 +308,7 @@ ${C.posts.length ? `<h2 class="h2"><a href="/blog/">Articles →</a></h2><div cl
 }
 function appsIndex() {
   if (V) return vAppsIndex();
-  const body = `<div class="grid">${brand()}<h1 class="h ch">🔥 Top mobile games</h1>${[...C.apps.filter((a) => reviewOf(a)), ...C.apps.filter((a) => !reviewOf(a))].map((a, i) => appTile(a, i < 3 ? "s2" : "", i > 7)).join("")}<h2 class="h">Play online now</h2>${games.slice(0, 12).map((g) => tile(g)).join("")}</div>
+  const body = `<div class="grid">${brand()}<h1 class="h ch">🔥 Top mobile games</h1></div>${gamNative(1)}<div class="grid">${[...C.apps.filter((a) => reviewOf(a)), ...C.apps.filter((a) => !reviewOf(a))].map((a, i) => appTile(a, i < 3 ? "s2" : "", i > 7)).join("")}</div>${gamNative(2)}<div class="grid"><h2 class="h">Play online now</h2>${games.slice(0, 12).map((g) => tile(g)).join("")}</div>
 ${C.home.intro ? `<section class="text prose">${fixLinks(C.home.intro)}</section>` : ""}`;
   return page({ title: `Top mobile games: guides, tips and official download links | ${site.name}`, desc: `Gameplay guides, tips and official store links for ${C.apps.slice(0, 4).map((a) => a.title).join(", ")} and more popular mobile games.`, canonical: "/topgames/", body });
 }
@@ -560,8 +560,12 @@ function vAppsIndex() {
     const img = sz === "w" ? playImg(p.header, "w720") : appImgOf(a, sz === "b" ? 512 : 256);
     return `<a class="vg ${sz}" href="${appUrl(a)}"><img src="${esc(img)}" alt="${esc(a.title)}"${i > 14 ? ' loading="lazy" decoding="async"' : ""}>${p?.score ? `<i class="vg-r">${p.score} ★</i>` : ""}${r ? `<i class="vg-s${r.editorsChoice ? " ec" : ""}">${r.editorsChoice ? "Editor's Choice · " : ""}${r.score.toFixed(1)}/5</i>` : ""}<b>${esc(a.title.split(/[:–]/)[0].trim())}</b></a>`;
   };
+  // /topgames/ is the landing page of the paid campaigns, so it carries both native slots: one right under the title
+  // (requested on load, even for visitors who leave without scrolling) and one partway down the wall.
+  const tiles = mixed.map(tile), cut = Math.min(24, tiles.length);
   const body = `<section class="vin vwall-h"><h1>Top mobile games</h1><p>${C.apps.length} Android games · live Google Play ratings · <a href="/best/">best-of lists</a></p></section>
-<section class="vin"><div class="vwall">${mixed.map(tile).join("")}</div></section>
+${NATIVE ? `<div class="vin vad">${gamNative(1)}</div>` : ""}<section class="vin"><div class="vwall">${tiles.slice(0, cut).join("")}</div></section>
+${NATIVE ? `<div class="vin vad">${gamNative(2)}</div>` : ""}${tiles.length > cut ? `<section class="vin"><div class="vwall">${tiles.slice(cut).join("")}</div></section>` : ""}
 <section class="vin">${vDisclaimer()}</section>`;
   return page({ slim: true, title: `Top mobile games: reviews, ratings and official downloads | ${site.name}`, desc: `Live Google Play ratings and our reviews of ${C.apps.length} Android games, including ${big.slice(0, 3).map((a) => a.title.split(":")[0]).join(", ")}.`, canonical: "/topgames/", body });
 }
