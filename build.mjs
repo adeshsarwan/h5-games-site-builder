@@ -175,10 +175,14 @@ const catTiles = () => `</div><nav class="cats" aria-label="Categories">${cats.m
 // tags live in the container; each per-site tag must be limited to that site's hostname there.
 const GTM_ID = /^GTM-[A-Z0-9]+$/.test(site.analytics?.gtm || "") ? site.analytics.gtm : null;
 const GTM = GTM_ID ? `<script async src="https://www.googletagmanager.com/gtm.js?id=${GTM_ID}"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date())</script>` : "";
+// Microsoft Clarity (site.json analytics.clarity = the project ID from clarity.microsoft.com/projects/view/<id>), loaded
+// directly so each site records into its own project. Don't also add a Clarity tag in GTM for that site.
+const CLARITY_ID = /^[a-z0-9]{6,16}$/.test(site.analytics?.clarity || "") ? site.analytics.clarity : null;
+const CLARITY = CLARITY_ID ? `<script>(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y)})(window,document,"clarity","script","${CLARITY_ID}")</script>` : "";
 function page({ title, desc, canonical, body, head = "", ogImage = "", jsonld = null, robots = "", slim = false }) {
   const url = origin + canonical;
   const siteJs = { games: Object.fromEntries(games.map((g) => [g.slug, g.title])) };
-  return `<!doctype html><html lang="${site.language || "en"}"><head>${GTM}<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  return `<!doctype html><html lang="${site.language || "en"}"><head>${GTM}${CLARITY}<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">${origin ? `<link rel="canonical" href="${url}">` : ""}${robots ? `<meta name="robots" content="${robots}">` : ""}
 <meta name="theme-color" content="${t.background}"><link rel="icon" href="/favicon.svg" type="image/svg+xml">${LOGO ? `${RESVG ? '<link rel="icon" href="/favicon.ico" sizes="48x48">' : ""}<link rel="apple-touch-icon" href="/apple-touch-icon.png">` : ""}<link rel="manifest" href="/manifest.webmanifest">
 <meta property="og:type" content="website"><meta property="og:site_name" content="${esc(site.name)}"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">${ogImage ? `<meta property="og:image" content="${origin}${ogImage}"><meta name="twitter:card" content="summary_large_image">` : ""}
