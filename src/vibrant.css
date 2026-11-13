@@ -356,3 +356,5 @@ a.gp-chip:hover{transform:translateY(-1px)}
 .v .gp-player:fullscreen .stage{aspect-ratio:auto;height:auto;max-height:none;flex:1}
 .v .gp-player .bar .exit{display:none}
 body.immersive .gp-player .bar .exit{display:grid}
+/* image logo (site.json logo.image): the image is its own sticker, so drop the letter tile styling */
+.vmark.img{background:none;border:0;box-shadow:none;transform:none;overflow:visible}.vmark.img img{width:100%;height:100%;display:block}

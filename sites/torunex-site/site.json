@@ -16,7 +16,8 @@
   },
   "logo": {
     "text": "Torunex",
-    "mark": "T"
+    "mark": "T",
+    "image": "logo.svg"
   },
   "games": "all",
   "exclude": [],

@@ -153,6 +153,12 @@ let CSS = minCss(await readFile(path.join(ROOT, "src", "styles.css"), "utf8"));
 const t = site.theme;
 const V = site.design === "vibrant"; // bold "sticker" design (torunex.site); default design otherwise
 if (V) CSS += minCss(await readFile(path.join(ROOT, "src", "vibrant.css"), "utf8"));
+// Optional image logo: sites/<key>/logo.svg (+ logo.png), set as site.json "logo": { "image": "logo.svg" }. Used for the
+// header/footer mark, favicon and app icon instead of the letter.
+const LOGO_IMG = site.logo?.image && existsSync(path.join(ROOT, "sites", SITE_KEY, site.logo.image)) ? site.logo.image : null;
+const LOGO_PNG = LOGO_IMG && existsSync(path.join(ROOT, "sites", SITE_KEY, "logo.png"));
+const markIn = () => LOGO_IMG ? `<img src="/${esc(LOGO_IMG)}" alt="" width="46" height="46">` : esc(site.logo.mark);
+const markCls = LOGO_IMG ? " img" : "";
 const themeCss = `:root{--bg:${t.background};--bg2:${t.backgroundAlt};--accent:${t.accent};--accentText:${t.accentText};--text:${t.text};--tile:${t.tile}}`;
 const JS = await readFile(path.join(ROOT, "src", "app.js"), "utf8");
 const JS_FILE = `/assets/app.${hash(JS)}.js`;
@@ -161,7 +167,7 @@ function tile(g, size = "", lazy = true, badge = "") {
   const px = size === "s3" ? 314 : size === "s2" ? 204 : 94;
   return `<a class="tile ${size}" href="/game/${g.slug}/">${badge ? `<span class="badge">${badge}</span>` : ""}<img src="/media/${g.slug}/${px > 94 ? "thumb-1x1" : "icon-192"}.webp" srcset="/media/${g.slug}/icon-192.webp 192w, /media/${g.slug}/thumb-1x1.webp 400w, /media/${g.slug}/icon-512.webp 512w" sizes="${px}px" width="${px}" height="${px}" alt="${esc(g.title)}"${lazy ? ' loading="lazy" decoding="async"' : ' fetchpriority="high"'}><span class="t">${esc(g.title)}</span></a>`;
 }
-const brand = () => V ? "" : `<div class="brand"><a class="logo" href="/" aria-label="${esc(site.name)} home"><span class="mark">${esc(site.logo.mark)}</span>${esc(site.logo.text)}</a><nav><a href="/" aria-label="Home">${ICON.home}</a>${LISTS().length ? `<a href="/best/" aria-label="Best games">${ICON.trophy}</a>` : ""}${C?.apps.length ? `<a href="/topgames/" aria-label="Mobile games">${ICON.phone}</a>` : ""}${C?.posts.length ? `<a href="/blog/" aria-label="Blog">${ICON.blog}</a>` : ""}<button data-search aria-label="Search games">${ICON.search}</button></nav></div>`;
+const brand = () => V ? "" : `<div class="brand"><a class="logo" href="/" aria-label="${esc(site.name)} home"><span class="mark${markCls}">${markIn()}</span>${esc(site.logo.text)}</a><nav><a href="/" aria-label="Home">${ICON.home}</a>${LISTS().length ? `<a href="/best/" aria-label="Best games">${ICON.trophy}</a>` : ""}${C?.apps.length ? `<a href="/topgames/" aria-label="Mobile games">${ICON.phone}</a>` : ""}${C?.posts.length ? `<a href="/blog/" aria-label="Blog">${ICON.blog}</a>` : ""}<button data-search aria-label="Search games">${ICON.search}</button></nav></div>`;
 const catTiles = () => `</div><nav class="cats" aria-label="Categories">${cats.map((c) => `<a class="cat" href="/category/${catSlug(c)}/"><i>${CAT_ICON[c] || "🎮"}</i>${esc(c)} games</a>`).join("")}</nav><div class="grid">`;
 
 function page({ title, desc, canonical, body, head = "", ogImage = "", jsonld = null, robots = "", slim = false }) {
@@ -169,7 +175,7 @@ function page({ title, desc, canonical, body, head = "", ogImage = "", jsonld = 
   const siteJs = { games: Object.fromEntries(games.map((g) => [g.slug, g.title])) };
   return `<!doctype html><html lang="${site.language || "en"}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">${origin ? `<link rel="canonical" href="${url}">` : ""}${robots ? `<meta name="robots" content="${robots}">` : ""}
-<meta name="theme-color" content="${t.background}"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="${t.background}"><link rel="icon" href="/favicon.svg" type="image/svg+xml">${LOGO_PNG ? '<link rel="apple-touch-icon" href="/logo.png">' : ""}<link rel="manifest" href="/manifest.webmanifest">
 <meta property="og:type" content="website"><meta property="og:site_name" content="${esc(site.name)}"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">${ogImage ? `<meta property="og:image" content="${origin}${ogImage}"><meta name="twitter:card" content="summary_large_image">` : ""}
 ${ADS_OFF ? "" : '<link rel="preconnect" href="https://securepubads.g.doubleclick.net">'}${head}${(site.headHtml || []).join("")}
 ${V ? '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">' : ""}
@@ -473,14 +479,14 @@ function vHeader(slim = false) {
     nApps() ? `<a class="vpill" style="--c:#FFFFFF" href="/topgames/">Mobile games</a>` : "",
   ].join("");
   return `<header class="vh"><div class="vin vtop">
-<a class="vlogo" href="/" aria-label="${esc(site.name)} home"><span class="vmark">${esc(site.logo.mark)}</span><span>${esc(site.logo.text)}</span></a>
+<a class="vlogo" href="/" aria-label="${esc(site.name)} home"><span class="vmark${markCls}">${markIn()}</span><span>${esc(site.logo.text)}</span></a>
 <button class="vsearch" data-search>${VSVG.search}<span>Search ${games.length + nApps()} games and lists…</span></button>
 ${LISTS().length ? `<a class="vbtn vhot" href="/best/">${VSVG.trophy}<span>Best lists</span></a>` : ""}
 </div>${slim ? "" : `<nav class="vin vcats" aria-label="Categories">${pills}</nav>`}</header>`;
 }
 function vFooter() {
   const links = [LISTS().length && ["/best/", "Best lists"], nApps() && ["/topgames/", "Mobile games"], C?.ed?.method && ["/how-we-review/", "How we review"], C?.posts.length && ["/blog/", "Blog"], ["/about/", "About"], ["/privacy/", "Privacy"], ["/terms/", "Terms"], C?.pages.contact && ["/contact/", "Contact"]].filter(Boolean);
-  return `<footer class="vf"><div class="vin"><span class="vlogo vsm"><span class="vmark">${esc(site.logo.mark)}</span>${esc(site.logo.text)}</span>${links.map(([h, n]) => `<a href="${h}">${n}</a>`).join("")}<span class="vcopy">Reviews and rankings are our opinion. Mobile games listed here are made and owned by their developers and download from Google Play; ${esc(site.name)} isn't affiliated with Google or the publishers. © ${new Date().getFullYear()} ${esc(site.name)}</span></div></footer>`;
+  return `<footer class="vf"><div class="vin"><span class="vlogo vsm"><span class="vmark${markCls}">${markIn()}</span>${esc(site.logo.text)}</span>${links.map(([h, n]) => `<a href="${h}">${n}</a>`).join("")}<span class="vcopy">Reviews and rankings are our opinion. Mobile games listed here are made and owned by their developers and download from Google Play; ${esc(site.name)} isn't affiliated with Google or the publishers. © ${new Date().getFullYear()} ${esc(site.name)}</span></div></footer>`;
 }
 // One H5 game tile in a mosaic; sz: "" | "w" (2x1, cover art) | "b" (2x2)
 function vTile(g, sz = "", badge = "", lazy = true) {
@@ -706,8 +712,9 @@ if (C) {
 }
 await w("404.html", page({ title: `Page not found | ${site.name}`, desc: site.description, canonical: "/404", robots: "noindex", body: `<div class="grid">${brand()}<h1 class="h ch">Oops! That page wandered off. Try one of these:</h1>${games.slice(0, 18).map((g) => tile(g)).join("")}</div>` }));
 await w("search.json", JSON.stringify(games.map((g) => ({ s: g.slug, t: g.title, c: g.categories.join(" ") }))));
-await w("favicon.svg", `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="${t.accent}"/><text x="32" y="45" font-family="Arial,sans-serif" font-weight="900" font-size="38" text-anchor="middle" fill="${t.accentText}">${esc(site.logo.mark)}</text></svg>`);
-await w("manifest.webmanifest", JSON.stringify({ name: site.name, short_name: site.name, start_url: "/", display: "standalone", background_color: t.background, theme_color: t.background, icons: [{ src: "/favicon.svg", sizes: "any", type: "image/svg+xml" }] }));
+if (LOGO_IMG) { await cp(path.join(ROOT, "sites", SITE_KEY, LOGO_IMG), path.join(OUT, LOGO_IMG)); await cp(path.join(ROOT, "sites", SITE_KEY, LOGO_IMG), path.join(OUT, "favicon.svg")); if (LOGO_PNG) await cp(path.join(ROOT, "sites", SITE_KEY, "logo.png"), path.join(OUT, "logo.png")); }
+else await w("favicon.svg", `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="${t.accent}"/><text x="32" y="45" font-family="Arial,sans-serif" font-weight="900" font-size="38" text-anchor="middle" fill="${t.accentText}">${esc(site.logo.mark)}</text></svg>`);
+await w("manifest.webmanifest", JSON.stringify({ name: site.name, short_name: site.name, start_url: "/", display: "standalone", background_color: t.background, theme_color: t.background, icons: [{ src: "/favicon.svg", sizes: "any", type: "image/svg+xml" }, ...(LOGO_PNG ? [{ src: "/logo.png", sizes: "512x512", type: "image/png" }] : [])] }));
 await w("robots.txt", `User-agent: *\nDisallow: /play/\n${origin ? `Sitemap: ${origin}/sitemap.xml\n` : ""}`);
 if (origin) {
   const urls = ["/", ...games.map((g) => `/game/${g.slug}/`), ...cats.map((c) => `/category/${catSlug(c)}/`), "/about/", "/privacy/", "/terms/",

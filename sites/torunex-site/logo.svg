@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <g transform="rotate(-6 256 256)">
+    <!-- sticker tile with offset shadow, like the site's header mark -->
+    <rect x="70" y="70" width="400" height="400" rx="96" fill="#1B1035"/>
+    <rect x="46" y="46" width="400" height="400" rx="96" fill="#B6F23A" stroke="#1B1035" stroke-width="16"/>
+    <g transform="translate(262 252) scale(0.86) translate(-281 -276)">
+    <!-- controller body -->
+    <path d="M150 178 h192 c46 0 76 34 84 82 l14 86 c7 42-34 66-62 38 l-40-40 h-184 l-40 40 c-28 28-69 4-62-38 l14-86 c8-48 38-82 84-82 z"
+          fill="#2A1A6E" stroke="#1B1035" stroke-width="14" stroke-linejoin="round"/>
+    <!-- d-pad -->
+    <rect x="148" y="226" width="26" height="78" rx="6" fill="#B6F23A"/>
+    <rect x="122" y="252" width="78" height="26" rx="6" fill="#B6F23A"/>
+    <!-- buttons -->
+    <circle cx="338" cy="240" r="17" fill="#D6246E"/>
+    <circle cx="374" cy="276" r="17" fill="#F3F1FF"/>
+    <circle cx="302" cy="276" r="17" fill="#F3F1FF"/>
+    <circle cx="338" cy="312" r="17" fill="#D6246E"/>
+    </g>
+  </g>
+</svg>
