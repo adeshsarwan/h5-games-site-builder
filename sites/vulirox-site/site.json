@@ -93,7 +93,8 @@
   "analytics": {
     "ga4": "G-SFJRGT7P8Q",
     "ga4Property": "properties/564004011",
-    "gtm": "GTM-WV6SWT6V"
+    "gtm": "GTM-WV6SWT6V",
+    "clarity": "zcxqxaibw6"
   },
   "content": {
     "dir": "torunex-site",
