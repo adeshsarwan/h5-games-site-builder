@@ -217,3 +217,13 @@ footer a:hover{text-decoration:underline}
 .gam-ad-wrapper{margin:20px auto;max-width:970px;text-align:center}
 .gam-ad-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.6;margin-bottom:6px}
 .gam-native-slot{width:100%;min-height:250px}
+
+/* ---- Anchor ad (#gam-anchor, filled by Price Optimiser; only on sites with ads.anchor) ----
+   Sticky bottom display placement. The SDK picks 320x50/320x100 below 768px and 728x90 above, so reserve
+   100px / 90px plus the safe-area inset under all content, and keep the mobile immersive player above it. */
+.gam-anchor-wrapper{position:fixed;left:0;right:0;bottom:0;z-index:45;display:flex;justify-content:center;align-items:flex-end;padding-bottom:env(safe-area-inset-bottom,0px);pointer-events:none}
+.gam-anchor-slot{pointer-events:auto;max-width:100%;line-height:0}
+.gam-anchor-slot:not(:empty){background:var(--tile);box-shadow:0 -4px 16px rgba(0,0,0,.12)}
+body.has-anchor{--anchor-h:100px;padding-bottom:calc(var(--anchor-h) + env(safe-area-inset-bottom,0px))}
+@media (min-width:768px){body.has-anchor{--anchor-h:90px}}
+body.has-anchor.immersive .player,body.has-anchor.immersive .gp-player{height:auto;bottom:calc(var(--anchor-h) + env(safe-area-inset-bottom,0px))}

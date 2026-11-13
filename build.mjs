@@ -113,6 +113,11 @@ function siteUnit(slot) {
 // Native banner containers filled by the Price Optimiser script (same ids as gamezadda.store): one of each per page.
 const NATIVE = !!site.ads.nativeSlots;
 const gamNative = (n) => NATIVE ? `<div id="gam-native-0${n}-wrapper" class="gam-ad-wrapper" aria-label="Advertisement" aria-busy="true"><div class="gam-ad-label">Advertisement</div><div id="gam-native-0${n}" class="gam-native-slot" style="width:100%;min-height:250px"></div></div>` : "";
+// Anchor ad (Price Optimiser Rules API slot "gam-anchor": 320x50 / 320x100 below 768px, 728x90 above). A fixed
+// display placement, not a GPT out-of-page anchor: the container sits in the shared layout of every page, before
+// the deferred SDK initialises, and styles.css makes it sticky and reserves bottom space for it.
+const ANCHOR = !!site.ads.anchor && site.headHtml.some((h) => typeof h === "string" && /serve\.thebesads\.com\/sdk\//.test(h)); // needs the SDK tag
+const anchorHtml = () => ANCHOR ? '<div id="gam-anchor-wrapper" class="gam-anchor-wrapper" aria-label="Advertisement"><div id="gam-anchor" class="gam-anchor-slot"></div></div>' : "";
 const ADS_OFF = site.ads.mode === "off"; // no ad slots or GPT on portal pages (ads added later, e.g. by Price Optimiser)
 function adSlot(slot, cls = "") {
   if (ADS_OFF) return "";
@@ -170,9 +175,9 @@ ${ADS_OFF ? "" : '<link rel="preconnect" href="https://securepubads.g.doubleclic
 ${V ? '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">' : ""}
 <style>${themeCss}${CSS}</style>${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script>` : ""}
 <script>window.__SITE__=${JSON.stringify(siteJs)}</script><script defer src="${JS_FILE}"></script>${site.analytics?.ga4 ? `<script async src="https://www.googletagmanager.com/gtag/js?id=${site.analytics.ga4}"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${site.analytics.ga4}')</script>` : ""}
-</head><body${V ? ' class="v"' : ""}>${V ? vHeader(slim) : ""}<main class="wrap">${body}</main>
+</head><body${V || ANCHOR ? ` class="${[V && "v", ANCHOR && "has-anchor"].filter(Boolean).join(" ")}"` : ""}>${V ? vHeader(slim) : ""}<main class="wrap">${body}</main>
 ${V ? vFooter() : ""}<footer${V ? " hidden" : ""}><a href="/">All games</a>${cats.map((c) => `<a href="/category/${catSlug(c)}/">${esc(c)}</a>`).join("")}${LISTS().length ? '<a href="/best/">Best games</a>' : ""}${C?.apps.length ? '<a href="/topgames/">Mobile games</a>' : ""}${C?.posts.length ? '<a href="/blog/">Blog</a>' : ""}<a href="/about/">About</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a>${C?.pages.contact ? '<a href="/contact/">Contact</a>' : site.contactEmail ? `<a href="mailto:${esc(site.contactEmail)}">Contact</a>` : ""}<span>© ${new Date().getFullYear()} ${esc(site.name)}</span></footer>
-<div class="search" role="dialog" aria-label="Search"><div class="box"><input type="search" placeholder="Search ${games.length} games…" aria-label="Search games"><div class="res"></div></div></div>
+${anchorHtml()}<div class="search" role="dialog" aria-label="Search"><div class="box"><input type="search" placeholder="Search ${games.length} games…" aria-label="Search games"><div class="res"></div></div></div>
 </body></html>`;
 }
 

@@ -80,7 +80,8 @@
       ]
     },
     "games": {},
-    "siteUnits": {}
+    "siteUnits": {},
+    "anchor": true
   },
   "assets": "proxy",
   "adsTxt": [
@@ -104,5 +105,8 @@
       "GAMEZ ADDA": "CHINA H5 GAMETUNO.COM"
     },
     "editorialDir": "gametuno-com"
-  }
+  },
+  "headHtml": [
+    "<script defer src=\"https://serve.thebesads.com/sdk/publisher-sdk.js\" data-po-site=\"gametuno.com\" data-po-runtime-config-url=\"https://serve.thebesads.com/runtime/config\"></script>"
+  ]
 }
