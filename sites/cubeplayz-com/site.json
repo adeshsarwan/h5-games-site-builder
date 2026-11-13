@@ -80,7 +80,8 @@
       ]
     },
     "games": {},
-    "siteUnits": {}
+    "siteUnits": {},
+    "nativeSlots": true
   },
   "assets": "proxy",
   "adsTxt": [
@@ -103,5 +104,8 @@
       "Gamez Adda": "China H5 cubeplayz.com",
       "GAMEZ ADDA": "CHINA H5 CUBEPLAYZ.COM"
     }
-  }
+  },
+  "headHtml": [
+    "<script defer src=\"https://serve.thebesads.com/sdk/publisher-sdk.js\" data-po-site=\"cubeplayz.com\" data-po-runtime-config-url=\"https://serve.thebesads.com/runtime/config\"></script>"
+  ]
 }
