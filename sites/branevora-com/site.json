@@ -94,7 +94,8 @@
   "analytics": {
     "ga4": "G-GZ64C22YGE",
     "ga4Property": "properties/563966265",
-    "gtm": "GTM-WV6SWT6V"
+    "gtm": "GTM-WV6SWT6V",
+    "clarity": "zcx7otpeh3"
   },
   "design": "vibrant",
   "content": {
