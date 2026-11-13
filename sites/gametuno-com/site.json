@@ -92,7 +92,8 @@
   "contactEmail": "hello@gametuno.com",
   "analytics": {
     "ga4": "G-VR23Q27XJQ",
-    "ga4Property": "properties/563991990"
+    "ga4Property": "properties/563991990",
+    "gtm": "GTM-WV6SWT6V"
   },
   "design": "vibrant",
   "content": {

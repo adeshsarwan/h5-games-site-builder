@@ -171,10 +171,14 @@ function tile(g, size = "", lazy = true, badge = "") {
 const brand = () => V ? "" : `<div class="brand"><a class="logo" href="/" aria-label="${esc(site.name)} home"><span class="mark${markCls}">${markIn()}</span>${esc(site.logo.text)}</a><nav><a href="/" aria-label="Home">${ICON.home}</a>${LISTS().length ? `<a href="/best/" aria-label="Best games">${ICON.trophy}</a>` : ""}${C?.apps.length ? `<a href="/topgames/" aria-label="Mobile games">${ICON.phone}</a>` : ""}${C?.posts.length ? `<a href="/blog/" aria-label="Blog">${ICON.blog}</a>` : ""}<button data-search aria-label="Search games">${ICON.search}</button></nav></div>`;
 const catTiles = () => `</div><nav class="cats" aria-label="Categories">${cats.map((c) => `<a class="cat" href="/category/${catSlug(c)}/"><i>${CAT_ICON[c] || "🎮"}</i>${esc(c)} games</a>`).join("")}</nav><div class="grid">`;
 
+// Shared Google Tag Manager container (site.json analytics.gtm), first thing in <head> as Google asks. Clarity and other
+// tags live in the container; each per-site tag must be limited to that site's hostname there.
+const GTM_ID = /^GTM-[A-Z0-9]+$/.test(site.analytics?.gtm || "") ? site.analytics.gtm : null;
+const GTM = GTM_ID ? `<script async src="https://www.googletagmanager.com/gtm.js?id=${GTM_ID}"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date())</script>` : "";
 function page({ title, desc, canonical, body, head = "", ogImage = "", jsonld = null, robots = "", slim = false }) {
   const url = origin + canonical;
   const siteJs = { games: Object.fromEntries(games.map((g) => [g.slug, g.title])) };
-  return `<!doctype html><html lang="${site.language || "en"}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  return `<!doctype html><html lang="${site.language || "en"}"><head>${GTM}<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">${origin ? `<link rel="canonical" href="${url}">` : ""}${robots ? `<meta name="robots" content="${robots}">` : ""}
 <meta name="theme-color" content="${t.background}"><link rel="icon" href="/favicon.svg" type="image/svg+xml">${LOGO ? `${RESVG ? '<link rel="icon" href="/favicon.ico" sizes="48x48">' : ""}<link rel="apple-touch-icon" href="/apple-touch-icon.png">` : ""}<link rel="manifest" href="/manifest.webmanifest">
 <meta property="og:type" content="website"><meta property="og:site_name" content="${esc(site.name)}"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">${ogImage ? `<meta property="og:image" content="${origin}${ogImage}"><meta name="twitter:card" content="summary_large_image">` : ""}

@@ -92,7 +92,8 @@
   "contactEmail": "hello@vulirox.site",
   "analytics": {
     "ga4": "G-SFJRGT7P8Q",
-    "ga4Property": "properties/564004011"
+    "ga4Property": "properties/564004011",
+    "gtm": "GTM-WV6SWT6V"
   },
   "content": {
     "dir": "torunex-site",

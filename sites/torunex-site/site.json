@@ -92,7 +92,8 @@
   "contactEmail": "adesh@thebesads.com",
   "analytics": {
     "ga4": "G-6KXE513HW0",
-    "ga4Property": "properties/563792366"
+    "ga4Property": "properties/563792366",
+    "gtm": "GTM-WV6SWT6V"
   },
   "content": {
     "dir": "torunex-site",

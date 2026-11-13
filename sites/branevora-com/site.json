@@ -93,7 +93,8 @@
   "contactEmail": "hello@branevora.com",
   "analytics": {
     "ga4": "G-GZ64C22YGE",
-    "ga4Property": "properties/563966265"
+    "ga4Property": "properties/563966265",
+    "gtm": "GTM-WV6SWT6V"
   },
   "design": "vibrant",
   "content": {
