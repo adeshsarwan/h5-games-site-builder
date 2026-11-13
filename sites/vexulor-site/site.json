@@ -16,7 +16,9 @@
   },
   "logo": {
     "text": "Vexulor",
-    "mark": "V"
+    "mark": "V",
+    "motif": "crt",
+    "tile": "#FF9F45"
   },
   "games": "all",
   "exclude": [],

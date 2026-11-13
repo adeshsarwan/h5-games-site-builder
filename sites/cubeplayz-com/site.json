@@ -16,7 +16,9 @@
   },
   "logo": {
     "text": "China H5 cubeplayz.com",
-    "mark": "C"
+    "mark": "C",
+    "motif": "handheld",
+    "tile": "#5CE1E6"
   },
   "games": "all",
   "exclude": [],

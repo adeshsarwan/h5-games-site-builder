@@ -17,7 +17,8 @@
   "logo": {
     "text": "Torunex",
     "mark": "T",
-    "image": "logo.svg"
+    "motif": "controller",
+    "tile": "#B6F23A"
   },
   "games": "all",
   "exclude": [],

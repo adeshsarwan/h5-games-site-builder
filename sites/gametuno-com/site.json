@@ -16,7 +16,9 @@
   },
   "logo": {
     "text": "China H5 gametuno.com",
-    "mark": "C"
+    "mark": "C",
+    "motif": "cassette",
+    "tile": "#FF8FB8"
   },
   "games": "all",
   "exclude": [],

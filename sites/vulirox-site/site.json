@@ -16,7 +16,9 @@
   },
   "logo": {
     "text": "China H5",
-    "mark": "C"
+    "mark": "C",
+    "motif": "joystick",
+    "tile": "#B79CFF"
   },
   "games": "all",
   "exclude": [],

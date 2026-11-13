@@ -16,7 +16,9 @@
   },
   "logo": {
     "text": "China H5 games",
-    "mark": "C"
+    "mark": "C",
+    "motif": "cartridge",
+    "tile": "#FFD23F"
   },
   "games": "all",
   "exclude": [],

@@ -153,12 +153,13 @@ let CSS = minCss(await readFile(path.join(ROOT, "src", "styles.css"), "utf8"));
 const t = site.theme;
 const V = site.design === "vibrant"; // bold "sticker" design (torunex.site); default design otherwise
 if (V) CSS += minCss(await readFile(path.join(ROOT, "src", "vibrant.css"), "utf8"));
-// Optional image logo: sites/<key>/logo.svg (+ logo.png), set as site.json "logo": { "image": "logo.svg" }. Used for the
-// header/footer mark, favicon and app icon instead of the letter.
-const LOGO_IMG = site.logo?.image && existsSync(path.join(ROOT, "sites", SITE_KEY, site.logo.image)) ? site.logo.image : null;
-const LOGO_PNG = LOGO_IMG && existsSync(path.join(ROOT, "sites", SITE_KEY, "logo.png"));
-const markIn = () => LOGO_IMG ? `<img src="/${esc(LOGO_IMG)}" alt="" width="46" height="46">` : esc(site.logo.mark);
-const markCls = LOGO_IMG ? " img" : "";
+// Retro logo (src/logo.mjs): site.json "logo": { "motif": "cassette", "tile": "#FF8FB8" } replaces the letter mark in the
+// header/footer and makes the favicon, apple-touch icon, manifest icons and a 512px logo.png.
+const LOGO = site.logo?.motif ? await import("./src/logo.mjs") : null;
+const markIn = () => LOGO ? '<img src="/logo.svg" alt="" width="46" height="46">' : esc(site.logo.mark);
+const markCls = LOGO ? " img" : "";
+let RESVG = null;
+if (LOGO) { try { RESVG = (await import("@resvg/resvg-js")).Resvg; } catch { console.warn("  ! @resvg/resvg-js not installed: logo PNG/ICO files skipped (SVG only)"); } }
 const themeCss = `:root{--bg:${t.background};--bg2:${t.backgroundAlt};--accent:${t.accent};--accentText:${t.accentText};--text:${t.text};--tile:${t.tile}}`;
 const JS = await readFile(path.join(ROOT, "src", "app.js"), "utf8");
 const JS_FILE = `/assets/app.${hash(JS)}.js`;
@@ -175,7 +176,7 @@ function page({ title, desc, canonical, body, head = "", ogImage = "", jsonld = 
   const siteJs = { games: Object.fromEntries(games.map((g) => [g.slug, g.title])) };
   return `<!doctype html><html lang="${site.language || "en"}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">${origin ? `<link rel="canonical" href="${url}">` : ""}${robots ? `<meta name="robots" content="${robots}">` : ""}
-<meta name="theme-color" content="${t.background}"><link rel="icon" href="/favicon.svg" type="image/svg+xml">${LOGO_PNG ? '<link rel="apple-touch-icon" href="/logo.png">' : ""}<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="${t.background}"><link rel="icon" href="/favicon.svg" type="image/svg+xml">${LOGO ? `${RESVG ? '<link rel="icon" href="/favicon.ico" sizes="48x48">' : ""}<link rel="apple-touch-icon" href="/apple-touch-icon.png">` : ""}<link rel="manifest" href="/manifest.webmanifest">
 <meta property="og:type" content="website"><meta property="og:site_name" content="${esc(site.name)}"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">${ogImage ? `<meta property="og:image" content="${origin}${ogImage}"><meta name="twitter:card" content="summary_large_image">` : ""}
 ${ADS_OFF ? "" : '<link rel="preconnect" href="https://securepubads.g.doubleclick.net">'}${head}${(site.headHtml || []).join("")}
 ${V ? '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">' : ""}
@@ -712,9 +713,21 @@ if (C) {
 }
 await w("404.html", page({ title: `Page not found | ${site.name}`, desc: site.description, canonical: "/404", robots: "noindex", body: `<div class="grid">${brand()}<h1 class="h ch">Oops! That page wandered off. Try one of these:</h1>${games.slice(0, 18).map((g) => tile(g)).join("")}</div>` }));
 await w("search.json", JSON.stringify(games.map((g) => ({ s: g.slug, t: g.title, c: g.categories.join(" ") }))));
-if (LOGO_IMG) { await cp(path.join(ROOT, "sites", SITE_KEY, LOGO_IMG), path.join(OUT, LOGO_IMG)); await cp(path.join(ROOT, "sites", SITE_KEY, LOGO_IMG), path.join(OUT, "favicon.svg")); if (LOGO_PNG) await cp(path.join(ROOT, "sites", SITE_KEY, "logo.png"), path.join(OUT, "logo.png")); }
+if (LOGO) {
+  const m = site.logo.motif, tile = site.logo.tile;
+  await w("logo.svg", LOGO.logoSvg(m, tile));
+  await w("favicon.svg", LOGO.faviconSvg(m, tile));
+  if (RESVG) {
+    const png = (svg, size) => Buffer.from(new RESVG(svg, { fitTo: { mode: "width", value: size } }).render().asPng());
+    await writeFile(path.join(OUT, "logo.png"), png(LOGO.logoSvg(m, tile), 512));
+    await writeFile(path.join(OUT, "apple-touch-icon.png"), png(LOGO.faviconSvg(m, tile), 180));
+    await writeFile(path.join(OUT, "icon-192.png"), png(LOGO.faviconSvg(m, tile), 192));
+    await writeFile(path.join(OUT, "icon-512.png"), png(LOGO.faviconSvg(m, tile), 512));
+    await writeFile(path.join(OUT, "favicon.ico"), LOGO.icoFromPngs([16, 32, 48].map((size) => ({ size, data: png(LOGO.faviconSvg(m, tile), size) }))));
+  }
+}
 else await w("favicon.svg", `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="${t.accent}"/><text x="32" y="45" font-family="Arial,sans-serif" font-weight="900" font-size="38" text-anchor="middle" fill="${t.accentText}">${esc(site.logo.mark)}</text></svg>`);
-await w("manifest.webmanifest", JSON.stringify({ name: site.name, short_name: site.name, start_url: "/", display: "standalone", background_color: t.background, theme_color: t.background, icons: [{ src: "/favicon.svg", sizes: "any", type: "image/svg+xml" }, ...(LOGO_PNG ? [{ src: "/logo.png", sizes: "512x512", type: "image/png" }] : [])] }));
+await w("manifest.webmanifest", JSON.stringify({ name: site.name, short_name: site.name, start_url: "/", display: "standalone", background_color: t.background, theme_color: t.background, icons: [{ src: "/favicon.svg", sizes: "any", type: "image/svg+xml" }, ...(LOGO && RESVG ? [{ src: "/icon-192.png", sizes: "192x192", type: "image/png" }, { src: "/icon-512.png", sizes: "512x512", type: "image/png" }] : [])] }));
 await w("robots.txt", `User-agent: *\nDisallow: /play/\n${origin ? `Sitemap: ${origin}/sitemap.xml\n` : ""}`);
 if (origin) {
   const urls = ["/", ...games.map((g) => `/game/${g.slug}/`), ...cats.map((c) => `/category/${catSlug(c)}/`), "/about/", "/privacy/", "/terms/",
