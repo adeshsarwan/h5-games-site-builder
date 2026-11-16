@@ -119,6 +119,17 @@ const gamNative = (n) => NATIVE ? `<div id="gam-native-0${n}-wrapper" class="gam
 const ANCHOR = !!site.ads.anchor && site.headHtml.some((h) => typeof h === "string" && /serve\.thebesads\.com\/sdk\//.test(h)); // needs the SDK tag
 const anchorHtml = () => ANCHOR ? '<div id="gam-anchor-wrapper" class="gam-anchor-wrapper" aria-label="Advertisement"><div id="gam-anchor" class="gam-anchor-slot"></div></div>' : "";
 const ADS_OFF = site.ads.mode === "off"; // no ad slots or GPT on portal pages (ads added later, e.g. by Price Optimiser)
+// Play gate (site.json "playGate": { "enabled": true }): "Get it on Google Play" asks the visitor to watch a rewarded ad
+// to support the site, then opens the Play Store page in a new tab (same flow as the jobsthe.world apply gate).
+// Needs the Price Optimiser script (it owns GPT and the "rewarded" slot). src/app.js only intercepts the click when
+// that script's window.PublisherExperience bridge has loaded, so with no API, no fill or an error the link still opens normally.
+const PO_TAG = site.headHtml.some((h) => typeof h === "string" && /serve\.thebesads\.com\/sdk\//.test(h));
+const PG = site.playGate?.enabled && PO_TAG ? site.playGate : null;
+const playGateHtml = () => !PG ? "" : `<dialog class="pg" id="play-gate" aria-labelledby="pg-title"><button type="button" class="pg-x" data-pg-close aria-label="Close">${ICON.close}</button>
+<div data-view="ask"><img class="pg-icon" alt="" width="72" height="72" hidden><h2 id="pg-title">${esc(PG.title || "One quick step")}</h2><p class="pg-app"></p><p class="pg-msg"></p>
+<button type="button" class="pg-btn" data-pg-watch>${esc(PG.cta || "Watch Ad & Get the Game")}</button>${PG.allowSkip ? `<a class="pg-btn ghost" data-pg-skip target="_blank" rel="nofollow noopener">${esc(PG.skip || "No thanks, continue")}</a>` : ""}<p class="pg-note">Google Play opens in a new tab, so you can keep browsing here.</p></div>
+<div data-view="ready" hidden><div class="pg-ok" aria-hidden="true">✓</div><h2>Thanks for your support!</h2><p class="pg-ready"></p><a class="pg-btn" data-pg-open target="_blank" rel="nofollow noopener">Open Google Play</a></div>
+<div data-view="incomplete" hidden><h2>The ad was closed early</h2><p>Watch the ad to the end to unlock the download link.</p><button type="button" class="pg-btn" data-pg-watch>Try again</button>${PG.allowSkip ? `<a class="pg-btn ghost" data-pg-skip target="_blank" rel="nofollow noopener">${esc(PG.skip || "No thanks, continue")}</a>` : ""}</div></dialog>`;
 function adSlot(slot, cls = "") {
   if (ADS_OFF) return "";
   const sizes = site.ads.siteSlots?.[slot];
@@ -181,7 +192,7 @@ const CLARITY_ID = /^[a-z0-9]{6,16}$/.test(site.analytics?.clarity || "") ? site
 const CLARITY = CLARITY_ID ? `<script>(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y)})(window,document,"clarity","script","${CLARITY_ID}")</script>` : "";
 function page({ title, desc, canonical, body, head = "", ogImage = "", jsonld = null, robots = "", slim = false }) {
   const url = origin + canonical;
-  const siteJs = { games: Object.fromEntries(games.map((g) => [g.slug, g.title])) };
+  const siteJs = { games: Object.fromEntries(games.map((g) => [g.slug, g.title])), ...(PG ? { playGate: { message: PG.message || "{app} is free on Google Play. Please support {site} by watching a short ad from our sponsor, then the download page opens.", site: site.name, frequency: PG.frequency || "app" } } : {}) };
   return `<!doctype html><html lang="${site.language || "en"}"><head>${GTM}${CLARITY}<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">${origin ? `<link rel="canonical" href="${url}">` : ""}${robots ? `<meta name="robots" content="${robots}">` : ""}
 <meta name="theme-color" content="${t.background}"><link rel="icon" href="/favicon.svg" type="image/svg+xml">${LOGO ? `${RESVG ? '<link rel="icon" href="/favicon.ico" sizes="48x48">' : ""}<link rel="apple-touch-icon" href="/apple-touch-icon.png">` : ""}<link rel="manifest" href="/manifest.webmanifest">
@@ -192,7 +203,7 @@ ${V ? '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="pre
 <script>window.__SITE__=${JSON.stringify(siteJs)}</script><script defer src="${JS_FILE}"></script>${site.analytics?.ga4 ? `<script async src="https://www.googletagmanager.com/gtag/js?id=${site.analytics.ga4}"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${site.analytics.ga4}')</script>` : ""}
 </head><body${V || ANCHOR ? ` class="${[V && "v", ANCHOR && "has-anchor"].filter(Boolean).join(" ")}"` : ""}>${V ? vHeader(slim) : ""}<main class="wrap">${body}</main>
 ${V ? vFooter() : ""}<footer${V ? " hidden" : ""}><a href="/">All games</a>${cats.map((c) => `<a href="/category/${catSlug(c)}/">${esc(c)}</a>`).join("")}${LISTS().length ? '<a href="/best/">Best games</a>' : ""}${C?.apps.length ? '<a href="/topgames/">Mobile games</a>' : ""}${C?.posts.length ? '<a href="/blog/">Blog</a>' : ""}<a href="/about/">About</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a>${C?.pages.contact ? '<a href="/contact/">Contact</a>' : site.contactEmail ? `<a href="mailto:${esc(site.contactEmail)}">Contact</a>` : ""}<span>© ${new Date().getFullYear()} ${esc(site.name)}</span></footer>
-${anchorHtml()}<div class="search" role="dialog" aria-label="Search"><div class="box"><input type="search" placeholder="Search ${games.length} games…" aria-label="Search games"><div class="res"></div></div></div>
+${anchorHtml()}${playGateHtml()}<div class="search" role="dialog" aria-label="Search"><div class="box"><input type="search" placeholder="Search ${games.length} games…" aria-label="Search games"><div class="res"></div></div></div>
 </body></html>`;
 }
 
