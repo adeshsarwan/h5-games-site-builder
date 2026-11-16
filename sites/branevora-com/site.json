@@ -112,5 +112,9 @@
   },
   "headHtml": [
     "<script defer src=\"https://serve.thebesads.com/sdk/publisher-sdk.js\" data-po-site=\"branevora.com\" data-po-runtime-config-url=\"https://serve.thebesads.com/runtime/config\"></script>"
-  ]
+  ],
+  "playGate": {
+    "enabled": true,
+    "frequency": "app"
+  }
 }
