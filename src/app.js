@@ -51,7 +51,12 @@
     var poInit = function () {
       var px = window.PublisherExperience;
       if (!px || typeof px.init !== "function") return;
-      Promise.resolve(px.init()).then(function (st) { poReady = !!(st && st.loaded); }, function () { poReady = false; });
+      Promise.resolve(px.init()).then(function (st) {
+        // Dedicated scripts return { loaded }; the generic SDK returns { runtime, adapter }. Either way the site's
+        // runtime config must have an enabled "rewarded" slot, otherwise the dialog would only ever fall back.
+        var slots = st && st.runtime && st.runtime.slots, rw = slots && slots.rewarded;
+        poReady = !!st && st.loaded !== false && st.status !== "error" && (!slots || (!!rw && rw.enabled !== false));
+      }, function () { poReady = false; });
     };
     if (window.PublisherExperience) poInit(); else window.addEventListener("load", poInit);
     var ss = (function () { try { return sessionStorage; } catch (e) { return null; } })();
