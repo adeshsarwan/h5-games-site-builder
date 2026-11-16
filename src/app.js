@@ -35,7 +35,7 @@
   }, true);
   if (pageType === "list") track("list_view", { list: location.pathname.split("/")[2] });
 
-  /* ---------- Play gate: rewarded ad before leaving for Google Play (same rules as the jobsthe.world apply gate) ----------
+  /* ---------- Play gate: rewarded ad before leaving for Google Play (same rules as the jobsthe.world apply gate; site.json playGate) ----------
      - the rewarded ad is shown only after the visitor opts in ("Watch") and is preloaded when the dialog opens;
      - the link unlocks only on a real grant (onGranted fired and the ad closed), never on onReady or a closed ad;
      - no API / no fill / error / timeout → the link still opens (never trapped);
