@@ -40,27 +40,20 @@
      - the link unlocks only on a real grant (onGranted fired and the ad closed), never on onReady or a closed ad;
      - no API / no fill / error / timeout → the link still opens (never trapped);
      - closed early → "Try again" once; a second attempt without a reward opens the link anyway.
-     Price Optimiser owns GPT and the "rewarded" slot; we never define slots. Its per-site script must expose its
-     rewarded API (window.__PO_GAM_FAMILY__.sdk); the generic SDK (window.PublisherExperience) works too. */
+     Price Optimiser owns GPT and the "rewarded" slot; we never define slots. We only call its window.PublisherExperience
+     bridge (same name on the dedicated per-site scripts and the generic SDK). */
   var PG = CFG.playGate, dlg = PG && document.getElementById("play-gate");
   if (dlg) {
-    var poAds = function () {
-      var fam = window.__PO_GAM_FAMILY__, sdk = fam && fam.status === "ready" && fam.sdk;
-      if (sdk && typeof sdk.showRewarded === "function") return sdk;
-      // Per-site script's own method: requestRewarded(key, { ready, granted, videoCompleted, closed }).
-      if (sdk && typeof sdk.requestRewarded === "function") return {
-        preloadRewarded: function (k) { return sdk.preloadRewarded && sdk.preloadRewarded(k); },
-        showRewarded: function (k, cb) {
-          return sdk.requestRewarded(k, { granted: cb.onGranted, closed: cb.onClosed }).then(function (r) {
-            var st = String((r && r.status) || "unavailable");
-            if (!/^(granted|completed)$/.test(st)) cb.onFallback({ status: st });
-            return r;
-          });
-        }
-      };
+    // Price Optimiser bridge on the site's existing script: init() → { loaded }, preloadRewarded, showRewarded.
+    // The click is only intercepted once init() has reported loaded; until then (or if it never loads) links open normally.
+    var poReady = false;
+    var poAds = function () { var px = window.PublisherExperience; return poReady && px && typeof px.showRewarded === "function" ? px : null; };
+    var poInit = function () {
       var px = window.PublisherExperience;
-      return px && typeof px.showRewarded === "function" ? px : null;
+      if (!px || typeof px.init !== "function") return;
+      Promise.resolve(px.init()).then(function (st) { poReady = !!(st && st.loaded); }, function () { poReady = false; });
     };
+    if (window.PublisherExperience) poInit(); else window.addEventListener("load", poInit);
     var ss = (function () { try { return sessionStorage; } catch (e) { return null; } })();
     var unlocked = function (url) {
       if (PG.frequency === "always" || !ss) return false;
@@ -75,7 +68,7 @@
     var cur = null, misses = 0, opened = false, watching = false, warm = null;
     var preload = function () {
       var a = poAds();
-      if (!warm && a && a.preloadRewarded) { try { warm = Promise.resolve(a.preloadRewarded("rewarded")).catch(function () { warm = null; }); } catch (e) {} }
+      if (!warm && a && a.preloadRewarded) { try { warm = Promise.resolve(a.preloadRewarded("rewarded", { onFallback: function () { warm = null; } })).catch(function () { warm = null; }); } catch (e) {} }
     };
     var openApp = function (how) {
       if (!cur || opened) return;

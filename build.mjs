@@ -122,7 +122,7 @@ const ADS_OFF = site.ads.mode === "off"; // no ad slots or GPT on portal pages (
 // Play gate (site.json "playGate": { "enabled": true }): "Get it on Google Play" asks the visitor to watch a rewarded ad
 // to support the site, then opens the Play Store page in a new tab (same flow as the jobsthe.world apply gate).
 // Needs the Price Optimiser script (it owns GPT and the "rewarded" slot). src/app.js only intercepts the click when
-// that script exposes its rewarded API, so with no API, no fill or an error the link still opens normally.
+// that script's window.PublisherExperience bridge has loaded, so with no API, no fill or an error the link still opens normally.
 const PO_TAG = site.headHtml.some((h) => typeof h === "string" && /serve\.thebesads\.com\/sdk\//.test(h));
 const PG = site.playGate?.enabled && PO_TAG ? site.playGate : null;
 const playGateHtml = () => !PG ? "" : `<dialog class="pg" id="play-gate" aria-labelledby="pg-title"><button type="button" class="pg-x" data-pg-close aria-label="Close">${ICON.close}</button>
