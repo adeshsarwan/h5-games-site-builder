@@ -35,6 +35,112 @@
   }, true);
   if (pageType === "list") track("list_view", { list: location.pathname.split("/")[2] });
 
+  /* ---------- Play gate: rewarded ad before leaving for Google Play (same rules as the jobsthe.world apply gate) ----------
+     - the rewarded ad is shown only after the visitor opts in ("Watch") and is preloaded when the dialog opens;
+     - the link unlocks only on a real grant (onGranted fired and the ad closed), never on onReady or a closed ad;
+     - no API / no fill / error / timeout → the link still opens (never trapped);
+     - closed early → "Try again" once; a second attempt without a reward opens the link anyway.
+     Price Optimiser owns GPT and the "rewarded" slot; we never define slots. Its per-site script must expose its
+     rewarded API (window.__PO_GAM_FAMILY__.sdk); the generic SDK (window.PublisherExperience) works too. */
+  var PG = CFG.playGate, dlg = PG && document.getElementById("play-gate");
+  if (dlg) {
+    var poAds = function () {
+      var fam = window.__PO_GAM_FAMILY__, sdk = fam && fam.status === "ready" && fam.sdk;
+      if (sdk && typeof sdk.showRewarded === "function") return sdk;
+      // Per-site script's own method: requestRewarded(key, { ready, granted, videoCompleted, closed }).
+      if (sdk && typeof sdk.requestRewarded === "function") return {
+        preloadRewarded: function (k) { return sdk.preloadRewarded && sdk.preloadRewarded(k); },
+        showRewarded: function (k, cb) {
+          return sdk.requestRewarded(k, { granted: cb.onGranted, closed: cb.onClosed }).then(function (r) {
+            var st = String((r && r.status) || "unavailable");
+            if (!/^(granted|completed)$/.test(st)) cb.onFallback({ status: st });
+            return r;
+          });
+        }
+      };
+      var px = window.PublisherExperience;
+      return px && typeof px.showRewarded === "function" ? px : null;
+    };
+    var ss = (function () { try { return sessionStorage; } catch (e) { return null; } })();
+    var unlocked = function (url) {
+      if (PG.frequency === "always" || !ss) return false;
+      var v = ss.getItem("pg_unlocked") || "";
+      return PG.frequency === "session" ? v !== "" : v.split("\n").indexOf(url) > -1;
+    };
+    var remember = function (url) { if (ss) ss.setItem("pg_unlocked", PG.frequency === "session" ? "1" : (ss.getItem("pg_unlocked") || "").split("\n").filter(Boolean).concat(url).slice(-50).join("\n")); };
+    var views = dlg.querySelectorAll("[data-view]");
+    var show = function (v) { for (var i = 0; i < views.length; i++) views[i].hidden = views[i].getAttribute("data-view") !== v; };
+    var watchBtns = dlg.querySelectorAll("[data-pg-watch]");
+    var setBusy = function (b) { for (var i = 0; i < watchBtns.length; i++) watchBtns[i].disabled = b; };
+    var cur = null, misses = 0, opened = false, watching = false, warm = null;
+    var preload = function () {
+      var a = poAds();
+      if (!warm && a && a.preloadRewarded) { try { warm = Promise.resolve(a.preloadRewarded("rewarded")).catch(function () { warm = null; }); } catch (e) {} }
+    };
+    var openApp = function (how) {
+      if (!cur || opened) return;
+      opened = true; remember(cur.url);
+      var w = window.open(cur.url, "_blank");
+      if (w) { try { w.opener = null; } catch (e) {} }
+      track("play_gate_reveal", { via: how, app_name: cur.app, auto_opened: !!w, page_type: pageType });
+      $(".pg-ready", dlg).textContent = w ? cur.app + " opened on Google Play in a new tab." : "Your Google Play link for " + cur.app + " is ready.";
+      $("[data-pg-open]", dlg).textContent = w ? "Open it again" : "Open " + cur.app + " on Google Play";
+      show("ready");
+    };
+    document.addEventListener("click", function (e) {
+      var a = e.target.closest && e.target.closest('a[href*="play.google.com"]');
+      if (!a || dlg.contains(a) || !poAds() || unlocked(a.href)) return; // no ad API (yet) or already unlocked → normal link
+      e.preventDefault();
+      var pick = a.closest(".vpick");
+      var app = a.getAttribute("data-app") || ((pick && pick.querySelector("h2")) || document.querySelector("h1") || {}).textContent || "This game";
+      app = app.replace(/ review$/, "");
+      var icon = (a.closest(".apphead,.vpick,section") || document).querySelector("img");
+      cur = { url: a.href, app: app }; misses = 0; opened = false;
+      $(".pg-app", dlg).textContent = app;
+      $(".pg-msg", dlg).textContent = PG.message.replace(/\{app\}/g, app).replace(/\{site\}/g, PG.site);
+      var img = $(".pg-icon", dlg);
+      img.hidden = !icon; if (icon) img.src = icon.currentSrc || icon.src;
+      var links = dlg.querySelectorAll("[data-pg-open],[data-pg-skip]");
+      for (var i = 0; i < links.length; i++) links[i].href = cur.url;
+      setBusy(false); show("ask"); dlg.showModal(); preload();
+      track("play_gate_open", { app_name: app, page_type: pageType });
+    }, true);
+    for (var wi = 0; wi < watchBtns.length; wi++) watchBtns[wi].addEventListener("click", function () {
+      if (watching) return;
+      watching = true; setBusy(true);
+      // GPT shows the rewarded ad in its own full-screen overlay; a modal <dialog> sits above everything in the
+      // top layer, so close ours while the ad is up and reopen it for the result.
+      dlg.close();
+      var a = poAds(), granted = false, closed = false, fallback = null;
+      var done = function () {
+        watching = false; warm = null; setBusy(false); dlg.showModal();
+        if (granted && closed) { track("play_gate_granted", { app_name: cur.app }); return openApp("granted"); }
+        var status = fallback || (closed ? "closed" : "unavailable");
+        var userStopped = /declin|dismiss|clos|cancel|skip/i.test(status) || (closed && !fallback);
+        if (!userStopped) { track("play_gate_fallback", { status: status }); return openApp("fallback-" + status); }
+        if (++misses >= 2) { track("play_gate_retry_access", { status: status }); return openApp("retry-" + status); }
+        track("play_gate_incomplete", { status: status });
+        show("incomplete");
+      };
+      if (!a) return done();
+      Promise.resolve().then(function () {
+        return a.showRewarded("rewarded", {
+          onGranted: function () { granted = true; },
+          onClosed: function () { closed = true; },
+          onFallback: function (r) { fallback = fallback || String((r && r.status) || "unavailable"); }
+        });
+      }).then(function (res) {
+        if (granted && !closed) closed = true; // settled after a grant = terminal outcome
+        if (!granted && !fallback && !closed) fallback = String((res && res.status) || "unavailable");
+      }, function (err) { fallback = fallback || String((err && err.status) || "error"); }).then(done);
+    });
+    var skips = dlg.querySelectorAll("[data-pg-skip]");
+    for (var si = 0; si < skips.length; si++) skips[si].addEventListener("click", function () { if (cur) remember(cur.url); track("play_gate_skip", { app_name: cur && cur.app }); dlg.close(); });
+    $("[data-pg-open]", dlg).addEventListener("click", function () { setTimeout(function () { dlg.close(); }, 50); });
+    $("[data-pg-close]", dlg).addEventListener("click", function () { track("play_gate_dismiss", { app_name: cur && cur.app }); dlg.close(); });
+    dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
+  }
+
   /* ---------- Search ---------- */
   var overlay = $(".search"), input = overlay && $("input", overlay), res = overlay && $(".res", overlay), index = null;
   function openSearch() {

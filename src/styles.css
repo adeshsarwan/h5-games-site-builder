@@ -231,3 +231,16 @@ body.has-anchor{--anchor-h:100px;padding-bottom:calc(var(--anchor-h) + env(safe-
 @media (min-width:768px){body.has-anchor{--anchor-h:90px}}
 body.has-anchor.immersive .player,body.has-anchor.immersive .gp-player{height:auto;bottom:calc(var(--anchor-h) + env(safe-area-inset-bottom,0px))}
 .mark.img{background:none;padding:0;transform:none}.mark.img img{width:100%;height:100%;display:block}
+/* Play gate: rewarded "support us" dialog before Google Play (build.mjs playGateHtml, app.js) */
+.pg{border:0;border-radius:22px;padding:30px 26px 24px;width:min(440px,calc(100vw - 32px));text-align:center;color:var(--text);background:#fff;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+.pg::backdrop{background:rgba(15,10,40,.6);backdrop-filter:blur(2px)}
+.pg h2{font-size:24px;line-height:1.2;margin:10px 0 4px}
+.pg-x{position:absolute;top:10px;right:10px;width:36px;height:36px;border:0;background:none;cursor:pointer;color:inherit;opacity:.6}.pg-x svg{width:20px;height:20px}
+.pg-icon{display:block;margin:0 auto;border-radius:18px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.pg-app{font-weight:800;opacity:.7;margin:0}.pg-msg{margin:12px 0 18px;line-height:1.55}
+.pg-btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:50px;margin-top:10px;border:0;border-radius:999px;background:var(--accent);color:var(--accentText);font:inherit;font-weight:900;font-size:17px;cursor:pointer;text-decoration:none}
+.pg-btn:disabled{opacity:.6;cursor:progress}.pg-btn.ghost{background:var(--bg2);color:var(--text)}
+.pg-note{font-size:13px;opacity:.65;margin:14px 0 0}
+.pg-ok{width:56px;height:56px;margin:0 auto;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accentText);font-size:28px;font-weight:900}
+.v .pg{border:var(--bd);box-shadow:8px 8px 0 var(--ink)}.v .pg h2{font-family:Fredoka,sans-serif}
+.v .pg-btn{border:var(--bd);box-shadow:4px 4px 0 var(--ink);background:var(--pop);color:var(--ink);font-family:Fredoka,sans-serif;font-weight:600}.v .pg-btn.ghost{background:#fff}
