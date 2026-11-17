@@ -278,6 +278,7 @@ ${nShots ? `<h3>Screenshots</h3><div class="shots">${Array.from({ length: nShots
 }
 
 function categoryPage(c) {
+  if (V) return vCategoryPage(c);
   const list = games.filter((g) => g.categories.includes(c));
   const body = `<div class="grid">${brand()}<h1 class="h ch">${CAT_ICON[c] || ""} ${esc(c)} games</h1>
 ${list.map((g, i) => tile(g, i === 0 ? "s2" : "", i > 7)).join("")}${adSlot("home_rect")}<h2 class="h">Other categories</h2>${catTiles()}</div>
@@ -631,6 +632,85 @@ ${shots.length ? `<div class="vshots">${shots.map((u, k) => `<img src="${esc(pla
     body,
   });
 }
+// Category page, vibrant design: hero (top game + runners-up), every game in the category, best-of lists and Play
+// Store games that fit the category, more free games, other categories, then SEO text and a short FAQ.
+// Lists and mobile genres per category; anything unmatched falls back to the site's general lists / popular apps.
+const CAT_LISTS = {
+  Puzzle: ["best-puzzle-games", "best-games-like-candy-crush", "best-mahjong-games", "best-word-games", "best-games-for-short-breaks"],
+  Casual: ["best-games-for-short-breaks", "best-relaxing-games-before-sleep", "best-games-like-candy-crush", "best-games-for-seniors", "best-offline-games"],
+  Word: ["best-word-games", "best-puzzle-games", "best-games-for-seniors", "best-relaxing-games-before-sleep"],
+  Arcade: ["best-action-games", "best-games-for-short-breaks", "best-racing-games", "best-offline-games"],
+  Brain: ["best-puzzle-games", "best-word-games", "best-strategy-games", "best-games-for-seniors", "best-mahjong-games"],
+  Cards: ["best-mahjong-games", "best-two-player-games", "best-strategy-games", "best-games-for-a-long-flight"],
+  Casino: ["best-mahjong-games", "best-two-player-games", "best-games-without-in-app-purchases", "best-games-for-a-long-flight"],
+  Sports: ["best-sports-games", "best-racing-games", "best-two-player-games", "best-multiplayer-games"],
+  Action: ["best-action-games", "best-racing-games", "best-multiplayer-games", "best-games-like-among-us", "best-games-like-minecraft"],
+};
+const CAT_GENRES = {
+  Puzzle: ["Puzzle"], Casual: ["Casual"], Word: ["Word", "Trivia"], Arcade: ["Arcade"], Brain: ["Puzzle", "Trivia", "Board", "Educational"],
+  Cards: ["Card", "Board"], Casino: ["Card", "Board", "Casino"], Sports: ["Sports", "Racing"], Action: ["Action", "Adventure"],
+};
+const CAT_BLURB = {
+  Puzzle: "Sort, merge, connect and clear: puzzles that start in a second and get properly tricky.",
+  Casual: "Easy to pick up, hard to put down. Perfect for a coffee break or the bus ride home.",
+  Word: "Crosswords, riddles and picture clues to give your vocabulary a workout.",
+  Arcade: "Quick reflexes, high scores and one-more-go gameplay, straight in your browser.",
+  Brain: "Logic, maths and memory games that keep your mind sharp while you play.",
+  Cards: "Classic card games, shuffled and dealt instantly. No account needed.",
+  Casino: "Table-game classics for fun only: no real money, no sign-up, just play.",
+  Sports: "Shoot hoops, sink pool balls and chase trick shots without leaving your seat.",
+  Action: "Fast runs, tight dodges and nonstop momentum for when you want some adrenaline.",
+};
+function vCategoryPage(c) {
+  const ci = cats.indexOf(c), col = VPAL[ci % VPAL.length], lc = c.toLowerCase(), icon = CAT_ICON[c] || "🎮";
+  const pool = [...featured.map((s) => bySlug[s]).filter(Boolean), ...games].filter((x, i, a) => a.indexOf(x) === i);
+  const list = pool.filter((g) => g.categories.includes(c));
+  const others = pool.filter((g) => !list.includes(g));
+  const top = list[0], side = list.slice(1, 3);
+  const sideCard = (g) => `<a class="vcat-side" href="/game/${g.slug}/"><img src="/media/${g.slug}/cover-16x9.webp" alt="" loading="lazy" decoding="async"><span>${`<img class="vicon" src="/media/${g.slug}/icon-192.webp" width="52" height="52" alt="">`}<strong>${esc(g.title)}</strong><i>${VSVG.play}</i></span></a>`;
+  const hero = `<section class="vin vcat-hero${side.length ? "" : " solo"}"><a class="vcat-top" href="/game/${top.slug}/"><img class="vcat-cover" src="/media/${top.slug}/cover-16x9.webp" alt="" fetchpriority="high"><i class="vtag">#1 in ${esc(c)}</i>
+<span class="vcat-top-b"><img class="vicon" src="/media/${top.slug}/icon-192.webp" width="72" height="72" alt=""><span class="vcat-top-t"><strong>${esc(top.title)}</strong>${top.tagline ? `<small>${esc(short(webify(top.tagline), 90))}</small>` : ""}</span><span class="vbtn vpop vlg">${VSVG.play}<span>Play now</span></span></span></a>
+${side.length ? `<div class="vcat-sides">${side.map(sideCard).join("")}</div>` : ""}</section>`;
+
+  // Best-of lists for this category (fill to 4 with the site's other non-kids lists)
+  const ls = LISTS().filter((l) => !l.kids && picksOf(l).length);
+  const want = CAT_LISTS[c] || [];
+  const lists = [...want.map((s) => ls.find((l) => l.slug === s)).filter(Boolean), ...ls].filter((x, i, a) => a.indexOf(x) === i).slice(0, 4);
+  // Play Store games in matching genres: editor's choice first, then by installs
+  const gen = CAT_GENRES[c] || [c];
+  const pop = (a) => playOf(a)?.minInstalls || 0;
+  const apps = (C?.apps || []).filter((a) => gen.some((x) => (a.genre || "").replace(/^Game /, "") === x))
+    .sort((x, y) => ((reviewOf(y)?.editorsChoice ? 2e10 : 0) + pop(y)) - ((reviewOf(x)?.editorsChoice ? 2e10 : 0) + pop(x))).slice(0, 12);
+  const appTile = (a, i) => { const p = playOf(a), r = reviewOf(a); const big = i === 0;
+    return `<a class="vg${big ? " b" : ""}" href="${appUrl(a)}"><img src="${esc(appImgOf(a, big ? 512 : 256))}" alt="${esc(a.title)}" loading="lazy" decoding="async">${p?.score ? `<i class="vg-r">${p.score} ★</i>` : ""}${r ? `<i class="vg-s${r.editorsChoice ? " ec" : ""}">${r.editorsChoice ? "Editor's Choice · " : ""}${r.score.toFixed(1)}/5</i>` : ""}<b>${esc(a.title.split(/[:–]/)[0].trim())}</b></a>`; };
+
+  const faq = [
+    [`Are these ${lc} games free?`, `Yes. All ${list.length} ${lc} games on ${site.name} are free to play and need no account.`],
+    ["Do I need to download anything?", "No. Every game here runs in your browser and starts in a few seconds."],
+    ["Do they work on my phone?", "Yes, on phones, tablets and desktops. On a phone, tap Play and the game opens full screen."],
+  ];
+  const body = `<div class="vband vcat-band" style="--c:${col}"><section class="vin vcat-h"><nav class="vcat-crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><span>${esc(c)} games</span></nav>
+<div class="vcat-title"><span class="vcat-ico" aria-hidden="true">${icon}</span><div><h1>${esc(c)} <span>games</span></h1><p>${esc(CAT_BLURB[c] || `Free ${lc} games you can play instantly in your browser.`)}</p></div></div>
+<div class="vchips vcat-chips"><i class="g">${list.length} free game${list.length === 1 ? "" : "s"}</i><i>No download</i><i class="b">Phone · tablet · desktop</i></div></section>
+${hero}</div>
+${list.length > 3 ? `<section class="vin vsec"><div class="vsec-h"><h2>All ${esc(lc)} games</h2><span class="vsticker" style="background:${col}">${list.length} games</span></div>${vMosaic(list.slice(3), 2)}</section>` : ""}
+${NATIVE ? `<div class="vin vad">${gamNative(1)}</div>` : adSlot("home_rect")}
+${lists.length ? `<section class="vpink"><div class="vin vsec"><div class="vsec-h"><div><h2>Best ${esc(lc)} games to download</h2><p>Hand-picked Android games, checked against Google Play every day.</p></div><a class="vbtn vwhite" href="/best/">${VSVG.trophy}<span>All ${LISTS().length} lists</span></a></div><div class="vlists">${lists.map((l, i) => vListCard(l, i + ci)).join("")}</div></div></section>` : ""}
+${apps.length >= 4 ? `<section class="vin vsec"><div class="vsec-h"><div><h2>Top ${esc(lc)} games on Google Play</h2><p class="vcat-sub">Live Play Store ratings and our scores</p></div><a href="/topgames/">All mobile games →</a></div><div class="vwall">${apps.map(appTile).join("")}</div></section>` : ""}
+${NATIVE ? `<div class="vin vad">${gamNative(2)}</div>` : ""}
+${others.length ? `<section class="vin vsec"><div class="vsec-h"><h2>${list.length < 6 ? "You'll also love these" : "More free games"}</h2><a href="/">All ${games.length} games →</a></div>${vMosaic(others.slice(0, 21))}</section>` : ""}
+<section class="vin vsec"><div class="vsec-h"><h2>Other categories</h2></div><nav class="vcat-grid">${cats.filter((x) => x !== c).map((x) => { const n = games.filter((g) => g.categories.includes(x)).length; const g0 = games.find((g) => g.categories.includes(x));
+    return `<a class="vcat-card" style="--c:${VPAL[cats.indexOf(x) % VPAL.length]}" href="/category/${catSlug(x)}/"><span class="vcat-card-i">${CAT_ICON[x] || "🎮"}</span><span><strong>${esc(x)}</strong><small>${n} game${n === 1 ? "" : "s"}</small></span>${g0 ? `<img src="/media/${g0.slug}/icon-192.webp" width="56" height="56" alt="" loading="lazy">` : ""}</a>`; }).join("")}</nav></section>
+<section class="vin vsec vcat-seo"><div class="vtext"><h2>Free ${esc(lc)} games on ${esc(site.name)}</h2><p>Play ${list.length} free ${esc(lc)} games online on ${esc(site.name)}, including ${list.slice(0, 3).map((g) => esc(g.title)).join(", ")}. They load instantly in your browser with no downloads or sign-up, and work on phone, tablet and desktop.${lists.length ? ` Looking for something to install? See our <a href="/best/${lists[0].slug}/">${esc(lists[0].title.toLowerCase())}</a>.` : ""}</p></div>
+<div class="vfaq">${faq.map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join("")}</div></section>`;
+  return page({ title: `${c} games: play free online on ${site.name}`, desc: `Play ${list.length} free ${lc} games online on ${site.name}: ${list.slice(0, 3).map((g) => g.title).join(", ")} and more. Instant play, no downloads.`, canonical: `/category/${catSlug(c)}/`,
+    head: `<link rel="preload" as="image" href="/media/${top.slug}/cover-16x9.webp" fetchpriority="high">`, ogImage: `/media/${top.slug}/cover-16x9.webp`,
+    jsonld: { "@context": "https://schema.org", "@type": "CollectionPage", name: `${c} games`, url: origin ? `${origin}/category/${catSlug(c)}/` : undefined,
+      mainEntity: { "@type": "ItemList", itemListElement: list.map((g, i) => ({ "@type": "ListItem", position: i + 1, name: g.title, url: origin ? `${origin}/game/${g.slug}/` : undefined })) },
+      breadcrumb: { "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Home", item: origin ? `${origin}/` : undefined }, { "@type": "ListItem", position: 2, name: `${c} games` }] } },
+    body });
+}
+
 // H5 game page, vibrant design. One HTML document with two layouts:
 //  desktop (>=870px): framed player + 300px right rail (sidebar ad + trending), similar games under the player
 //  mobile  (<870px):  launch card (cover, icon, big Play button -> full-screen game), then content in one column
