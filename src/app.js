@@ -1,5 +1,9 @@
-/* PlayPop portal runtime: search, play, fullscreen, recently played, GPT ads. Kept tiny on purpose. */
-(function () {
+/* PlayPop portal runtime: search, play, fullscreen, recently played, GPT ads. Kept tiny on purpose.
+   On a page Chrome is prerendering (the game finder preloads the match page while the rewarded video plays) the runtime
+   waits until the visitor actually sees the page; GPT itself also holds ad requests until then. */
+(function (run) {
+  if (document.prerendering) document.addEventListener("prerenderingchange", run, { once: true }); else run();
+})(function () {
   "use strict";
   var CFG = window.__SITE__ || {};
   var $ = function (s, r) { return (r || document).querySelector(s); };
@@ -69,18 +73,21 @@
       if (!warm && a && a.preloadRewarded) { try { warm = Promise.resolve(a.preloadRewarded("rewarded", { onFallback: function () { warm = null; } })).catch(function () { warm = null; }); } catch (e) {} }
     };
     var run = function (cb) {
-      var a = api(), granted = false, closed = false, fallback = null;
+      var a = api(), granted = false, closed = false, fallback = null, t0 = Date.now(), t1 = 0;
       var fin = function () {
         warm = null;
-        if (granted && closed) return cb("granted", "granted");
+        var watched = Math.round(((t1 || Date.now()) - t0) / 1000); // seconds the ad was up (from onReady when it fires)
+        if (granted && closed) return cb("granted", "granted", watched);
         var status = fallback || (closed ? "closed" : "unavailable");
-        cb(/declin|dismiss|clos|cancel|skip/i.test(status) || (closed && !fallback) ? "stopped" : "fallback", status);
+        cb(/declin|dismiss|clos|cancel|skip/i.test(status) || (closed && !fallback) ? "stopped" : "fallback", status, watched);
       };
       if (!a) return fin();
       Promise.resolve().then(function () {
         return a.showRewarded("rewarded", {
+          onReady: function () { t0 = Date.now(); },
           onGranted: function () { granted = true; },
-          onClosed: function () { closed = true; },
+          onVideoCompleted: function () { granted = true; },
+          onClosed: function () { closed = true; t1 = Date.now(); },
           onFallback: function (r) { fallback = fallback || String((r && r.status) || "unavailable"); }
         });
       }).then(function (res) {
@@ -177,6 +184,7 @@
     var D; try { D = JSON.parse(mmData.textContent); } catch (e) { return; }
     var views = mm.querySelectorAll("[data-mm-view]");
     var show = function (v) { for (var i = 0; i < views.length; i++) views[i].hidden = views[i].getAttribute("data-mm-view") !== v; };
+    var MIN_WATCH = CFG.matchMinWatch || 5; // seconds of the rewarded video before its Close/Skip opens the match
     var picks = [], labels = [], round = 0, match = null, runners = [], fit = 0, misses = 0, busy = false;
     var el = function (tag, cls, txt) { var x = document.createElement(tag); if (cls) x.className = cls; if (txt != null) x.textContent = txt; return x; };
     var dots = function (box) { box.innerHTML = ""; for (var i = 0; i < D.rounds.length; i++) box.appendChild(el("i", i < round ? "on" : i === round ? "cur" : "")); };
@@ -217,8 +225,24 @@
       (new Image()).src = match.i; PO.preload();
       setTimeout(reveal, 1500);
     };
+    // Save the match and have Chrome prerender its page right away, so it opens instantly after the video. GPT delays the
+    // prerendered page's ad requests until it is shown, so its native/anchor ads load the moment it opens and nothing
+    // is counted while it is hidden. Browsers without speculation rules just prefetch the HTML.
+    var save = function () { try { if (SS) SS.setItem("mm_match", JSON.stringify({ u: match.u, n: match.n, w: match.w, fit: fit, labels: labels, gp: match.gp, runners: runners.map(function (x) { return { u: x.u, n: x.n, i: x.i }; }) })); } catch (e) {} };
+    var preloaded = "";
+    var preloadMatch = function () {
+      var url = match.u + "?match=1";
+      if (preloaded === url) return; preloaded = url;
+      try {
+        if (HTMLScriptElement.supports && HTMLScriptElement.supports("speculationrules")) {
+          var sr = document.createElement("script"); sr.type = "speculationrules";
+          sr.textContent = JSON.stringify({ prerender: [{ source: "list", urls: [url], eagerness: "immediate" }] });
+          document.head.appendChild(sr);
+        } else { var l = document.createElement("link"); l.rel = "prefetch"; l.href = url; document.head.appendChild(l); }
+      } catch (e) {}
+    };
     var reveal = function () {
-      misses = 0;
+      misses = 0; save(); preloadMatch();
       $(".mm-blur img", mm).src = match.i;
       $(".mm-fit", mm).textContent = fit + "% fit";
       $(".mm-sum", mm).textContent = (match.g ? (/^[aeiou]/i.test(match.g) ? "An " : "A ") + match.g.toLowerCase() + " " : "A ") + "game for players who picked " + labels.map(function (l) { return l.toLowerCase(); }).join(", ") + ".";
@@ -227,7 +251,7 @@
     };
     var go = function (how) {
       track("match_unlock", { via: how, app: match.n, fit: fit });
-      try { if (SS) SS.setItem("mm_match", JSON.stringify({ u: match.u, n: match.n, w: match.w, fit: fit, labels: labels, gp: match.gp, runners: runners.map(function (x) { return { u: x.u, n: x.n, i: x.i }; }) })); } catch (e) {}
+      save();
       unlockPlay(match.gp);
       show("go");
       location.href = match.u + "?match=1";
@@ -236,12 +260,15 @@
     for (var i = 0; i < watchBtns.length; i++) watchBtns[i].addEventListener("click", function () {
       if (busy || !match) return; busy = true;
       track("match_ad_start", { app: match.n });
-      PO.run(function (res, status) {
+      PO.run(function (res, status, watched) {
         busy = false;
         if (res === "granted") return go("granted");
         if (res === "fallback") return go("fallback-" + status);
+        // The visitor used the ad's own Close/Skip. After MIN_WATCH seconds that counts as watched; earlier closes get
+        // one "Try again", then the match opens anyway.
+        if (watched >= MIN_WATCH) return go("skipped-after-" + watched + "s");
         if (++misses >= 2) return go("retry-" + status);
-        track("match_ad_incomplete", { status: status });
+        track("match_ad_incomplete", { status: status, watched: watched });
         show("incomplete");
       });
     });
@@ -418,4 +445,4 @@
     if (document.readyState === "complete") idle(loadAds);
     else window.addEventListener("load", function () { idle(loadAds); });
   }
-})();
+});
