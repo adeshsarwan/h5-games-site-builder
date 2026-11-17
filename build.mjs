@@ -645,23 +645,22 @@ function mmData() {
 }
 function mmBox() {
   if (!C || !LISTS().length || !C.apps.length) return "";
-  // The funnel starts on landing: round 1 is in the HTML (images preloaded), src/app.js takes over from there.
-  // The start card is only shown again after "Skip".
+  // Popup funnel (like jobguidematch.com): opens over a blurred /best/ on landing with question 1 already in the HTML
+  // (images preloaded); no close button. The last step reveals the match after a rewarded video (src/app.js).
   const D = mmData(), r1 = D.rounds[0];
   const opt1 = r1.o.map((o, k) => `<button type="button" class="mm-opt">${o.img ? `<img alt="" src="${esc(o.img)}" fetchpriority="high">` : `<span class="mm-noimg">${k ? "⚡" : "🌿"}</span>`}<b>${esc(o.label)}</b></button>`).join("");
-  return `<section class="mm" id="match" aria-label="Find your next game"><script type="application/json" id="mm-data">${JSON.stringify(D).replace(/</g, "\\u003c")}</script>
-<div class="mm-card" data-mm-view="start" hidden><i class="vtag">Game finder</i><strong class="mm-t">Find your next game in 20 seconds</strong><p>Play 4 quick rounds of <b>This or That</b> and we'll match you with one game we think you'll love.</p><div class="mm-dots">${MM_ROUNDS.map(() => "<i></i>").join("")}</div><button type="button" class="vbtn vpop vlg" data-mm-start>${VSVG.play}<span>Start</span></button></div>
-<div class="mm-card" data-mm-view="round"><i class="vtag">Find your next game</i><div class="mm-top"><span class="mm-step">Round 1 of ${D.rounds.length}</span><div class="mm-dots">${D.rounds.map((_, i) => `<i${i ? "" : ' class="cur"'}></i>`).join("")}</div></div><strong class="mm-t mm-q">${esc(r1.q)}</strong><div class="mm-pair">${opt1}</div><small class="mm-hint">Tap the one you'd rather play · 4 quick rounds</small></div>
+  return `<div class="mm-pop" id="match" role="dialog" aria-modal="true" aria-label="Find your next game"><script type="application/json" id="mm-data">${JSON.stringify(D).replace(/</g, "\\u003c")}</script><div class="mm">
+<div class="mm-card" data-mm-view="round"><div class="mm-top"><span class="mm-step">Question 1 of ${D.rounds.length}</span><div class="mm-dots">${D.rounds.map((_, i) => `<i${i ? "" : ' class="cur"'}></i>`).join("")}</div></div><strong class="mm-t mm-q">${esc(r1.q)}</strong><div class="mm-pair">${opt1}</div><small class="mm-hint">Tap the one you'd rather play</small></div>
 <div class="mm-card" data-mm-view="think" hidden><div class="mm-spin" aria-hidden="true">🎮</div><strong class="mm-t">Finding your match…</strong><p>Checking ${C.apps.length} games against your picks</p></div>
-<div class="mm-card" data-mm-view="reveal" hidden><i class="vtag">Match found</i><div class="mm-blur"><img alt="" width="120" height="120"><span class="mm-fit"></span></div><strong class="mm-t">We found your perfect game!</strong><p class="mm-sum"></p><button type="button" class="vbtn vhot vlg" data-mm-watch><span>Watch a short ad to reveal</span></button><button type="button" class="mm-skip" data-mm-skip>Skip, show me the lists</button><small class="mm-note">Ads keep ${esc(site.name)} free. The ad is optional.</small></div>
-<div class="mm-card" data-mm-view="incomplete" hidden><strong class="mm-t">The ad was closed early</strong><p>Watch it to the end to reveal your match.</p><button type="button" class="vbtn vhot vlg" data-mm-watch><span>Try again</span></button><button type="button" class="mm-skip" data-mm-skip>Skip, show me the lists</button></div>
-<div class="mm-card" data-mm-view="go" hidden><div class="mm-spin" aria-hidden="true">🎯</div><strong class="mm-t">Opening your match…</strong></div></section>`;
+<div class="mm-card" data-mm-view="reveal" hidden><div class="mm-ok" aria-hidden="true">✓</div><div class="mm-blur"><img alt="" width="96" height="96"><span class="mm-fit"></span></div><strong class="mm-t">Your game match is ready</strong><p class="mm-sum"></p><button type="button" class="vbtn vhot vlg" data-mm-watch>${VSVG.play}<span>See my game</span></button><small class="mm-note">A short sponsored video plays first.</small></div>
+<div class="mm-card" data-mm-view="incomplete" hidden><strong class="mm-t">The video was closed early</strong><p>Watch it to the end to see your game.</p><button type="button" class="vbtn vhot vlg" data-mm-watch>${VSVG.play}<span>Try again</span></button></div>
+<div class="mm-card" data-mm-view="go" hidden><div class="mm-spin" aria-hidden="true">🎯</div><strong class="mm-t">Opening your match…</strong></div></div></div>`;
 }
 function vBestIndex() {
   const SZ = ["b", "w", "", "", "w", "", "", "b", "", "", "w", "", "", "w", "", ""];
   const ls = LISTS().filter((l) => !l.kids), kids = LISTS().filter((l) => l.kids);
   const order = [...ls.filter((l) => l.filter || /like|without|low-end|two-player|seniors|sleep|flight|mahjong|word/.test(l.slug)), ...ls.filter((l) => !(l.filter || /like|without|low-end|two-player|seniors|sleep|flight|mahjong|word/.test(l.slug)))];
-  const body = `<div class="vband vband-hot"><div class="vin mm-wrap"><section class="vpage-h"><h1>What should you <span>download next?</span></h1><p>${LISTS().length} hand-picked lists for every mood, phone and budget. Every pick links to its official Google Play page. <a href="/how-we-review/">How we choose</a></p></section>${mmBox()}</div></div>
+  const body = `<div class="vband vband-hot"><section class="vin vpage-h"><h1>What should you <span>download next?</span></h1><p>${LISTS().length} hand-picked lists for every mood, phone and budget. Every pick links to its official Google Play page. <a href="/how-we-review/">How we choose</a></p></section></div>${mmBox()}
 <section class="vin vsec" id="lists"><div class="vlists vmos">${order.map((l, i) => vListCard(l, i, SZ[i % SZ.length])).join("")}</div></section>
 ${kids.length ? `<section class="vin vsec"><div class="vsec-h"><h2>For kids</h2></div><div class="vlists">${kids.map((l, i) => vListCard(l, i + 3)).join("")}</div></section>` : ""}
 <section class="vin">${vDisclaimer()}</section>`;

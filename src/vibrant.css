@@ -425,7 +425,6 @@ body.immersive .gp-player .bar .exit{display:grid}
 .v .vrev a.vrev-all{justify-content:center;color:#4B2FC4;padding-top:12px}
 
 /* /best/: game finder (This or That) */
-.mm-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,520px);gap:32px;align-items:center}
 .mm{min-width:0}
 .mm-card{position:relative;background:#fff;color:var(--ink);border:4px solid var(--ink);box-shadow:8px 8px 0 var(--ink);border-radius:28px;padding:26px 24px 22px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;min-height:360px;justify-content:center}
 .mm-card[hidden]{display:none}
@@ -466,12 +465,20 @@ body.immersive .gp-player .bar .exit{display:grid}
 .mm-b-more img{width:36px;height:36px;border-radius:10px;border:2px solid var(--ink);background:#fff}
 .v .mm-b-more a.mm-b-again{color:#4B2FC4;text-decoration:underline}
 @media (max-width:869px){
-  .mm-wrap{grid-template-columns:1fr;gap:22px}
   .mm-card{padding:22px 14px 18px;min-height:0}
   .mm-t{font-size:23px}
   .mm-pair{gap:10px}.mm-opt b{font-size:15px}
   .mm-banner{margin:14px 14px 4px}
 }
 @media (max-width:869px){.mm .vbtn.vhot span{display:inline}.mm .vbtn.vhot{padding:0 22px}}
-/* the finder opens on landing: on phones it comes before the heading so round 1 is above the fold */
-@media (max-width:869px){.mm-wrap .mm{order:-1;margin-top:18px}.mm-wrap .vpage-h h1{font-size:30px}}
+
+/* game finder popup (opens on landing over a blurred /best/) */
+.mm-pop{display:none}
+html.mm-open{overflow:hidden}
+html.mm-open .mm-pop{display:flex;position:fixed;inset:0;z-index:70;align-items:center;justify-content:center;padding:16px;background:rgba(27,16,53,.55);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);overflow-y:auto}
+html.mm-open .mm{width:100%;max-width:520px;margin:auto;animation:mmin .28s ease-out}
+@keyframes mmin{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+.mm-pop .mm-card{min-height:0;padding:24px 22px 20px}
+.mm-ok{width:56px;height:56px;border-radius:50%;background:var(--pop);border:var(--bd);display:grid;place-items:center;font-size:28px;font-weight:900}
+.mm-pop .mm-blur,.mm-pop .mm-blur img{width:96px;height:96px}
+@media (max-width:869px){.mm-pop .mm-card{padding:20px 14px 16px}.mm-pop .vbtn.vhot{width:100%}}

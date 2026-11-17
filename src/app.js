@@ -167,10 +167,11 @@
     dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
   }
 
-  /* ---------- Game finder on /best/ (#match): 4 This-or-That rounds → one Play Store game ----------
-     The match is revealed after an opt-in rewarded ad (PO.run, same rules as the Play gate): granted or no ad
-     available → open the match's /topgames/ page with ?match=1; closed early → "Try again" once, then open anyway;
-     "Skip" → back to the lists on /best/. The match's Play link is then unlocked, so the Play gate doesn't ask again. */
+  /* ---------- Game finder popup on /best/ (#match), like jobguidematch.com: opens on landing over the blurred page,
+     no close button, 4 This-or-That questions → one Play Store game. "See my game" (labelled "A short sponsored video
+     plays first") shows a rewarded video via PO.run (same rules as the Play gate): granted or no ad available → open the
+     match's /topgames/ page with ?match=1; closed early → "Try again" once, then open anyway. The match's Play link is
+     then unlocked, so the Play gate doesn't ask again. */
   var mm = document.getElementById("match"), mmData = document.getElementById("mm-data");
   if (mm && mmData) (function () {
     var D; try { D = JSON.parse(mmData.textContent); } catch (e) { return; }
@@ -181,7 +182,7 @@
     var dots = function (box) { box.innerHTML = ""; for (var i = 0; i < D.rounds.length; i++) box.appendChild(el("i", i < round ? "on" : i === round ? "cur" : "")); };
     var renderRound = function () {
       var r = D.rounds[round];
-      $(".mm-step", mm).textContent = "Round " + (round + 1) + " of " + D.rounds.length;
+      $(".mm-step", mm).textContent = "Question " + (round + 1) + " of " + D.rounds.length;
       dots($("[data-mm-view=round] .mm-dots", mm));
       $(".mm-q", mm).textContent = r.q;
       var pair = $(".mm-pair", mm); pair.innerHTML = "";
@@ -244,15 +245,8 @@
         show("incomplete");
       });
     });
-    var skips = mm.querySelectorAll("[data-mm-skip]");
-    for (var j = 0; j < skips.length; j++) skips[j].addEventListener("click", function () {
-      track("match_skip", { app: match && match.n });
-      picks = []; labels = []; round = 0; match = null;
-      show("start");
-      var l = document.getElementById("lists"); if (l) l.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-    $("[data-mm-start]", mm).addEventListener("click", function () { picks = []; labels = []; round = 0; track("match_start", { auto: false }); renderRound(); });
-    // Start on landing: round 1 is already in the HTML; bind it (same content, no flash).
+    // Opens on landing as a popup over the blurred page; question 1 is already in the HTML, bind it (same content, no flash).
+    document.documentElement.classList.add("mm-open");
     renderRound(); track("match_start", { auto: true });
   })();
 
