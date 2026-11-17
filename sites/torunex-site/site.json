@@ -94,7 +94,11 @@
     "ga4": "G-6KXE513HW0",
     "ga4Property": "properties/563792366",
     "gtm": "GTM-WV6SWT6V",
-    "clarity": "zcx0i3zfmu"
+    "clarity": "zcx0i3zfmu",
+    "googleAds": {
+      "customerId": "295-799-5545",
+      "connectedAt": "2026-11-17"
+    }
   },
   "content": {
     "dir": "torunex-site",

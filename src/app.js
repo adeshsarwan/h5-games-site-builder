@@ -34,6 +34,16 @@
     else if ((m = h.match(/^\/category\/([^/]+)/))) track("category_click", { category: m[1], placement: place, page_type: pageType });
   }, true);
   if (pageType === "list") track("list_view", { list: location.pathname.split("/")[2] });
+  // ad_shown: Google Ads conversion for sites connected to a Google Ads account (CFG.googleAds, from site.json
+  // analytics.googleAds). For now it fires on page load, once per browser session; sendTo also reports it to the
+  // Google Ads conversion action directly (otherwise Ads imports it from GA4 as a key event).
+  if (CFG.googleAds) (function (g) {
+    var ss = (function () { try { return sessionStorage; } catch (e) { return null; } })();
+    if (ss && ss.getItem("ad_shown_sent")) return;
+    if (ss) try { ss.setItem("ad_shown_sent", "1"); } catch (e) {}
+    track("ad_shown", { page_type: pageType, view: view(), trigger: "page_load" });
+    if (g.sendTo) track("conversion", { send_to: g.sendTo });
+  })(CFG.googleAds);
 
   /* ---------- Play gate: rewarded ad before leaving for Google Play (same rules as the jobsthe.world apply gate; site.json playGate) ----------
      - the rewarded ad is shown only after the visitor opts in ("Watch") and is preloaded when the dialog opens;
