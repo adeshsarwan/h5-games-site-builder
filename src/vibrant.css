@@ -473,3 +473,5 @@ body.immersive .gp-player .bar .exit{display:grid}
   .mm-banner{margin:14px 14px 4px}
 }
 @media (max-width:869px){.mm .vbtn.vhot span{display:inline}.mm .vbtn.vhot{padding:0 22px}}
+/* the finder opens on landing: on phones it comes before the heading so round 1 is above the fold */
+@media (max-width:869px){.mm-wrap .mm{order:-1;margin-top:18px}.mm-wrap .vpage-h h1{font-size:30px}}

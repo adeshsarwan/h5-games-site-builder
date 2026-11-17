@@ -251,7 +251,9 @@
       show("start");
       var l = document.getElementById("lists"); if (l) l.scrollIntoView({ behavior: "smooth", block: "start" });
     });
-    $("[data-mm-start]", mm).addEventListener("click", function () { picks = []; labels = []; round = 0; track("match_start", {}); renderRound(); });
+    $("[data-mm-start]", mm).addEventListener("click", function () { picks = []; labels = []; round = 0; track("match_start", { auto: false }); renderRound(); });
+    // Start on landing: round 1 is already in the HTML; bind it (same content, no flash).
+    renderRound(); track("match_start", { auto: true });
   })();
 
   /* ---------- "Your match" banner on the matched /topgames/ page ---------- */

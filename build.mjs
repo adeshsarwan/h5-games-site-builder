@@ -428,7 +428,8 @@ function bestIndex() {
 <div class="cards">${main.map(listCard).join("")}</div>
 ${kids.length ? `<h2 class="h2">For kids</h2><div class="cards">${kids.map(listCard).join("")}</div>` : ""}
 <h2 class="h2">Editor's Choice</h2><div class="grid">${C.apps.filter((a) => reviewOf(a)?.editorsChoice).map((a) => appTile(a)).join("")}</div>`;
-  return page({ title: `Best mobile games to download in ${new Date().getFullYear()} | ${site.name}`, desc: `Editor-picked lists of the best Android games: ${main.slice(0, 4).map((l) => l.title.replace(/^Best /, "").toLowerCase()).join(", ")} and more.`, canonical: "/best/", body });
+  const r1img = C && C.apps.length ? mmData().rounds[0].o.map((o) => o.img).filter(Boolean) : [];
+  return page({ head: r1img.map((u) => `<link rel="preload" as="image" href="${esc(u)}" fetchpriority="high">`).join(""), title: `Best mobile games to download in ${new Date().getFullYear()} | ${site.name}`, desc: `Editor-picked lists of the best Android games: ${main.slice(0, 4).map((l) => l.title.replace(/^Best /, "").toLowerCase()).join(", ")} and more.`, canonical: "/best/", body });
 }
 // A list can require facts that must stay true ("filter": "noAds" | "noIAP" | "noAdsNoIAP"); picks that no longer
 // match the live Google Play data are dropped at build time, so the page never claims something stale.
@@ -644,9 +645,13 @@ function mmData() {
 }
 function mmBox() {
   if (!C || !LISTS().length || !C.apps.length) return "";
-  return `<section class="mm" id="match" aria-label="Find your next game"><script type="application/json" id="mm-data">${JSON.stringify(mmData()).replace(/</g, "\\u003c")}</script>
-<div class="mm-card" data-mm-view="start"><i class="vtag">Game finder</i><strong class="mm-t">Find your next game in 20 seconds</strong><p>Play 4 quick rounds of <b>This or That</b> and we'll match you with one game we think you'll love.</p><div class="mm-dots">${MM_ROUNDS.map(() => "<i></i>").join("")}</div><button type="button" class="vbtn vpop vlg" data-mm-start>${VSVG.play}<span>Start</span></button></div>
-<div class="mm-card" data-mm-view="round" hidden><div class="mm-top"><span class="mm-step"></span><div class="mm-dots"></div></div><strong class="mm-t mm-q"></strong><div class="mm-pair"></div><small class="mm-hint">Tap the one you'd rather play</small></div>
+  // The funnel starts on landing: round 1 is in the HTML (images preloaded), src/app.js takes over from there.
+  // The start card is only shown again after "Skip".
+  const D = mmData(), r1 = D.rounds[0];
+  const opt1 = r1.o.map((o, k) => `<button type="button" class="mm-opt">${o.img ? `<img alt="" src="${esc(o.img)}" fetchpriority="high">` : `<span class="mm-noimg">${k ? "⚡" : "🌿"}</span>`}<b>${esc(o.label)}</b></button>`).join("");
+  return `<section class="mm" id="match" aria-label="Find your next game"><script type="application/json" id="mm-data">${JSON.stringify(D).replace(/</g, "\\u003c")}</script>
+<div class="mm-card" data-mm-view="start" hidden><i class="vtag">Game finder</i><strong class="mm-t">Find your next game in 20 seconds</strong><p>Play 4 quick rounds of <b>This or That</b> and we'll match you with one game we think you'll love.</p><div class="mm-dots">${MM_ROUNDS.map(() => "<i></i>").join("")}</div><button type="button" class="vbtn vpop vlg" data-mm-start>${VSVG.play}<span>Start</span></button></div>
+<div class="mm-card" data-mm-view="round"><i class="vtag">Find your next game</i><div class="mm-top"><span class="mm-step">Round 1 of ${D.rounds.length}</span><div class="mm-dots">${D.rounds.map((_, i) => `<i${i ? "" : ' class="cur"'}></i>`).join("")}</div></div><strong class="mm-t mm-q">${esc(r1.q)}</strong><div class="mm-pair">${opt1}</div><small class="mm-hint">Tap the one you'd rather play · 4 quick rounds</small></div>
 <div class="mm-card" data-mm-view="think" hidden><div class="mm-spin" aria-hidden="true">🎮</div><strong class="mm-t">Finding your match…</strong><p>Checking ${C.apps.length} games against your picks</p></div>
 <div class="mm-card" data-mm-view="reveal" hidden><i class="vtag">Match found</i><div class="mm-blur"><img alt="" width="120" height="120"><span class="mm-fit"></span></div><strong class="mm-t">We found your perfect game!</strong><p class="mm-sum"></p><button type="button" class="vbtn vhot vlg" data-mm-watch><span>Watch a short ad to reveal</span></button><button type="button" class="mm-skip" data-mm-skip>Skip, show me the lists</button><small class="mm-note">Ads keep ${esc(site.name)} free. The ad is optional.</small></div>
 <div class="mm-card" data-mm-view="incomplete" hidden><strong class="mm-t">The ad was closed early</strong><p>Watch it to the end to reveal your match.</p><button type="button" class="vbtn vhot vlg" data-mm-watch><span>Try again</span></button><button type="button" class="mm-skip" data-mm-skip>Skip, show me the lists</button></div>
