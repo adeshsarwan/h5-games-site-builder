@@ -414,3 +414,12 @@ body.immersive .gp-player .bar .exit{display:grid}
 }
 .v .vlist{color:var(--ink)} /* ".v a{color:inherit}" made list titles white inside the pink band */
 .vcat-top .vcat-cover{flex:1 1 auto;aspect-ratio:auto;min-height:280px}
+/* sidebar: top reviewed Play Store games */
+.vrev{background:#fff;border:var(--bd);box-shadow:var(--sh);border-radius:24px;padding:16px 18px;display:flex;flex-direction:column;margin-top:20px}
+.vrev strong{font-family:Fredoka,sans-serif;font-size:20px;margin-bottom:6px}
+.vrev a{display:flex;align-items:center;gap:12px;padding:8px 0;border-top:2px dashed #E4DFFF;font-weight:900}
+.vrev a:hover span{text-decoration:underline}
+.vrev .vicon{width:44px;height:44px;border-width:2px}
+.vrev span{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.vrev em{font-style:normal;font-weight:900;font-size:13px;padding:2px 8px;border-radius:999px;background:#FFF4C2;border:2px solid var(--ink)}
+.v .vrev a.vrev-all{justify-content:center;color:#4B2FC4;padding-top:12px}

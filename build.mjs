@@ -625,7 +625,7 @@ ${shots.length ? `<div class="vshots">${shots.map((u, k) => `<img src="${esc(pla
   const more = LISTS().filter((x) => x.slug !== l.slug && !!x.kids === !!l.kids).slice(0, 4);
   const body = `<div class="vband"><section class="vin vlist-hero"><div><span class="vsticker pink">${picks.length} picks · updated ${esc(fmtDate(l.updated))}</span><h1>${h1}</h1>${l.intro.map((x) => `<p>${esc(x)}</p>`).join("")}<p class="vby">By ${esc(authorName(l.author))} · Our picks are our opinion; these games are made by their developers and download from Google Play · <a href="/how-we-review/">How we choose</a></p></div><nav class="vquick" aria-label="Quick picks"><strong>Quick picks</strong>${quick}</nav></section></div>
 <div class="vin vlist-body"><article>${gamNative(1)}${picks.map((p, i) => card(p, i) + (i === 1 ? gamNative(2) : "")).join("")}${l.howWeChose ? `<section class="vhow"><h2>How we chose</h2><p>${esc(l.howWeChose)}</p><p class="src">Ratings, installs, prices and ads info come from Google Play and refresh daily. Names, icons and screenshots belong to their publishers.</p></section>` : ""}${vDisclaimer()}</article>
-<aside><div class="vplay"><strong>Bored of waiting? Play now</strong><div>${h5}</div><span>Free in your browser, no download</span></div><div class="vmore"><strong>More lists</strong>${more.map((x) => `<a href="/best/${x.slug}/">${esc(x.title)}</a>`).join("")}</div></aside></div>`;
+<aside><div class="vplay"><strong>Bored of waiting? Play now</strong><div>${h5}</div><span>Free in your browser, no download</span></div><div class="vmore"><strong>More lists</strong>${more.map((x) => `<a href="/best/${x.slug}/">${esc(x.title)}</a>`).join("")}</div>${vReviewedBox(l.slug, picks.map((p) => p.a))}</aside></div>`;
   return page({
     title: `${l.title} (${fmtDate(l.updated).split(" ").slice(1).join(" ")}) | ${site.name}`, desc: short(l.intro[0]), canonical: `/best/${l.slug}/`,
     jsonld: { "@context": "https://schema.org", "@type": "ItemList", name: l.title, itemListElement: picks.map((p, i) => ({ "@type": "ListItem", position: i + 1, name: p.a.title, url: origin ? origin + appUrl(p.a) : undefined })) },
@@ -711,6 +711,16 @@ ${others.length ? `<section class="vin vsec"><div class="vsec-h"><h2>${list.leng
     body });
 }
 
+// Sidebar box: our reviewed Play Store games (icon, name, our score). Rotates by page so each page links to a different set.
+function vReviewedBox(seed = "", exclude = [], n = 8) {
+  const all = (C?.apps || []).filter((a) => reviewOf(a) && !exclude.includes(a))
+    .sort((x, y) => ((reviewOf(y).editorsChoice ? 10 : 0) + reviewOf(y).score) - ((reviewOf(x).editorsChoice ? 10 : 0) + reviewOf(x).score));
+  if (!all.length) return "";
+  const top = all.slice(0, 3), rest = all.slice(3);
+  const off = rest.length ? parseInt(hash(seed), 16) % rest.length : 0;
+  const pick = [...top, ...rest.slice(off), ...rest.slice(0, off)].slice(0, n);
+  return `<div class="vrev"><strong>Top reviewed games</strong>${pick.map((a) => `<a href="${appUrl(a)}">${vIcon(a, 44)}<span>${esc(a.title.split(/[:–]/)[0].trim())}</span><em>${reviewOf(a).score.toFixed(1)}/5</em></a>`).join("")}<a class="vrev-all" href="/topgames/">All mobile games →</a></div>`;
+}
 // H5 game page, vibrant design. One HTML document with two layouts:
 //  desktop (>=870px): framed player + 300px right rail (sidebar ad + trending), similar games under the player
 //  mobile  (<870px):  launch card (cover, icon, big Play button -> full-screen game), then content in one column
@@ -750,7 +760,7 @@ function vGamePage(g) {
   const about = `<article class="gp-about"><h1>${esc(g.title)}</h1><div class="gp-chips">${chips}</div>
 ${g.tagline ? `<p class="gp-tag">${esc(webify(g.tagline))}</p>` : ""}${descHtml(desc)}</article>`;
 
-  const rail = `<aside class="gp-rail">${sideAd}<div class="gp-trend"><strong>Trending now</strong>${trending.map((x, i) => `<a href="/game/${x.slug}/"><b>${i + 1}</b><img src="/media/${x.slug}/icon-192.webp" width="48" height="48" alt="" loading="lazy"><span>${esc(x.title)}</span></a>`).join("")}</div></aside>`;
+  const rail = `<aside class="gp-rail">${sideAd}<div class="gp-trend"><strong>Trending now</strong>${trending.map((x, i) => `<a href="/game/${x.slug}/"><b>${i + 1}</b><img src="/media/${x.slug}/icon-192.webp" width="48" height="48" alt="" loading="lazy"><span>${esc(x.title)}</span></a>`).join("")}</div>${vReviewedBox(g.slug)}</aside>`;
 
   const lists = LISTS().filter((l) => !l.kids).slice(0, 3);
   const body = `<nav class="vin gp-crumbs" aria-label="Breadcrumb"><a href="/">Home</a>${c0 ? `<span>›</span><a href="/category/${catSlug(c0)}/">${esc(c0)} games</a>` : ""}<span>›</span><span>${esc(g.title)}</span></nav>
