@@ -601,12 +601,63 @@ ${NATIVE ? `<div class="vin vad">${gamNative(2)}</div>` : ""}${tiles.length > cu
 <section class="vin">${vDisclaimer()}</section>`;
   return page({ slim: true, title: `Top mobile games: reviews, ratings and official downloads | ${site.name}`, desc: `Live Google Play ratings and our reviews of ${C.apps.length} Android games, including ${big.slice(0, 3).map((a) => a.title.split(":")[0]).join(", ")}.`, canonical: "/topgames/", body });
 }
+// "Find your next game" (/best/): 4 This-or-That picture rounds pick one Play Store game for the visitor. The match is
+// revealed after an opt-in rewarded ad (Price Optimiser, same bridge as the Play gate) and opens its /topgames/ page with
+// a "Your match" banner; skipping goes back to the lists on /best/. Scoring runs in src/app.js on the JSON below.
+const MM_GENRE = {
+  chill: ["Puzzle", "Casual", "Simulation", "Word", "Board", "Educational", "Card", "Music", "Trivia"],
+  thrill: ["Action", "Racing", "Sports", "Arcade", "Adventure", "Strategy", "Role Playing"],
+  think: ["Puzzle", "Strategy", "Word", "Board", "Trivia", "Card", "Educational", "Simulation"],
+  reflex: ["Action", "Arcade", "Racing", "Sports", "Music"],
+  quick: ["Casual", "Arcade", "Puzzle", "Word", "Music", "Trivia", "Card"],
+  deep: ["Role Playing", "Adventure", "Strategy", "Simulation"],
+};
+const MM_LISTS = {
+  chill: ["best-relaxing-games-before-sleep", "best-games-for-seniors"], thrill: ["best-action-games", "best-racing-games"],
+  quick: ["best-games-for-short-breaks"], deep: ["best-games-for-a-long-flight", "best-games-like-minecraft", "best-strategy-games"],
+  solo: ["best-offline-games", "best-games-for-a-long-flight"], together: ["best-multiplayer-games", "best-two-player-games", "best-games-like-among-us"],
+};
+const MM_ROUNDS = [
+  ["Which looks more fun?", ["chill", "Chill & cozy"], ["thrill", "Fast & intense"]],
+  ["Pick your challenge", ["think", "Use your brain"], ["reflex", "Test your reflexes"]],
+  ["How long do you play?", ["quick", "Quick 5-minute bursts"], ["deep", "Long sessions"]],
+  ["Who are you playing with?", ["solo", "Just me"], ["together", "With friends"]],
+];
+function mmData() {
+  const ls = LISTS().filter((l) => !l.kids);
+  const inList = new Map();
+  for (const l of ls) for (const p of picksOf(l)) { const k = p.a.path || p.a.slug; if (!inList.has(k)) inList.set(k, { a: p.a, lists: [], why: p.why }); inList.get(k).lists.push(l.slug); }
+  for (const a of C.apps) if (reviewOf(a) && !inList.has(a.path || a.slug)) inList.set(a.path || a.slug, { a, lists: [], why: "" });
+  const apps = [...inList.values()].filter((x) => playOf(x.a)?.icon).map(({ a, lists, why }) => {
+    const p = playOf(a), r = reviewOf(a), g = (p.genre || a.genre || "").replace(/^Game /, "");
+    const t = Object.keys(MM_GENRE).filter((k) => MM_GENRE[k].includes(g));
+    for (const [k, v] of Object.entries(MM_LISTS)) if (v.some((x) => lists.includes(x)) && !t.includes(k)) t.push(k);
+    if (!t.includes("together") && !t.includes("solo")) t.push("solo");
+    if (p.adSupported === false) t.push("noads");
+    return { u: appUrl(a), n: a.title.split(/[:–]/)[0].trim(), i: playImg(p.icon, "s256"), g, t, s: r ? r.score : 0, e: r?.editorsChoice ? 1 : 0, w: short(r?.bestFor || why || r?.verdict || "", 150), gp: a.googlePlay, h: p.header ? playImg(p.header, "w720") : "", r: p.score || 0 };
+  });
+  // round pictures: a well-known game's feature graphic for each side, never the same game twice
+  const used = new Set();
+  const imgFor = (tag) => { const c = apps.filter((x) => x.h && x.t.includes(tag) && !used.has(x.u)).sort((x, y) => (y.e - x.e) || (y.s - x.s) || (y.r - x.r))[0]; if (!c) return ""; used.add(c.u); return c.h; };
+  const rounds = MM_ROUNDS.map(([q, a, b]) => ({ q, o: [a, b].map(([tag, label]) => ({ tag, label, img: imgFor(tag) })) }));
+  return { rounds, apps: apps.map(({ h, ...x }) => x) };
+}
+function mmBox() {
+  if (!C || !LISTS().length || !C.apps.length) return "";
+  return `<section class="mm" id="match" aria-label="Find your next game"><script type="application/json" id="mm-data">${JSON.stringify(mmData()).replace(/</g, "\\u003c")}</script>
+<div class="mm-card" data-mm-view="start"><i class="vtag">Game finder</i><strong class="mm-t">Find your next game in 20 seconds</strong><p>Play 4 quick rounds of <b>This or That</b> and we'll match you with one game we think you'll love.</p><div class="mm-dots">${MM_ROUNDS.map(() => "<i></i>").join("")}</div><button type="button" class="vbtn vpop vlg" data-mm-start>${VSVG.play}<span>Start</span></button></div>
+<div class="mm-card" data-mm-view="round" hidden><div class="mm-top"><span class="mm-step"></span><div class="mm-dots"></div></div><strong class="mm-t mm-q"></strong><div class="mm-pair"></div><small class="mm-hint">Tap the one you'd rather play</small></div>
+<div class="mm-card" data-mm-view="think" hidden><div class="mm-spin" aria-hidden="true">🎮</div><strong class="mm-t">Finding your match…</strong><p>Checking ${C.apps.length} games against your picks</p></div>
+<div class="mm-card" data-mm-view="reveal" hidden><i class="vtag">Match found</i><div class="mm-blur"><img alt="" width="120" height="120"><span class="mm-fit"></span></div><strong class="mm-t">We found your perfect game!</strong><p class="mm-sum"></p><button type="button" class="vbtn vhot vlg" data-mm-watch><span>Watch a short ad to reveal</span></button><button type="button" class="mm-skip" data-mm-skip>Skip, show me the lists</button><small class="mm-note">Ads keep ${esc(site.name)} free. The ad is optional.</small></div>
+<div class="mm-card" data-mm-view="incomplete" hidden><strong class="mm-t">The ad was closed early</strong><p>Watch it to the end to reveal your match.</p><button type="button" class="vbtn vhot vlg" data-mm-watch><span>Try again</span></button><button type="button" class="mm-skip" data-mm-skip>Skip, show me the lists</button></div>
+<div class="mm-card" data-mm-view="go" hidden><div class="mm-spin" aria-hidden="true">🎯</div><strong class="mm-t">Opening your match…</strong></div></section>`;
+}
 function vBestIndex() {
   const SZ = ["b", "w", "", "", "w", "", "", "b", "", "", "w", "", "", "w", "", ""];
   const ls = LISTS().filter((l) => !l.kids), kids = LISTS().filter((l) => l.kids);
   const order = [...ls.filter((l) => l.filter || /like|without|low-end|two-player|seniors|sleep|flight|mahjong|word/.test(l.slug)), ...ls.filter((l) => !(l.filter || /like|without|low-end|two-player|seniors|sleep|flight|mahjong|word/.test(l.slug)))];
-  const body = `<div class="vband vband-hot"><section class="vin vpage-h"><h1>What should you <span>download next?</span></h1><p>${LISTS().length} hand-picked lists for every mood, phone and budget. Every pick links to its official Google Play page. <a href="/how-we-review/">How we choose</a></p></section></div>
-<section class="vin vsec"><div class="vlists vmos">${order.map((l, i) => vListCard(l, i, SZ[i % SZ.length])).join("")}</div></section>
+  const body = `<div class="vband vband-hot"><div class="vin mm-wrap"><section class="vpage-h"><h1>What should you <span>download next?</span></h1><p>${LISTS().length} hand-picked lists for every mood, phone and budget. Every pick links to its official Google Play page. <a href="/how-we-review/">How we choose</a></p></section>${mmBox()}</div></div>
+<section class="vin vsec" id="lists"><div class="vlists vmos">${order.map((l, i) => vListCard(l, i, SZ[i % SZ.length])).join("")}</div></section>
 ${kids.length ? `<section class="vin vsec"><div class="vsec-h"><h2>For kids</h2></div><div class="vlists">${kids.map((l, i) => vListCard(l, i + 3)).join("")}</div></section>` : ""}
 <section class="vin">${vDisclaimer()}</section>`;
   return page({ title: `Best mobile games to download in ${new Date().getFullYear()} | ${site.name}`, desc: `${LISTS().length} editor-picked lists of the best Android games: ${ls.slice(0, 4).map((l) => shortList(l).toLowerCase()).join(", ")} and more.`, canonical: "/best/", body });

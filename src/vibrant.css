@@ -423,3 +423,53 @@ body.immersive .gp-player .bar .exit{display:grid}
 .vrev span{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .vrev em{font-style:normal;font-weight:900;font-size:13px;padding:2px 8px;border-radius:999px;background:#FFF4C2;border:2px solid var(--ink)}
 .v .vrev a.vrev-all{justify-content:center;color:#4B2FC4;padding-top:12px}
+
+/* /best/: game finder (This or That) */
+.mm-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,520px);gap:32px;align-items:center}
+.mm{min-width:0}
+.mm-card{position:relative;background:#fff;color:var(--ink);border:4px solid var(--ink);box-shadow:8px 8px 0 var(--ink);border-radius:28px;padding:26px 24px 22px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;min-height:360px;justify-content:center}
+.mm-card[hidden]{display:none}
+.mm-card .vtag{top:-14px;left:22px}
+.mm-t{font-family:Fredoka,sans-serif;font-size:28px;line-height:1.1}
+.mm-card p{margin:0;font-weight:700;color:var(--muted);font-size:16px;line-height:1.45}
+.mm-dots{display:flex;gap:8px;justify-content:center}
+.mm-dots i{width:34px;height:10px;border-radius:999px;background:#E4DFFF;border:2px solid var(--ink)}
+.mm-dots i.on{background:var(--pop)}.mm-dots i.cur{background:#FFD23F}
+.mm-top{display:flex;align-items:center;justify-content:space-between;width:100%;gap:10px}
+.mm-step{font-weight:900;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#4B2FC4}
+.mm-pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%}
+.mm-opt{position:relative;display:flex;flex-direction:column;padding:0;border-radius:20px;overflow:hidden;border:var(--bd);box-shadow:5px 5px 0 var(--ink);background:#fff;cursor:pointer;transition:transform .14s,box-shadow .14s;font:inherit;color:var(--ink)}
+.mm-opt:nth-child(1){transform:rotate(-1.5deg)}.mm-opt:nth-child(2){transform:rotate(1.5deg)}
+.mm-opt:hover{transform:translate(-2px,-4px) rotate(0);box-shadow:8px 8px 0 var(--ink)}
+.mm-opt img,.mm-noimg{width:100%;aspect-ratio:16/10;object-fit:cover;border-bottom:var(--bd);display:grid;place-items:center;font-size:48px;background:#DDF9F6}
+.mm-opt b{padding:10px 8px;font-family:Fredoka,sans-serif;font-weight:600;font-size:17px;line-height:1.15}
+.mm-opt.pick{transform:scale(1.06) rotate(0);background:var(--pop);box-shadow:8px 8px 0 var(--ink)}
+.mm-hint{font-weight:800;color:var(--muted)}
+.mm-spin{font-size:56px;animation:mmspin 1s ease-in-out infinite}
+@keyframes mmspin{0%,100%{transform:rotate(-12deg) scale(1)}50%{transform:rotate(12deg) scale(1.15)}}
+.mm-blur{position:relative;width:120px;height:120px}
+.mm-blur img{width:120px;height:120px;border-radius:28%;border:var(--bd);filter:blur(14px) saturate(1.4);transform:scale(.92)}
+.mm-fit{position:absolute;right:-30px;bottom:-8px;padding:4px 12px;border-radius:999px;background:var(--pop);border:var(--bd);font-weight:900;font-size:15px;transform:rotate(-6deg);white-space:nowrap}
+.mm-skip{background:none;border:0;font:inherit;font-weight:800;color:#4B2FC4;text-decoration:underline;cursor:pointer;padding:4px}
+.mm-note{font-weight:700;color:var(--muted);font-size:12px}
+.mm .vbtn{max-width:100%}
+/* "Your match" banner on the matched /topgames/ page */
+.mm-banner{max-width:1192px;margin:22px auto 4px;display:flex;flex-wrap:wrap;align-items:center;gap:16px 22px;padding:18px 22px;border-radius:24px;background:var(--pop);border:4px solid var(--ink);box-shadow:6px 6px 0 var(--ink);color:var(--ink)}
+.mm-b-ico{font-size:40px;flex:none}
+.mm-b-t{flex:1 1 360px;min-width:0;display:flex;flex-direction:column;gap:4px}
+.mm-b-t strong{font-family:Fredoka,sans-serif;font-size:24px;line-height:1.1}
+.mm-b-t p{margin:0;font-weight:800}
+.mm-b-t .mm-b-why{font-weight:700}
+.mm-b-more{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
+.mm-b-more small{width:100%;font-weight:900;text-transform:uppercase;font-size:12px;letter-spacing:.05em}
+.mm-b-more a{display:flex;align-items:center;gap:8px;font-weight:900}
+.mm-b-more img{width:36px;height:36px;border-radius:10px;border:2px solid var(--ink);background:#fff}
+.v .mm-b-more a.mm-b-again{color:#4B2FC4;text-decoration:underline}
+@media (max-width:869px){
+  .mm-wrap{grid-template-columns:1fr;gap:22px}
+  .mm-card{padding:22px 14px 18px;min-height:0}
+  .mm-t{font-size:23px}
+  .mm-pair{gap:10px}.mm-opt b{font-size:15px}
+  .mm-banner{margin:14px 14px 4px}
+}
+@media (max-width:869px){.mm .vbtn.vhot span{display:inline}.mm .vbtn.vhot{padding:0 22px}}

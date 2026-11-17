@@ -12,7 +12,7 @@
   var track = function (name, p) { try { if (window.gtag) window.gtag("event", name, p || {}); } catch (e) {} };
   var view = function () { return window.matchMedia("(max-width:869px)").matches ? "mobile" : "desktop"; };
   // Where on the page a click happened, so we can see which modules send people onward.
-  var PLACES = [[".search", "search"], [".gp-strip", "similar_games"], [".gp-trend", "trending"], [".gp-launch", "launch_card"], [".vhero", "home_hero"],
+  var PLACES = [[".search", "search"], [".mm", "game_finder"], [".mm-banner", "match_banner"], [".vrev", "top_reviewed"], [".gp-strip", "similar_games"], [".gp-trend", "trending"], [".gp-launch", "launch_card"], [".vhero", "home_hero"],
     [".vquick", "quick_picks"], [".vpick", "list_pick"], [".vplay", "list_sidebar_games"], [".vmore", "more_lists"], [".vlists", "lists"], [".vwall", "mobile_wall"],
     [".vmosaic", "game_grid"], [".vapps", "apps_grid"], [".vcats,.vcats2", "category_pills"], [".gp-crumbs", "breadcrumb"], [".info,.gp-about,.prose", "article"],
     [".vh", "header"], [".vf,footer", "footer"]];
@@ -45,30 +45,66 @@
     if (g.sendTo) track("conversion", { send_to: g.sendTo });
   })(CFG.googleAds);
 
-  /* ---------- Play gate: rewarded ad before leaving for Google Play (same rules as the jobsthe.world apply gate; site.json playGate) ----------
-     - the rewarded ad is shown only after the visitor opts in ("Watch") and is preloaded when the dialog opens;
-     - the link unlocks only on a real grant (onGranted fired and the ad closed), never on onReady or a closed ad;
-     - no API / no fill / error / timeout → the link still opens (never trapped);
-     - closed early → "Try again" once; a second attempt without a reward opens the link anyway.
+  /* ---------- Price Optimiser rewarded bridge (shared by the Play gate and the game finder) ----------
      Price Optimiser owns GPT and the "rewarded" slot; we never define slots. We only call its window.PublisherExperience
-     bridge (same name on the dedicated per-site scripts and the generic SDK). */
-  var PG = CFG.playGate, dlg = PG && document.getElementById("play-gate");
-  if (dlg) {
-    // Price Optimiser bridge on the site's existing script: init() → { loaded }, preloadRewarded, showRewarded.
-    // The click is only intercepted once init() has reported loaded; until then (or if it never loads) links open normally.
-    var poReady = false;
-    var poAds = function () { var px = window.PublisherExperience; return poReady && px && typeof px.showRewarded === "function" ? px : null; };
-    var poInit = function () {
+     bridge (same name on the dedicated per-site scripts and the generic SDK): init() → { loaded }, preloadRewarded, showRewarded.
+     PO.run(cb) shows one rewarded ad and calls cb(result, status): "granted" (onGranted fired and the ad closed),
+     "stopped" (the visitor closed or declined it) or "fallback" (no API / no fill / error / timeout). */
+  var PO = (function () {
+    var ready = false, warm = null;
+    var api = function () { var px = window.PublisherExperience; return ready && px && typeof px.showRewarded === "function" ? px : null; };
+    var init = function () {
       var px = window.PublisherExperience;
       if (!px || typeof px.init !== "function") return;
       Promise.resolve(px.init()).then(function (st) {
         // Dedicated scripts return { loaded }; the generic SDK returns { runtime, adapter }. Either way the site's
-        // runtime config must have an enabled "rewarded" slot, otherwise the dialog would only ever fall back.
+        // runtime config must have an enabled "rewarded" slot, otherwise we would only ever fall back.
         var slots = st && st.runtime && st.runtime.slots, rw = slots && slots.rewarded;
-        poReady = !!st && st.loaded !== false && st.status !== "error" && (!slots || (!!rw && rw.enabled !== false));
-      }, function () { poReady = false; });
+        ready = !!st && st.loaded !== false && st.status !== "error" && (!slots || (!!rw && rw.enabled !== false));
+      }, function () { ready = false; });
     };
-    if (window.PublisherExperience) poInit(); else window.addEventListener("load", poInit);
+    if (window.PublisherExperience) init(); else window.addEventListener("load", init);
+    var preload = function () {
+      var a = api();
+      if (!warm && a && a.preloadRewarded) { try { warm = Promise.resolve(a.preloadRewarded("rewarded", { onFallback: function () { warm = null; } })).catch(function () { warm = null; }); } catch (e) {} }
+    };
+    var run = function (cb) {
+      var a = api(), granted = false, closed = false, fallback = null;
+      var fin = function () {
+        warm = null;
+        if (granted && closed) return cb("granted", "granted");
+        var status = fallback || (closed ? "closed" : "unavailable");
+        cb(/declin|dismiss|clos|cancel|skip/i.test(status) || (closed && !fallback) ? "stopped" : "fallback", status);
+      };
+      if (!a) return fin();
+      Promise.resolve().then(function () {
+        return a.showRewarded("rewarded", {
+          onGranted: function () { granted = true; },
+          onClosed: function () { closed = true; },
+          onFallback: function (r) { fallback = fallback || String((r && r.status) || "unavailable"); }
+        });
+      }).then(function (res) {
+        if (granted && !closed) closed = true; // settled after a grant = terminal outcome
+        if (!granted && !fallback && !closed) fallback = String((res && res.status) || "unavailable");
+      }, function (err) { fallback = fallback || String((err && err.status) || "error"); }).then(fin);
+    };
+    return { api: api, preload: preload, run: run };
+  })();
+  var SS = (function () { try { return sessionStorage; } catch (e) { return null; } })();
+  // Remember a Play Store link as already unlocked so the Play gate doesn't ask for a second ad (site.json playGate.frequency).
+  var unlockPlay = function (url) {
+    var PGc = CFG.playGate; if (!SS || !PGc || !url) return;
+    try { SS.setItem("pg_unlocked", PGc.frequency === "session" ? "1" : (SS.getItem("pg_unlocked") || "").split("\n").filter(Boolean).concat(url).slice(-50).join("\n")); } catch (e) {}
+  };
+
+  /* ---------- Play gate: rewarded ad before leaving for Google Play (same rules as the jobsthe.world apply gate; site.json playGate) ----------
+     - the rewarded ad is shown only after the visitor opts in ("Watch") and is preloaded when the dialog opens;
+     - the link unlocks only on a real grant (onGranted fired and the ad closed), never on onReady or a closed ad;
+     - no API / no fill / error / timeout → the link still opens (never trapped);
+     - closed early → "Try again" once; a second attempt without a reward opens the link anyway. */
+  var PG = CFG.playGate, dlg = PG && document.getElementById("play-gate");
+  if (dlg) {
+    var poAds = PO.api;
     var ss = (function () { try { return sessionStorage; } catch (e) { return null; } })();
     var unlocked = function (url) {
       if (PG.frequency === "always" || !ss) return false;
@@ -80,11 +116,7 @@
     var show = function (v) { for (var i = 0; i < views.length; i++) views[i].hidden = views[i].getAttribute("data-view") !== v; };
     var watchBtns = dlg.querySelectorAll("[data-pg-watch]");
     var setBusy = function (b) { for (var i = 0; i < watchBtns.length; i++) watchBtns[i].disabled = b; };
-    var cur = null, misses = 0, opened = false, watching = false, warm = null;
-    var preload = function () {
-      var a = poAds();
-      if (!warm && a && a.preloadRewarded) { try { warm = Promise.resolve(a.preloadRewarded("rewarded", { onFallback: function () { warm = null; } })).catch(function () { warm = null; }); } catch (e) {} }
-    };
+    var cur = null, misses = 0, opened = false, watching = false, preload = PO.preload;
     var openApp = function (how) {
       if (!cur || opened) return;
       opened = true; remember(cur.url);
@@ -119,28 +151,14 @@
       // GPT shows the rewarded ad in its own full-screen overlay; a modal <dialog> sits above everything in the
       // top layer, so close ours while the ad is up and reopen it for the result.
       dlg.close();
-      var a = poAds(), granted = false, closed = false, fallback = null;
-      var done = function () {
-        watching = false; warm = null; setBusy(false); dlg.showModal();
-        if (granted && closed) { track("play_gate_granted", { app_name: cur.app }); return openApp("granted"); }
-        var status = fallback || (closed ? "closed" : "unavailable");
-        var userStopped = /declin|dismiss|clos|cancel|skip/i.test(status) || (closed && !fallback);
-        if (!userStopped) { track("play_gate_fallback", { status: status }); return openApp("fallback-" + status); }
+      PO.run(function (res, status) {
+        watching = false; setBusy(false); dlg.showModal();
+        if (res === "granted") { track("play_gate_granted", { app_name: cur.app }); return openApp("granted"); }
+        if (res === "fallback") { track("play_gate_fallback", { status: status }); return openApp("fallback-" + status); }
         if (++misses >= 2) { track("play_gate_retry_access", { status: status }); return openApp("retry-" + status); }
         track("play_gate_incomplete", { status: status });
         show("incomplete");
-      };
-      if (!a) return done();
-      Promise.resolve().then(function () {
-        return a.showRewarded("rewarded", {
-          onGranted: function () { granted = true; },
-          onClosed: function () { closed = true; },
-          onFallback: function (r) { fallback = fallback || String((r && r.status) || "unavailable"); }
-        });
-      }).then(function (res) {
-        if (granted && !closed) closed = true; // settled after a grant = terminal outcome
-        if (!granted && !fallback && !closed) fallback = String((res && res.status) || "unavailable");
-      }, function (err) { fallback = fallback || String((err && err.status) || "error"); }).then(done);
+      });
     });
     var skips = dlg.querySelectorAll("[data-pg-skip]");
     for (var si = 0; si < skips.length; si++) skips[si].addEventListener("click", function () { if (cur) remember(cur.url); track("play_gate_skip", { app_name: cur && cur.app }); dlg.close(); });
@@ -148,6 +166,118 @@
     $("[data-pg-close]", dlg).addEventListener("click", function () { track("play_gate_dismiss", { app_name: cur && cur.app }); dlg.close(); });
     dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
   }
+
+  /* ---------- Game finder on /best/ (#match): 4 This-or-That rounds → one Play Store game ----------
+     The match is revealed after an opt-in rewarded ad (PO.run, same rules as the Play gate): granted or no ad
+     available → open the match's /topgames/ page with ?match=1; closed early → "Try again" once, then open anyway;
+     "Skip" → back to the lists on /best/. The match's Play link is then unlocked, so the Play gate doesn't ask again. */
+  var mm = document.getElementById("match"), mmData = document.getElementById("mm-data");
+  if (mm && mmData) (function () {
+    var D; try { D = JSON.parse(mmData.textContent); } catch (e) { return; }
+    var views = mm.querySelectorAll("[data-mm-view]");
+    var show = function (v) { for (var i = 0; i < views.length; i++) views[i].hidden = views[i].getAttribute("data-mm-view") !== v; };
+    var picks = [], labels = [], round = 0, match = null, runners = [], fit = 0, misses = 0, busy = false;
+    var el = function (tag, cls, txt) { var x = document.createElement(tag); if (cls) x.className = cls; if (txt != null) x.textContent = txt; return x; };
+    var dots = function (box) { box.innerHTML = ""; for (var i = 0; i < D.rounds.length; i++) box.appendChild(el("i", i < round ? "on" : i === round ? "cur" : "")); };
+    var renderRound = function () {
+      var r = D.rounds[round];
+      $(".mm-step", mm).textContent = "Round " + (round + 1) + " of " + D.rounds.length;
+      dots($("[data-mm-view=round] .mm-dots", mm));
+      $(".mm-q", mm).textContent = r.q;
+      var pair = $(".mm-pair", mm); pair.innerHTML = "";
+      r.o.forEach(function (o, k) {
+        var b = el("button", "mm-opt"); b.type = "button";
+        if (o.img) { var im = el("img"); im.alt = ""; im.src = o.img; b.appendChild(im); } else b.appendChild(el("span", "mm-noimg", k ? "⚡" : "🌿"));
+        b.appendChild(el("b", "", o.label));
+        b.addEventListener("click", function () {
+          if (busy) return; busy = true; b.classList.add("pick");
+          picks.push(o.tag); labels.push(o.label);
+          track("match_round", { round: round + 1, choice: o.tag });
+          setTimeout(function () { busy = false; round++; if (round < D.rounds.length) renderRound(); else finish(); }, 420);
+        });
+        pair.appendChild(b);
+      });
+      if (round + 1 < D.rounds.length) D.rounds[round + 1].o.forEach(function (o) { if (o.img) (new Image()).src = o.img; });
+      show("round");
+    };
+    var finish = function () {
+      show("think");
+      // Answers decide; quality (our score, Editor's Choice, Play rating) only breaks ties. A game with the opposite
+      // trait of an answer (e.g. solo-only when "With friends" was picked) loses points.
+      var OPP = { chill: "thrill", thrill: "chill", think: "reflex", reflex: "think", quick: "deep", deep: "quick", solo: "together", together: "solo" };
+      var has = function (a, t) { return a.t.indexOf(t) > -1; };
+      var hits = function (a) { var n = 0; for (var i = 0; i < picks.length; i++) if (has(a, picks[i])) n++; return n; };
+      var miss = function (a) { var n = 0; for (var i = 0; i < picks.length; i++) if (!has(a, picks[i]) && has(a, OPP[picks[i]])) n++; return n; };
+      var ranked = D.apps.map(function (a) { var h = hits(a); return { a: a, h: h, sc: h * 10 - miss(a) * 6 + (a.s || a.r * 0.9) + a.e * 1.5 + a.r * 0.5 + Math.random() * 3 }; })
+        .sort(function (x, y) { return y.sc - x.sc; });
+      match = ranked[0].a; runners = ranked.slice(1, 3).map(function (x) { return x.a; });
+      fit = Math.min(99, 80 + ranked[0].h * 4 + Math.floor(Math.random() * 4));
+      track("match_complete", { picks: picks.join(","), app: match.n, fit: fit });
+      (new Image()).src = match.i; PO.preload();
+      setTimeout(reveal, 1500);
+    };
+    var reveal = function () {
+      misses = 0;
+      $(".mm-blur img", mm).src = match.i;
+      $(".mm-fit", mm).textContent = fit + "% fit";
+      $(".mm-sum", mm).textContent = (match.g ? (/^[aeiou]/i.test(match.g) ? "An " : "A ") + match.g.toLowerCase() + " " : "A ") + "game for players who picked " + labels.map(function (l) { return l.toLowerCase(); }).join(", ") + ".";
+      show("reveal");
+      track("match_reveal_open", { app: match.n });
+    };
+    var go = function (how) {
+      track("match_unlock", { via: how, app: match.n, fit: fit });
+      try { if (SS) SS.setItem("mm_match", JSON.stringify({ u: match.u, n: match.n, w: match.w, fit: fit, labels: labels, gp: match.gp, runners: runners.map(function (x) { return { u: x.u, n: x.n, i: x.i }; }) })); } catch (e) {}
+      unlockPlay(match.gp);
+      show("go");
+      location.href = match.u + "?match=1";
+    };
+    var watchBtns = mm.querySelectorAll("[data-mm-watch]");
+    for (var i = 0; i < watchBtns.length; i++) watchBtns[i].addEventListener("click", function () {
+      if (busy || !match) return; busy = true;
+      track("match_ad_start", { app: match.n });
+      PO.run(function (res, status) {
+        busy = false;
+        if (res === "granted") return go("granted");
+        if (res === "fallback") return go("fallback-" + status);
+        if (++misses >= 2) return go("retry-" + status);
+        track("match_ad_incomplete", { status: status });
+        show("incomplete");
+      });
+    });
+    var skips = mm.querySelectorAll("[data-mm-skip]");
+    for (var j = 0; j < skips.length; j++) skips[j].addEventListener("click", function () {
+      track("match_skip", { app: match && match.n });
+      picks = []; labels = []; round = 0; match = null;
+      show("start");
+      var l = document.getElementById("lists"); if (l) l.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    $("[data-mm-start]", mm).addEventListener("click", function () { picks = []; labels = []; round = 0; track("match_start", {}); renderRound(); });
+  })();
+
+  /* ---------- "Your match" banner on the matched /topgames/ page ---------- */
+  if (/[?&]match=1\b/.test(location.search)) (function () {
+    var m = null; try { m = JSON.parse((SS && SS.getItem("mm_match")) || "null"); } catch (e) {}
+    try { history.replaceState(null, "", location.pathname + location.hash); } catch (e) {}
+    if (!m || decodeURIComponent(m.u) !== decodeURIComponent(location.pathname)) return;
+    var mk = function (tag, cls, txt) { var x = document.createElement(tag); if (cls) x.className = cls; if (txt != null) x.textContent = txt; return x; };
+    var b = mk("section", "mm-banner"); b.setAttribute("aria-label", "Your match");
+    b.appendChild(mk("span", "mm-b-ico", "🎯"));
+    var t = mk("div", "mm-b-t");
+    t.appendChild(mk("strong", "", "Your match: " + m.n + " · " + m.fit + "% fit"));
+    t.appendChild(mk("p", "", "You picked " + (m.labels || []).join(" · ") + "."));
+    if (m.w) t.appendChild(mk("p", "mm-b-why", m.w));
+    b.appendChild(t);
+    var more = mk("div", "mm-b-more");
+    if (m.runners && m.runners.length) {
+      more.appendChild(mk("small", "", "Also a great fit"));
+      m.runners.forEach(function (r) { var a = mk("a"); a.href = r.u; var im = mk("img"); im.src = r.i; im.alt = ""; im.width = 36; im.height = 36; a.appendChild(im); a.appendChild(mk("span", "", r.n)); more.appendChild(a); });
+    }
+    var again = mk("a", "mm-b-again", "Play the game finder again →"); again.href = "/best/#match"; more.appendChild(again);
+    b.appendChild(more);
+    var main = $("main"), first = $("main article") || (main && main.firstElementChild);
+    if (first) first.parentNode.insertBefore(b, first); else if (main) main.insertBefore(b, main.firstChild);
+    track("match_view", { app: m.n, fit: m.fit });
+  })();
 
   /* ---------- Search ---------- */
   var overlay = $(".search"), input = overlay && $("input", overlay), res = overlay && $(".res", overlay), index = null;
