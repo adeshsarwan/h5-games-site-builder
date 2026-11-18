@@ -186,6 +186,8 @@
     var show = function (v) { for (var i = 0; i < views.length; i++) views[i].hidden = views[i].getAttribute("data-mm-view") !== v; };
     var MIN_WATCH = CFG.matchMinWatch || 5; // seconds of the rewarded video before its Close/Skip opens the match
     var picks = [], labels = [], round = 0, match = null, runners = [], fit = 0, misses = 0, busy = false;
+    // Drop-off: where the visitor was when they left without unlocking the match (sent once, on pagehide).
+    var stage = "q1", t0 = Date.now(), done = false;
     var el = function (tag, cls, txt) { var x = document.createElement(tag); if (cls) x.className = cls; if (txt != null) x.textContent = txt; return x; };
     var dots = function (box) { box.innerHTML = ""; for (var i = 0; i < D.rounds.length; i++) box.appendChild(el("i", i < round ? "on" : i === round ? "cur" : "")); };
     var renderRound = function () {
@@ -202,7 +204,7 @@
           if (busy) return; busy = true; b.classList.add("pick");
           picks.push(o.tag); labels.push(o.label);
           track("match_round", { round: round + 1, choice: o.tag });
-          setTimeout(function () { busy = false; round++; if (round < D.rounds.length) renderRound(); else finish(); }, 420);
+          setTimeout(function () { busy = false; round++; if (round < D.rounds.length) { stage = "q" + (round + 1); renderRound(); } else finish(); }, 420);
         });
         pair.appendChild(b);
       });
@@ -210,7 +212,7 @@
       show("round");
     };
     var finish = function () {
-      show("think");
+      stage = "matching"; show("think");
       // Answers decide; quality (our score, Editor's Choice, Play rating) only breaks ties. A game with the opposite
       // trait of an answer (e.g. solo-only when "With friends" was picked) loses points.
       var OPP = { chill: "thrill", thrill: "chill", think: "reflex", reflex: "think", quick: "deep", deep: "quick", solo: "together", together: "solo" };
@@ -246,10 +248,11 @@
       $(".mm-blur img", mm).src = match.i;
       $(".mm-fit", mm).textContent = fit + "% fit";
       $(".mm-sum", mm).textContent = (match.g ? (/^[aeiou]/i.test(match.g) ? "An " : "A ") + match.g.toLowerCase() + " " : "A ") + "game for players who picked " + labels.map(function (l) { return l.toLowerCase(); }).join(", ") + ".";
-      show("reveal");
+      stage = "reveal"; show("reveal");
       track("match_reveal_open", { app: match.n });
     };
     var go = function (how) {
+      done = true;
       track("match_unlock", { via: how, app: match.n, fit: fit });
       save();
       unlockPlay(match.gp);
@@ -259,7 +262,7 @@
     var watchBtns = mm.querySelectorAll("[data-mm-watch]");
     for (var i = 0; i < watchBtns.length; i++) watchBtns[i].addEventListener("click", function () {
       if (busy || !match) return; busy = true;
-      track("match_ad_start", { app: match.n });
+      stage = "ad"; track("match_ad_start", { app: match.n });
       PO.run(function (res, status, watched) {
         busy = false;
         if (res === "granted") return go("granted");
@@ -269,12 +272,17 @@
         if (watched >= MIN_WATCH) return go("skipped-after-" + watched + "s");
         if (++misses >= 2) return go("retry-" + status);
         track("match_ad_incomplete", { status: status, watched: watched });
-        show("incomplete");
+        stage = "ad_incomplete"; show("incomplete");
       });
     });
     // Opens on landing as a popup over the blurred page; question 1 is already in the HTML, bind it (same content, no flash).
     document.documentElement.classList.add("mm-open");
     renderRound(); track("match_start", { auto: true });
+    window.addEventListener("pagehide", function () {
+      if (done || !window.gtag) return; done = true;
+      window.gtag("event", "match_drop", { stage: stage, answered: picks.length, seconds_on_finder: Math.round((Date.now() - t0) / 1000),
+        app: match ? match.n : undefined, view: view(), transport_type: "beacon" });
+    });
   })();
 
   /* ---------- "Your match" banner on the matched /topgames/ page ---------- */
