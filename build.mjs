@@ -24,6 +24,12 @@ const site = JSON.parse(await readFile(path.join(ROOT, "sites", SITE_KEY, "site.
 const catalog = JSON.parse(await readFile(path.join(ROOT, "catalog", "games.json"), "utf8"));
 site.key = SITE_KEY;
 const origin = site.domain ? `https://${site.domain}` : "";
+// Optional site.json "playHost" (e.g. "play.gametuno.com"): the game iframe loads from this subdomain instead of the
+// portal's own origin, so Unity's long frames and taps stay out of the portal document (and out of Clarity's INP).
+// Must be a subdomain of site.domain (same registrable domain keeps GAM/ads.txt on the portal's domain) and must be
+// added as a second custom domain on the same Pages project.
+const PLAY_HOST = site.playHost ? String(site.playHost).toLowerCase() : "";
+if (PLAY_HOST && (!site.domain || !PLAY_HOST.endsWith("." + site.domain) || !/^[a-z0-9.-]+$/.test(PLAY_HOST))) throw new Error(`site.json playHost "${site.playHost}" must be a subdomain of domain "${site.domain}"`);
 // Price Optimiser Rules API SDK: data-po-site and data-po-runtime-config-url must be explicit, otherwise the SDK
 // falls back to the legacy priceoptimiser1.thebesads.com runtime (404 for Rules API sites). Older site.json files
 // carry a bare tag, so complete it here; a tag pointing at the legacy runtime fails the build.
@@ -197,7 +203,7 @@ function page({ title, desc, canonical, body, head = "", ogImage = "", jsonld = 
 // sendTo ("AW-123456789/label") also sends that event straight to the Google Ads conversion action.
 const GADS = site.analytics?.googleAds?.customerId ? site.analytics.googleAds : null;
 const GADS_SEND_TO = GADS && /^AW-\d+\/[A-Za-z0-9_-]+$/.test(GADS.sendTo || "") ? GADS.sendTo : null;
-const siteJs = { ...(GADS ? { googleAds: { adShown: "session", ...(GADS_SEND_TO ? { sendTo: GADS_SEND_TO } : {}) } } : {}), games: Object.fromEntries(games.map((g) => [g.slug, g.title])), ...(PG ? { playGate: { message: PG.message || "{app} is free on Google Play. Please support {site} by watching a short ad from our sponsor, then the download page opens.", site: site.name, frequency: PG.frequency || "app" } } : {}), ...(site.gameFinder?.minWatch ? { matchMinWatch: site.gameFinder.minWatch } : {}) }; // site.json gameFinder.minWatch: seconds of the rewarded video before its Close/Skip opens the match (default 5)
+const siteJs = { ...(PLAY_HOST ? { playHost: PLAY_HOST } : {}), ...(GADS ? { googleAds: { adShown: "session", ...(GADS_SEND_TO ? { sendTo: GADS_SEND_TO } : {}) } } : {}), games: Object.fromEntries(games.map((g) => [g.slug, g.title])), ...(PG ? { playGate: { message: PG.message || "{app} is free on Google Play. Please support {site} by watching a short ad from our sponsor, then the download page opens.", site: site.name, frequency: PG.frequency || "app" } } : {}), ...(site.gameFinder?.minWatch ? { matchMinWatch: site.gameFinder.minWatch } : {}) }; // site.json gameFinder.minWatch: seconds of the rewarded video before its Close/Skip opens the match (default 5)
   return `<!doctype html><html lang="${site.language || "en"}"><head>${GTM}${CLARITY}<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">${origin ? `<link rel="canonical" href="${url}">` : ""}${robots ? `<meta name="robots" content="${robots}">` : ""}
 <meta name="theme-color" content="${t.background}"><link rel="icon" href="/favicon.svg" type="image/svg+xml">${LOGO ? `${RESVG ? '<link rel="icon" href="/favicon.ico" sizes="48x48">' : ""}<link rel="apple-touch-icon" href="/apple-touch-icon.png">` : ""}<link rel="manifest" href="/manifest.webmanifest">
@@ -266,7 +272,7 @@ ${nShots ? `<h3>Screenshots</h3><div class="shots">${Array.from({ length: nShots
     desc: short(`Play ${g.title} free in your browser. ${g.tagline || desc}`),
     canonical: `/game/${g.slug}/`,
     ogImage: `/media/${g.slug}/cover-16x9.webp`,
-    head: `<link rel="preload" as="image" href="/media/${g.slug}/cover-16x9.webp" fetchpriority="high">`,
+    head: `<link rel="preload" as="image" href="/media/${g.slug}/cover-16x9.webp" fetchpriority="high">${PLAY_HOST ? `<link rel="preconnect" href="https://${PLAY_HOST}">` : ""}`,
     jsonld: {
       "@context": "https://schema.org", "@type": "VideoGame", name: g.title, description: short(desc, 300),
       url: origin ? `${origin}/game/${g.slug}/` : undefined, image: origin ? `${origin}/media/${g.slug}/icon-512.webp` : undefined,
@@ -831,7 +837,7 @@ ${lists.length ? `<section class="vin vsec"><div class="vsec-h"><h2>Rather downl
     desc: short(`Play ${g.title} free in your browser. ${g.tagline || desc}`),
     canonical: `/game/${g.slug}/`,
     ogImage: `/media/${g.slug}/cover-16x9.webp`,
-    head: `<link rel="preload" as="image" href="/media/${g.slug}/cover-16x9.webp" fetchpriority="high">`,
+    head: `<link rel="preload" as="image" href="/media/${g.slug}/cover-16x9.webp" fetchpriority="high">${PLAY_HOST ? `<link rel="preconnect" href="https://${PLAY_HOST}">` : ""}`,
     jsonld: {
       "@context": "https://schema.org", "@type": "VideoGame", name: g.title, description: short(desc, 300),
       url: origin ? `${origin}/game/${g.slug}/` : undefined, image: origin ? `${origin}/media/${g.slug}/icon-512.webp` : undefined,
@@ -914,12 +920,15 @@ await w("_headers", `/assets/*
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-`);
+${PLAY_HOST ? `https://${PLAY_HOST}/*
+  X-Robots-Tag: noindex
+  Origin-Agent-Cluster: ?1
+` : ""}`);
 
 // Config for the /play/ Function (bundled by Pages after this build step).
 await mkdir(path.join(ROOT, "functions", "_generated"), { recursive: true });
 await writeFile(path.join(ROOT, "functions", "_generated", "site.js"),
-  `// Generated by build.mjs for site "${SITE_KEY}". Do not edit.\nexport default ${JSON.stringify({ key: SITE_KEY, domain: site.domain, assets: site.assets, ads: { mode: site.ads.mode, networkCode: site.ads.networkCode, gameUnitPattern: site.ads.gameUnitPattern, games: Object.fromEntries(Object.entries(site.ads.games || {}).filter(([s]) => bySlug[s])) }, games: games.map((g) => g.slug) }, null, 1)};\n`);
+  `// Generated by build.mjs for site "${SITE_KEY}". Do not edit.\nexport default ${JSON.stringify({ key: SITE_KEY, domain: site.domain, playHost: PLAY_HOST || undefined, assets: site.assets, ads: { mode: site.ads.mode, networkCode: site.ads.networkCode, gameUnitPattern: site.ads.gameUnitPattern, games: Object.fromEntries(Object.entries(site.ads.games || {}).filter(([s]) => bySlug[s])) }, games: games.map((g) => g.slug) }, null, 1)};\n`);
 
 const size = async (p) => (await stat(path.join(OUT, p))).size;
 console.log(`Done: dist/ (home ${(await size("index.html")) / 1000 | 0} KB, ${games.length} game pages, ${cats.length} categories)`);

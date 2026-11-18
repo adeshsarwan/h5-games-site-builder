@@ -349,6 +349,8 @@
   var player = $(".player");
   var mobile = function () { return window.matchMedia("(max-width:869px)").matches; };
   var playStart = 0, playTimer = null, playSlug = player && player.getAttribute("data-slug");
+  // site.json playHost: load the game from play.<domain> so it is a separate origin from the portal page.
+  var playUrl = function (s) { return (CFG.playHost ? "https://" + CFG.playHost : "") + "/play/" + s + "/"; };
   var secs = function () { return playStart ? Math.round((Date.now() - playStart) / 1000) : 0; };
   function stopPlay(reason) {
     if (!playStart) return;
@@ -376,7 +378,7 @@
       var beats = 0;
       playTimer = setInterval(function () { if (document.visibilityState === "visible") { beats++; track("game_time", { game: slug, minutes_played: beats, view: view() }); } }, 60000);
       var f = document.createElement("iframe");
-      f.src = "/play/" + slug + "/";
+      f.src = playUrl(slug);
       f.title = player.getAttribute("data-title") || "Game";
       f.allow = "autoplay; fullscreen; gamepad; clipboard-write";
       f.setAttribute("allowfullscreen", "");
@@ -404,7 +406,7 @@
     $(".play", player).addEventListener("pointerenter", function () {
       if (document.getElementById("pf")) return;
       var l = document.createElement("link");
-      l.id = "pf"; l.rel = "prefetch"; l.href = "/play/" + slug + "/";
+      l.id = "pf"; l.rel = "prefetch"; l.href = playUrl(slug);
       document.head.appendChild(l);
     }, { once: true });
   }

@@ -90,6 +90,33 @@ npx wrangler@3 pages dev dist      # serves pages + the /play/ Function on http:
   `games.gamewhame.com` with a shared cache. This needs the R2 bucket's CORS policy to allow the site's origin
   (or `*`) for `GET`/`HEAD`.
 
+## `playHost` setting (game iframe on its own subdomain)
+
+`"playHost": "play.example.com"` makes the game page load the iframe from `https://play.example.com/play/<slug>/`
+instead of the portal's own origin. Taps and Unity's long frames then belong to the game's document, not the portal's,
+so Clarity (which only runs on the portal) stops counting them in the portal's INP.
+
+1. Cloudflare → the site's Pages project → **Custom domains** → add `play.example.com` (same project, no new deploy).
+2. Set `playHost` in `site.json` and rebuild. The build checks it is a subdomain of `domain`.
+3. Recommended: a Redirect Rule on the zone so only the game files live on the subdomain:
+   `http.host eq "play.example.com" and not starts_with(http.request.uri.path, "/play/") and not http.request.uri.path in {"/ads.txt" "/robots.txt"}`
+   → 301 to `concat("https://example.com", http.request.uri.path)`, preserve query string.
+
+What the code does on the play host: `Origin-Agent-Cluster: ?1` and `X-Robots-Tag: noindex` on every response, and
+GPT inside the game gets `page_url` = `https://example.com/game/<slug>/`, so in-game ad requests report the portal
+domain. `ads.txt` and `robots.txt` are the same files on both hosts (same project, same registrable domain).
+Note: game saves (PlayerPrefs/IndexedDB) are per origin, so players start fresh once after switching.
+
+## Game loading and caching
+
+- The `/play/` Function only caches 2xx responses at the edge (`cacheTtlByStatus`); 404/5xx are never cached and are
+  sent with `cache-control: no-store`. Upstream fetches carry `?cv=<CACHE_V>`: bump `CACHE_V` in
+  `functions/play/[[path]].js` to move every portal to fresh cache keys without purging.
+- Every game's `index.html` gets a small script (`LOADER_JS` in the Function): canvas taps are ignored until
+  `createUnityInstance` resolves, a "Starting game…" line shows while Unity compiles (after 90%), and a failed or
+  stalled load shows "Tap to retry" instead of an `alert()`. No template changes needed.
+- `node scripts/check-play.mjs [siteKey]` lists game files a portal serves as an error while R2 has them.
+
 ## Extra content (mobile game guides, blog, own legal pages)
 
 A site can add content beyond the H5 games with `"content"` in `site.json`:
