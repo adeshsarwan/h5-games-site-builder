@@ -81,7 +81,8 @@
       wanted = false;
       if (!warm && a.preloadRewarded) { try { warm = Promise.resolve(a.preloadRewarded("rewarded", { onFallback: function () { warm = null; } })).catch(function () { warm = null; }); } catch (e) {} }
     };
-    var run = function (cb) {
+    // onStart (optional): called once when the ad is actually on screen (onReady), not on no-fill or error.
+    var run = function (cb, onStart) {
       var a = api(), granted = false, closed = false, fallback = null, t0 = Date.now(), t1 = 0;
       var fin = function () {
         warm = null;
@@ -93,7 +94,7 @@
       if (!a) return fin();
       Promise.resolve().then(function () {
         return a.showRewarded("rewarded", {
-          onReady: function () { t0 = Date.now(); },
+          onReady: function () { t0 = Date.now(); if (onStart) { try { onStart(); } catch (e) {} onStart = null; } },
           onGranted: function () { granted = true; },
           onVideoCompleted: function () { granted = true; },
           onClosed: function () { closed = true; t1 = Date.now(); },
@@ -196,7 +197,7 @@
     var MIN_WATCH = CFG.matchMinWatch || 5; // seconds of the rewarded video before its Close/Skip opens the match
     var picks = [], labels = [], round = 0, match = null, runners = [], fit = 0, misses = 0, busy = false;
     // Drop-off: where the visitor was when they left without unlocking the match (sent once, on pagehide).
-    var stage = "q1", t0 = Date.now(), done = false;
+    var stage = "q1", t0 = Date.now(), done = false, adStarted = false;
     var el = function (tag, cls, txt) { var x = document.createElement(tag); if (cls) x.className = cls; if (txt != null) x.textContent = txt; return x; };
     var dots = function (box) { box.innerHTML = ""; for (var i = 0; i < D.rounds.length; i++) box.appendChild(el("i", i < round ? "on" : i === round ? "cur" : "")); };
     var renderRound = function () {
@@ -214,6 +215,7 @@
           picks.push(o.tag); labels.push(o.label);
           if (round === 0) PO.preload(); // backup for the call on open (no-op if already loading or loaded)
           track("match_round", { round: round + 1, choice: o.tag });
+          track("quiz_q" + (round + 1), { question_no: round + 1, choice: o.tag, view: view() }); // quiz_q1 … quiz_q4
           setTimeout(function () { busy = false; round++; if (round < D.rounds.length) { stage = "q" + (round + 1); renderRound(); } else finish(); }, 420);
         });
         pair.appendChild(b);
@@ -283,17 +285,23 @@
         if (++misses >= 2) return go("retry-" + status);
         track("match_ad_incomplete", { status: status, watched: watched });
         stage = "ad_incomplete"; show("incomplete");
+      }, function () {
+        // quiz_ad_start: the rewarded video is actually on screen (not sent on no fill / error).
+        if (!adStarted) { adStarted = true; track("quiz_ad_start", { app: match.n, view: view() }); }
       });
     });
     // Opens on landing as a popup over the blurred page; question 1 is already in the HTML, bind it (same content, no flash).
     document.documentElement.classList.add("mm-open");
-    renderRound(); track("match_start", { auto: true });
+    renderRound(); track("match_start", { auto: true }); track("quiz_start", { view: view() });
     // Start the rewarded waterfall now, not after question 4, so the video is ready by "See my game".
     PO.preload();
     window.addEventListener("pagehide", function () {
       if (done || !window.gtag) return; done = true;
       window.gtag("event", "match_drop", { stage: stage, answered: picks.length, seconds_on_finder: Math.round((Date.now() - t0) / 1000),
         app: match ? match.n : undefined, view: view(), transport_type: "beacon" });
+      // quiz_drop: left the finder without getting the match through an ad (stage: q1…q4, matching, reveal, ad, ad_incomplete).
+      window.gtag("event", "quiz_drop", { stage: stage, answered: picks.length, ad_started: adStarted,
+        seconds_on_finder: Math.round((Date.now() - t0) / 1000), view: view(), transport_type: "beacon" });
     });
   })();
 
