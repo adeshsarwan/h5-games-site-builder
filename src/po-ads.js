@@ -5,7 +5,8 @@
  * is set or overwritten here. This file only decides WHEN the ads on the page are called:
  *   - natives load when their position comes near the viewport and has width; anchors on page load
  *   - one interstitial is requested per full page load (GPT decides when it shows), at Price Optimiser's
- *     session-ladder price: top price first, next price on the next page after an empty response
+ *     session-ladder price: top price first, next price on the next page after an empty response, and once the
+ *     lowest price came back empty, without price_rule for the rest of the session
  *   - links that must never trigger an interstitial are marked
  *
  * Which positions exist, and whether each is a native or an anchor, comes from the runtime
@@ -32,6 +33,9 @@
     // first page = top price; a confirmed empty response -> next price on the next page; a fill keeps that price for
     // the session; timeout/no response doesn't move it; control traffic stays unpriced. No waterfall on one page.
     sessionLadder: true,
+    // After the lowest ladder price came back empty in this session, the next interstitials go out without
+    // price_rule (still one request per page) so the page can get some fill. Session = 30 min without a visit.
+    unpricedAfterLadder: true,
     interstitialTriggers: { navBar: true, unhideWindow: true, inactivity: true, endOfArticle: true },
     lazyMarginMobile: 6,         // viewport heights ahead of a native position (<768px)
     lazyMarginDesktop: 3,        // viewport heights (>=768px)
@@ -92,6 +96,19 @@
       gt.cmd.push(function () { resolve(window.googletag); });
     });
   }
+  /* Interstitial state for the last ladder step, per site, kept like Price Optimiser's own session (30 min idle). */
+  var SITE_KEY = "poads:interstitial:" + location.hostname.replace(/^www\./, "");
+  var store = (function () { try { return window.localStorage; } catch (e) { return null; } })();
+  function readState() {
+    try {
+      var st = JSON.parse((store && store.getItem(SITE_KEY)) || "null");
+      if (!st || !(Date.now() - st.lastVisit < 1800000)) return { exhausted: false };
+      return st;
+    } catch (e) { return { exhausted: false }; }
+  }
+  function writeState(st) { try { st.lastVisit = Date.now(); store && store.setItem(SITE_KEY, JSON.stringify(st)); } catch (e) {} }
+
+  var interstitialMode = { unpriced: false, lowest: null };
   function hookInterstitialTriggers(g) {
     if (!g || g.__poAdsHooked || typeof g.defineOutOfPageSlot !== "function") return;
     g.__poAdsHooked = true;
@@ -100,13 +117,45 @@
       var slot = orig.apply(this, arguments);
       try {
         var inter = g.enums && g.enums.OutOfPageFormat && g.enums.OutOfPageFormat.INTERSTITIAL;
-        if (slot && format === inter && slot.setConfig) {
-          slot.setConfig({ interstitial: { requireStorageAccess: false, triggers: CFG.interstitialTriggers } });
+        if (slot && format === inter) {
+          if (slot.setConfig) slot.setConfig({ interstitial: { requireStorageAccess: false, triggers: CFG.interstitialTriggers } });
           log("interstitial triggers set", CFG.interstitialTriggers);
+          if (interstitialMode.unpriced) stripPrice(slot);
+          watchInterstitial(g, slot);
         }
       } catch (e) { warn(e); }
       return slot;
     };
+  }
+  // Last ladder step: the same single request, without price_rule (exp_key / exp_group stay).
+  function stripPrice(slot) {
+    var st = slot.setTargeting, sc = slot.setConfig;
+    if (st) slot.setTargeting = function (k, v) { return k === "price_rule" ? slot : st.apply(slot, arguments); };
+    if (sc) slot.setConfig = function (c) {
+      if (c && c.targeting && Object.prototype.hasOwnProperty.call(c.targeting, "price_rule")) {
+        c = Object.assign({}, c, { targeting: Object.assign({}, c.targeting) });
+        delete c.targeting.price_rule;
+      }
+      return sc.call(slot, c);
+    };
+    log("interstitial without price_rule (ladder done)");
+  }
+  // Learn from Google's own answer: an empty response at the lowest ladder price ends the ladder for this session.
+  function watchInterstitial(g, slot) {
+    g.pubads().addEventListener("slotRenderEnded", function (ev) {
+      if (ev.slot !== slot || interstitialMode.unpriced) return;
+      var get = function (k) { try { return (slot.getTargeting(k) || [])[0]; } catch (e) { return undefined; } };
+      var price = Number(get("price_rule"));
+      if (ev.isEmpty && get("exp_group") === "variant" && interstitialMode.lowest != null && price === interstitialMode.lowest) {
+        writeState({ exhausted: true });
+        log("lowest interstitial price empty: next pages go without price_rule");
+      }
+    });
+  }
+  function ladderOf(c) {
+    var pick = function (o) { if (!o) return []; var v = o.waterfall || o.ladder || o.priceRuleWaterfall || []; return Array.isArray(v) ? v : []; };
+    var l = pick(c); if (!l.length) l = pick(c.variant);
+    return l.map(Number).filter(function (n) { return isFinite(n) && n > 0; });
   }
 
   /* ---------- 3. Display placements ---------- */
@@ -184,7 +233,13 @@
       var skip = CFG.skipInterstitialPaths && CFG.skipInterstitialPaths.test(location.pathname);
       if (CFG.interstitial && !skip && inter) {
         // Price Optimiser's session ladder is a switch on its runtime slot; the ladder itself is the backend's.
-        if (CFG.sessionLadder) conf[inter].interstitialSessionLadder = true;
+        var ladder = ladderOf(conf[inter]);
+        interstitialMode.lowest = ladder.length ? Math.min.apply(Math, ladder) : null;
+        var state = readState();
+        interstitialMode.unpriced = !!(CFG.unpricedAfterLadder && state.exhausted);
+        if (interstitialMode.unpriced) writeState(state);   // keeps the session alive
+        // During the ladder, Price Optimiser's session ladder picks the price; on the last step it is left alone.
+        if (CFG.sessionLadder && !interstitialMode.unpriced) conf[inter].interstitialSessionLadder = true;
         // Hook GPT before Price Optimiser defines its slot, so the trigger settings are on it before the request.
         window.poAds.interstitial = gptReady().then(function (g) { hookInterstitialTriggers(g); return PE.showInterstitial(inter); })
           .then(function (r) { log("interstitial", r && r.status); return r; })
