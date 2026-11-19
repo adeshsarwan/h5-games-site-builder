@@ -60,7 +60,8 @@
     track("rewarded_watched", { source: source, via: how, app: app || undefined, watched: watched || undefined, page_type: pageType, view: view() });
   };
   var PO = (function () {
-    var ready = false, warm = null;
+    // wanted: preload() was called before init() resolved (the SDK is deferred); init fires it once it is ready.
+    var ready = false, warm = null, wanted = false;
     var api = function () { var px = window.PublisherExperience; return ready && px && typeof px.showRewarded === "function" ? px : null; };
     var init = function () {
       var px = window.PublisherExperience;
@@ -70,12 +71,15 @@
         // runtime config must have an enabled "rewarded" slot, otherwise we would only ever fall back.
         var slots = st && st.runtime && st.runtime.slots, rw = slots && slots.rewarded;
         ready = !!st && st.loaded !== false && st.status !== "error" && (!slots || (!!rw && rw.enabled !== false));
+        if (ready && wanted) preload();
       }, function () { ready = false; });
     };
     if (window.PublisherExperience) init(); else window.addEventListener("load", init);
     var preload = function () {
       var a = api();
-      if (!warm && a && a.preloadRewarded) { try { warm = Promise.resolve(a.preloadRewarded("rewarded", { onFallback: function () { warm = null; } })).catch(function () { warm = null; }); } catch (e) {} }
+      if (!a) { wanted = true; return; }
+      wanted = false;
+      if (!warm && a.preloadRewarded) { try { warm = Promise.resolve(a.preloadRewarded("rewarded", { onFallback: function () { warm = null; } })).catch(function () { warm = null; }); } catch (e) {} }
     };
     var run = function (cb) {
       var a = api(), granted = false, closed = false, fallback = null, t0 = Date.now(), t1 = 0;
@@ -208,6 +212,7 @@
         b.addEventListener("click", function () {
           if (busy) return; busy = true; b.classList.add("pick");
           picks.push(o.tag); labels.push(o.label);
+          if (round === 0) PO.preload(); // backup for the call on open (no-op if already loading or loaded)
           track("match_round", { round: round + 1, choice: o.tag });
           setTimeout(function () { busy = false; round++; if (round < D.rounds.length) { stage = "q" + (round + 1); renderRound(); } else finish(); }, 420);
         });
@@ -283,6 +288,8 @@
     // Opens on landing as a popup over the blurred page; question 1 is already in the HTML, bind it (same content, no flash).
     document.documentElement.classList.add("mm-open");
     renderRound(); track("match_start", { auto: true });
+    // Start the rewarded waterfall now, not after question 4, so the video is ready by "See my game".
+    PO.preload();
     window.addEventListener("pagehide", function () {
       if (done || !window.gtag) return; done = true;
       window.gtag("event", "match_drop", { stage: stage, answered: picks.length, seconds_on_finder: Math.round((Date.now() - t0) / 1000),
