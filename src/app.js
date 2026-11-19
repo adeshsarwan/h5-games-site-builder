@@ -92,7 +92,8 @@
         cb(/declin|dismiss|clos|cancel|skip/i.test(status) || (closed && !fallback) ? "stopped" : "fallback", status, watched);
       };
       if (!a) return fin();
-      Promise.resolve().then(function () {
+      var show = function () {
+        fallback = null;
         return a.showRewarded("rewarded", {
           onReady: function () { t0 = Date.now(); if (onStart) { try { onStart(); } catch (e) {} onStart = null; } },
           onGranted: function () { granted = true; },
@@ -100,6 +101,13 @@
           onClosed: function () { closed = true; t1 = Date.now(); },
           onFallback: function (r) { fallback = fallback || String((r && r.status) || "unavailable"); }
         });
+      };
+      Promise.resolve().then(show).then(function (res) {
+        // po-ads.js (src/po-ads.js) requests one interstitial per page; while that request is pending the SDK's single
+        // full-screen lock makes showRewarded() return "busy". Wait for it to settle (bounded by the backend interstitial
+        // timeout) and try once more instead of opening the link without a reward.
+        if (res && res.status === "busy" && window.poAds && window.poAds.interstitial) return window.poAds.interstitial.then(show);
+        return res;
       }).then(function (res) {
         if (granted && !closed) closed = true; // settled after a grant = terminal outcome
         if (!granted && !fallback && !closed) fallback = String((res && res.status) || "unavailable");

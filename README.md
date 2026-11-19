@@ -32,6 +32,14 @@ from the site's own domain (Pages CDN). Game files are cached at Cloudflare's ed
 **Portal pages (GPT):** slots are listed in `site.json → ads.siteSlots`. With `"mode": "test"` they use
 Google's sample unit; with `"mode": "live"` they use `ads.siteUnits[<slot>]` if set, else `siteUnitPattern`, e.g. `/23360556473/example.com_game_side`.
 
+**Price Optimiser positions (`ads.poAds`):** sites that load `publisher-sdk.js` can set `"poAds": {}` in `site.json → ads`.
+The build then adds `src/po-ads.js` and `data-auto-init="false"`, and renders the native/anchor positions as
+`<div data-po-div="gam-native-01">` (no `id`). `po-ads.js` adds the `id` when a position comes near the screen (anchors
+on page load) and requests one interstitial per page with the GPT triggers navBar, unhideWindow, inactivity, endOfArticle.
+It also marks privacy/terms/contact/external/new-tab links `data-google-interstitial="false"`. DIV ids, sizes, the
+variant/control split, prices and refresh all stay in the Price Optimiser backend; `po-ads.js` reads them and never sets them.
+`"poAds": { "skipInterstitialPaths": "^/best(/|$)" }` skips the interstitial on rewarded-first pages.
+
 **Inside the games:** every game's `gam-config.js` keeps working unchanged. When a site serves
 `/play/<slug>/`, the Function swaps every ad unit string ending in `_rewarded`, `_interstitial` or
 `_native` for this site's unit. Units are looked up in this order:

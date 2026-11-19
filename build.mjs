@@ -34,8 +34,14 @@ site.headHtml = (site.headHtml || []).map((h) => {
   const poSite = h.match(/data-po-site="([^"]+)"/)?.[1] || String(site.domain || "").replace(/^www\./, "");
   const runtime = h.match(/data-po-runtime-config-url="([^"]+)"/)?.[1] || PO_RUNTIME;
   if (!poSite) throw new Error("Price Optimiser SDK tag needs data-po-site, and site.json has no domain");
-  return `<script defer src="${PO_SDK}" data-po-site="${poSite}" data-po-runtime-config-url="${runtime}"></script>`;
+  return `<script defer src="${PO_SDK}" data-po-site="${poSite}" data-po-runtime-config-url="${runtime}"${site.ads?.poAds ? ' data-auto-init="false"' : ""}></script>`;
 });
+// Standard ad controller (src/po-ads.js, site.json "ads": { "poAds": {} | { "skipInterstitialPaths": "^/best(/|$)" } }).
+// publisher-sdk.js keeps everything from the Price Optimiser backend (DIV ids, sizes, split, prices, refresh); po-ads.js
+// only decides when the positions on the page are called and requests one interstitial per page. Needs publisher-sdk.js.
+const PO_ADS = site.ads?.poAds && site.headHtml.some((h) => typeof h === "string" && h.includes(PO_SDK))
+  ? (site.ads.poAds === true ? {} : site.ads.poAds) : null;
+if (site.ads?.poAds && !PO_ADS) throw new Error("site.json ads.poAds needs the publisher-sdk.js tag in headHtml");
 if (site.headHtml.filter((h) => typeof h === "string" && h.includes(PO_SDK)).length > 1) throw new Error("site.json headHtml loads the Price Optimiser SDK more than once");
 
 // ---------- games for this site ----------
@@ -112,12 +118,12 @@ function siteUnit(slot) {
 }
 // Native banner containers filled by the Price Optimiser script (same ids as gamezadda.store): one of each per page.
 const NATIVE = !!site.ads.nativeSlots;
-const gamNative = (n) => NATIVE ? `<div id="gam-native-0${n}-wrapper" class="gam-ad-wrapper" aria-label="Advertisement" aria-busy="true"><div class="gam-ad-label">Advertisement</div><div id="gam-native-0${n}" class="gam-native-slot" style="width:100%;min-height:280px"></div></div>` : "";
+const gamNative = (n) => NATIVE ? `<div id="gam-native-0${n}-wrapper" class="gam-ad-wrapper" aria-label="Advertisement" aria-busy="true"><div class="gam-ad-label">Advertisement</div><div ${PO_ADS ? `data-po-div="gam-native-0${n}"` : `id="gam-native-0${n}"`} class="gam-native-slot" style="width:100%;min-height:280px"></div></div>` : "";
 // Anchor ad (Price Optimiser Rules API slot "gam-anchor": 320x50 / 320x100 below 768px, 728x90 above). A fixed
 // display placement, not a GPT out-of-page anchor: the container sits in the shared layout of every page, before
 // the deferred SDK initialises, and styles.css makes it sticky and reserves bottom space for it.
 const ANCHOR = !!site.ads.anchor && site.headHtml.some((h) => typeof h === "string" && /serve\.thebesads\.com\/sdk\//.test(h)); // needs the SDK tag
-const anchorHtml = () => ANCHOR ? '<div id="gam-anchor-wrapper" class="gam-anchor-wrapper" aria-label="Advertisement"><div id="gam-anchor" class="gam-anchor-slot"></div></div>' : "";
+const anchorHtml = () => ANCHOR ? `<div id="gam-anchor-wrapper" class="gam-anchor-wrapper" aria-label="Advertisement"><div ${PO_ADS ? 'data-po-div="gam-anchor"' : 'id="gam-anchor"'} class="gam-anchor-slot"></div></div>` : "";
 const ADS_OFF = site.ads.mode === "off"; // no ad slots or GPT on portal pages (ads added later, e.g. by Price Optimiser)
 // Play gate (site.json "playGate": { "enabled": true }): "Get it on Google Play" asks the visitor to watch a rewarded ad
 // to support the site, then opens the Play Store page in a new tab (same flow as the jobsthe.world apply gate).
@@ -174,6 +180,9 @@ if (LOGO) { try { RESVG = (await import("@resvg/resvg-js")).Resvg; } catch { con
 const themeCss = `:root{--bg:${t.background};--bg2:${t.backgroundAlt};--accent:${t.accent};--accentText:${t.accentText};--text:${t.text};--tile:${t.tile}}`;
 const JS = await readFile(path.join(ROOT, "src", "app.js"), "utf8");
 const JS_FILE = `/assets/app.${hash(JS)}.js`;
+const PO_ADS_JS = PO_ADS ? await readFile(path.join(ROOT, "src", "po-ads.js"), "utf8") : "";
+const PO_ADS_FILE = PO_ADS ? `/assets/po-ads.${hash(PO_ADS_JS)}.js` : "";
+const PO_ADS_TAGS = PO_ADS ? `<script>window.__PO_ADS__=${JSON.stringify(PO_ADS).replace(/</g, "\\u003c")}</script><script defer src="${PO_ADS_FILE}"></script>` : "";
 
 function tile(g, size = "", lazy = true, badge = "") {
   const px = size === "s3" ? 314 : size === "s2" ? 204 : 94;
@@ -202,7 +211,7 @@ const siteJs = { ...(GADS ? { googleAds: { adShown: "session", ...(GADS_SEND_TO 
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">${origin ? `<link rel="canonical" href="${url}">` : ""}${robots ? `<meta name="robots" content="${robots}">` : ""}
 <meta name="theme-color" content="${t.background}"><link rel="icon" href="/favicon.svg" type="image/svg+xml">${LOGO ? `${RESVG ? '<link rel="icon" href="/favicon.ico" sizes="48x48">' : ""}<link rel="apple-touch-icon" href="/apple-touch-icon.png">` : ""}<link rel="manifest" href="/manifest.webmanifest">
 <meta property="og:type" content="website"><meta property="og:site_name" content="${esc(site.name)}"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">${ogImage ? `<meta property="og:image" content="${origin}${ogImage}"><meta name="twitter:card" content="summary_large_image">` : ""}
-${ADS_OFF ? "" : '<link rel="preconnect" href="https://securepubads.g.doubleclick.net">'}${head}${(site.headHtml || []).join("")}
+${ADS_OFF ? "" : '<link rel="preconnect" href="https://securepubads.g.doubleclick.net">'}${head}${(site.headHtml || []).join("")}${PO_ADS_TAGS}
 ${V ? '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">' : ""}
 <style>${themeCss}${CSS}</style>${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script>` : ""}
 <script>window.__SITE__=${JSON.stringify(siteJs)}</script><script defer src="${JS_FILE}"></script>${site.analytics?.ga4 ? `<script async src="https://www.googletagmanager.com/gtag/js?id=${site.analytics.ga4}"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${site.analytics.ga4}')${GADS_SEND_TO ? `;gtag('config','${GADS_SEND_TO.split("/")[0]}')` : ""}</script>` : ""}
@@ -856,6 +865,7 @@ if (!games.length) throw new Error("No games with media; nothing to build.");
 
 const w = async (p, s) => { await mkdir(path.dirname(path.join(OUT, p)), { recursive: true }); await writeFile(path.join(OUT, p), s); };
 await w(JS_FILE.slice(1), JS);
+if (PO_ADS) await w(PO_ADS_FILE.slice(1), PO_ADS_JS);
 await w("index.html", homePage());
 for (const g of games) await w(`game/${g.slug}/index.html`, gamePage(g));
 for (const c of cats) await w(`category/${catSlug(c)}/index.html`, categoryPage(c));
