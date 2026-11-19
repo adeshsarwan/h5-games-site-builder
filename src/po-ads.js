@@ -4,7 +4,8 @@
  * split, prices, refresh and rendering — all from the site's backend config. Nothing of that
  * is set or overwritten here. This file only decides WHEN the ads on the page are called:
  *   - natives load when their position comes near the viewport and has width; anchors on page load
- *   - one interstitial is requested per full page load (GPT decides when it shows)
+ *   - one interstitial is requested per full page load (GPT decides when it shows), at Price Optimiser's
+ *     session-ladder price: top price first, next price on the next page after an empty response
  *   - links that must never trigger an interstitial are marked
  *
  * Which positions exist, and whether each is a native or an anchor, comes from the runtime
@@ -26,7 +27,11 @@
   window.__poAdsStarted = true;
 
   var DEFAULTS = {
-    interstitial: true,          // one request per full page load
+    interstitial: true,          // one request per full page load, never retried
+    // Interstitial price per session (Price Optimiser's own session ladder; prices come from the backend ladder):
+    // first page = top price; a confirmed empty response -> next price on the next page; a fill keeps that price for
+    // the session; timeout/no response doesn't move it; control traffic stays unpriced. No waterfall on one page.
+    sessionLadder: true,
     interstitialTriggers: { navBar: true, unhideWindow: true, inactivity: true, endOfArticle: true },
     lazyMarginMobile: 6,         // viewport heights ahead of a native position (<768px)
     lazyMarginDesktop: 3,        // viewport heights (>=768px)
@@ -80,25 +85,28 @@
   /* ---------- 2. GPT interstitial trigger settings (applied to Price Optimiser's own slot) ----------
      We never define slots. When Price Optimiser defines its INTERSTITIAL slot, we add the trigger
      config to that slot before it is requested. */
-  function hookInterstitialTriggers() {
-    var gt = window.googletag = window.googletag || { cmd: [] };
-    gt.cmd = gt.cmd || [];
-    gt.cmd.push(function () {
-      var g = window.googletag;
-      if (!g || g.__poAdsHooked || typeof g.defineOutOfPageSlot !== "function") return;
-      g.__poAdsHooked = true;
-      var orig = g.defineOutOfPageSlot;
-      g.defineOutOfPageSlot = function (path, format) {
-        var slot = orig.apply(this, arguments);
-        try {
-          var inter = g.enums && g.enums.OutOfPageFormat && g.enums.OutOfPageFormat.INTERSTITIAL;
-          if (slot && format === inter && slot.setConfig) {
-            slot.setConfig({ interstitial: { requireStorageAccess: false, triggers: CFG.interstitialTriggers } });
-          }
-        } catch (e) { warn(e); }
-        return slot;
-      };
+  function gptReady() {
+    return new Promise(function (resolve) {
+      var gt = window.googletag = window.googletag || { cmd: [] };
+      gt.cmd = gt.cmd || [];
+      gt.cmd.push(function () { resolve(window.googletag); });
     });
+  }
+  function hookInterstitialTriggers(g) {
+    if (!g || g.__poAdsHooked || typeof g.defineOutOfPageSlot !== "function") return;
+    g.__poAdsHooked = true;
+    var orig = g.defineOutOfPageSlot;
+    g.defineOutOfPageSlot = function (path, format) {
+      var slot = orig.apply(this, arguments);
+      try {
+        var inter = g.enums && g.enums.OutOfPageFormat && g.enums.OutOfPageFormat.INTERSTITIAL;
+        if (slot && format === inter && slot.setConfig) {
+          slot.setConfig({ interstitial: { requireStorageAccess: false, triggers: CFG.interstitialTriggers } });
+          log("interstitial triggers set", CFG.interstitialTriggers);
+        }
+      } catch (e) { warn(e); }
+      return slot;
+    };
   }
 
   /* ---------- 3. Display placements ---------- */
@@ -154,7 +162,6 @@
   function start() {
     PE = window.PublisherExperience;
     if (!PE || typeof PE.init !== "function") { warn("publisher-sdk.js did not load"); return; }
-    if (CFG.interstitial) hookInterstitialTriggers();
     Promise.resolve(PE.init()).then(function (st) {
       var conf = (st && st.runtime && st.runtime.slots) || {};
       var keys = Object.keys(conf);
@@ -176,7 +183,10 @@
       var inter = keys.filter(function (k) { var c = conf[k]; return c && c.enabled !== false && String(c.adUnitType || "").toLowerCase() === "interstitial"; })[0];
       var skip = CFG.skipInterstitialPaths && CFG.skipInterstitialPaths.test(location.pathname);
       if (CFG.interstitial && !skip && inter) {
-        window.poAds.interstitial = PE.showInterstitial(inter)
+        // Price Optimiser's session ladder is a switch on its runtime slot; the ladder itself is the backend's.
+        if (CFG.sessionLadder) conf[inter].interstitialSessionLadder = true;
+        // Hook GPT before Price Optimiser defines its slot, so the trigger settings are on it before the request.
+        window.poAds.interstitial = gptReady().then(function (g) { hookInterstitialTriggers(g); return PE.showInterstitial(inter); })
           .then(function (r) { log("interstitial", r && r.status); return r; })
           .catch(function (e) { warn(e); return { status: "error" }; });
       }

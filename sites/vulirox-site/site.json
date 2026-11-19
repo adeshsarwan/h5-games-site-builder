@@ -83,7 +83,10 @@
     },
     "games": {},
     "siteUnits": {},
-    "anchor": true
+    "anchor": true,
+    "poAds": {
+      "skipInterstitialPaths": "^/best(/|$)"
+    }
   },
   "assets": "proxy",
   "adsTxt": [
