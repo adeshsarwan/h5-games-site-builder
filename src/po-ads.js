@@ -3,7 +3,7 @@
  * Price Optimiser (publisher-sdk.js) owns GPT, ad units, DIV ids, sizes, variant/control
  * split, prices, refresh and rendering — all from the site's backend config. Nothing of that
  * is set or overwritten here. This file only decides WHEN the ads on the page are called:
- *   - display slots load when their position comes near the viewport (anchors on page load)
+ *   - natives load when their position comes near the viewport and has width; anchors on page load
  *   - one interstitial is requested per full page load (GPT decides when it shows)
  *   - links that must never trigger an interstitial are marked
  *
@@ -171,7 +171,7 @@
         if (!id || slots[id] || document.getElementById(id)) return;   // one per page
         if (!display[id]) { log("no enabled backend slot for", id); return; }
         slots[id] = { id: id, el: el, type: display[id], loaded: false };
-        if (display[id] === "anchor") waitForWidth(id); else setupLazy(id);
+        if (display[id] === "anchor") load(id); else setupLazy(id);   // anchor: on page load (its empty div has no width yet)
       });
       var inter = keys.filter(function (k) { var c = conf[k]; return c && c.enabled !== false && String(c.adUnitType || "").toLowerCase() === "interstitial"; })[0];
       var skip = CFG.skipInterstitialPaths && CFG.skipInterstitialPaths.test(location.pathname);
