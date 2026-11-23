@@ -38,8 +38,8 @@
     else if ((m = h.match(/^\/category\/([^/]+)/))) track("category_click", { category: m[1], placement: place, page_type: pageType });
   }, true);
   if (pageType === "list") track("list_view", { list: location.pathname.split("/")[2] });
-  // ad_shown: Google Ads conversion for sites connected to a Google Ads account (CFG.googleAds, from site.json
-  // analytics.googleAds). For now it fires on page load, once per browser session; sendTo also reports it to the
+  // ad_shown: the Google Ads conversion (goal Page views) for sites connected to a Google Ads account (CFG.googleAds,
+  // from site.json analytics.googleAds). Fires on page load of every page (/best/, /topgames/, …), once per browser session; sendTo also reports it to the
   // Google Ads conversion action directly (otherwise Ads imports it from GA4 as a key event).
   if (CFG.googleAds) (function (g) {
     var ss = (function () { try { return sessionStorage; } catch (e) { return null; } })();
@@ -54,11 +54,6 @@
      bridge (same name on the dedicated per-site scripts and the generic SDK): init() → { loaded }, preloadRewarded, showRewarded.
      PO.run(cb) shows one rewarded ad and calls cb(result, status): "granted" (onGranted fired and the ad closed),
      "stopped" (the visitor closed or declined it) or "fallback" (no API / no fill / error / timeout). */
-  // rewarded_watched: one per rewarded video that counts as watched (completed, or in the game finder closed after
-  // minWatch seconds). Never sent when no ad was shown. Google Ads conversion for campaigns that optimise on watches.
-  var rewardedWatched = function (source, how, app, watched) {
-    track("rewarded_watched", { source: source, via: how, app: app || undefined, watched: watched || undefined, page_type: pageType, view: view() });
-  };
   var PO = (function () {
     // wanted: preload() was called before init() resolved (the SDK is deferred); init fires it once it is ready.
     var ready = false, warm = null, wanted = false;
@@ -178,7 +173,7 @@
       dlg.close();
       PO.run(function (res, status) {
         watching = false; setBusy(false); dlg.showModal();
-        if (res === "granted") { track("play_gate_granted", { app_name: cur.app }); rewardedWatched("play_gate", "granted", cur.app); return openApp("granted"); }
+        if (res === "granted") { track("play_gate_granted", { app_name: cur.app }); return openApp("granted"); }
         if (res === "fallback") { track("play_gate_fallback", { status: status }); return openApp("fallback-" + status); }
         if (++misses >= 2) { track("play_gate_retry_access", { status: status }); return openApp("retry-" + status); }
         track("play_gate_incomplete", { status: status });
@@ -285,11 +280,11 @@
       stage = "ad"; track("match_ad_start", { app: match.n });
       PO.run(function (res, status, watched) {
         busy = false;
-        if (res === "granted") { rewardedWatched("game_finder", "granted", match.n, watched); return go("granted"); }
+        if (res === "granted") return go("granted");
         if (res === "fallback") return go("fallback-" + status);
         // The visitor used the ad's own Close/Skip. After MIN_WATCH seconds that counts as watched; earlier closes get
         // one "Try again", then the match opens anyway.
-        if (watched >= MIN_WATCH) { rewardedWatched("game_finder", "skipped_after_min", match.n, watched); return go("skipped-after-" + watched + "s"); }
+        if (watched >= MIN_WATCH) return go("skipped-after-" + watched + "s");
         if (++misses >= 2) return go("retry-" + status);
         track("match_ad_incomplete", { status: status, watched: watched });
         stage = "ad_incomplete"; show("incomplete");
